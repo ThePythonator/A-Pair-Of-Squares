@@ -8,6 +8,6 @@ void Square::update(float dt) {
 
 }
 
-void Square::render() {
+void Square::render(Spritesheet& spritesheet) {
 
 }

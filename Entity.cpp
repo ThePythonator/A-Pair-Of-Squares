@@ -3,6 +3,9 @@
 Entity::Entity() {
 	x = y = 0.0f;
 	x_vel = y_vel = 0.0f;
+
+	current_frame = 0;
+	animation_timer = 0.0f;
 }
 
 Entity::Entity(float x, float y, AnimationFrames animation_frames) {
@@ -13,7 +16,6 @@ Entity::Entity(float x, float y, AnimationFrames animation_frames) {
 	this->animation_frames = animation_frames;
 
 	current_frame = 0;
-
 	animation_timer = 0.0f;
 }
 
@@ -33,6 +35,6 @@ void Entity::update(float dt) {
 	}
 }
 
-void Entity::render() {
-
+void Entity::render(Spritesheet& spritesheet) {
+	spritesheet.sprite_scaled(animation_frames[current_frame].first, x, y);
 }

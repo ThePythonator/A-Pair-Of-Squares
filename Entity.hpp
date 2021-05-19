@@ -1,7 +1,11 @@
+#pragma once
+
 #include "SDL.h"
 
 #include <vector>
 #include <utility>
+
+#include "Spritesheet.hpp"
 
 typedef std::pair<uint8_t, float> AnimationFrame;
 typedef std::vector<AnimationFrame> AnimationFrames;
@@ -13,7 +17,7 @@ public:
 
 	void update(float dt);
 
-	void render();
+	void render(Spritesheet& spritesheet);
 
 protected:
 	float x, y;

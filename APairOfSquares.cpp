@@ -87,7 +87,7 @@ void load_data() {
 	// Load data such as images
 	spritesheet_texture = load_texture("F:/Repositories/APairOfSquares/assets/spritesheet.png");
 
-	spritesheet = Spritesheet(renderer, spritesheet_texture);
+	spritesheet = Spritesheet(renderer, spritesheet_texture, 16, 4);
 }
 
 void clear_data() {
@@ -161,14 +161,14 @@ void update(float dt) {
 }
 
 void render() {
-	spritesheet.sprite(0, 32, 16, 4);
+	spritesheet.sprite_scaled(0, 16, 16);
 
-	spritesheet.sprite(4, 128, 16, 4);
+	spritesheet.sprite_scaled(4, 48, 16);
 
 
-	spritesheet.sprite(80, 16, 96, 4);
-	spritesheet.sprite(81, 80, 96, 4);
-	spritesheet.sprite(82, 144, 96, 4);
+	spritesheet.sprite_scaled(80, 16, 32);
+	spritesheet.sprite_scaled(81, 32, 32);
+	spritesheet.sprite_scaled(82, 48, 32);
 }
 
 SDL_Texture* load_texture(std::string path) {

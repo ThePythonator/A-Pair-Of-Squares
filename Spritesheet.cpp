@@ -10,9 +10,11 @@ Spritesheet::Spritesheet() {
 	rows = columns = 0;
 
 	sprite_size = 8;
+
+	scale = 1;
 }
 
-Spritesheet::Spritesheet(SDL_Renderer* renderer, SDL_Texture* spritesheet_texture, uint8_t sprite_size) {
+Spritesheet::Spritesheet(SDL_Renderer* renderer, SDL_Texture* spritesheet_texture, uint8_t sprite_size, uint8_t scale) {
 	this->renderer = renderer;
 
 	this->spritesheet_texture = spritesheet_texture;
@@ -24,6 +26,8 @@ Spritesheet::Spritesheet(SDL_Renderer* renderer, SDL_Texture* spritesheet_textur
 
 	rows = h / sprite_size;
 	columns = w / sprite_size;
+
+	this->scale = scale;
 }
 
 void Spritesheet::sprite(uint8_t index, int x, int y) {
@@ -38,6 +42,11 @@ void Spritesheet::sprite(uint8_t index, int x, int y, float scale) {
 	SDL_Rect src_rect{ sprite_size * (index % columns), sprite_size * (index / columns), sprite_size, sprite_size };
 	SDL_Rect dst_rect{ x, y, sprite_size * scale, sprite_size * scale };
 	SDL_RenderCopy(renderer, spritesheet_texture, &src_rect, &dst_rect);
+}
+
+void Spritesheet::sprite_scaled(uint8_t index, int x, int y) {
+	// Render sprite at index from texture to screen
+	sprite(index, x * scale, y * scale, scale);
 }
 
 void Spritesheet::rect(SDL_Rect* rect, int x, int y) {

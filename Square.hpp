@@ -1,6 +1,9 @@
+#pragma once
+
 #include "SDL.h"
 
 #include "Entity.hpp"
+#include "Spritesheet.hpp"
 
 class Square : public Entity {
 public:
@@ -8,7 +11,7 @@ public:
 
 	void update(float dt);
 
-	void render();
+	void render(Spritesheet& spritesheet);
 
 protected:
 
