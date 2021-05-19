@@ -4,16 +4,18 @@ cmake_minimum_required(VERSION 3.9)
 project(APairOfSquares)
 
 # Add your sources here (adding headers is optional, but helps some CMake generators)
-set(PROJECT_SOURCE "APairOfSquares.cpp" "Square.cpp" "Entity.cpp")
+set(PROJECT_SOURCE "APairOfSquares.cpp" "Square.cpp" "Entity.cpp" "Spritesheet.cpp")
 
 # ... and any other files you want in the release here
 set(PROJECT_DISTRIBS LICENSE README.md)
 
 find_package(SDL2 REQUIRED)
-include_directories(${SDL2_INCLUDE_DIRS})
+find_package(SDL2_image REQUIRED)
+include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
 
 add_executable(APairOfSquares ${PROJECT_SOURCE})
-target_link_libraries(APairOfSquares ${SDL2_LIBRARIES})
+
+target_link_libraries(APairOfSquares ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
 
 # setup release packages
 #install (FILES ${PROJECT_DISTRIBS} DESTINATION .)

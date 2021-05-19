@@ -6,9 +6,9 @@ class Square : public Entity {
 public:
 	Square();
 
-	void update();
+	void update(float dt);
 
-	void render(SDL_Surface* screen);
+	void render();
 
 protected:
 

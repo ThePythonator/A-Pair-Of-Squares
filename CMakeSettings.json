@@ -27,6 +27,11 @@
           "name": "SDL2_DIR",
           "value": "F:/SDL2/vs/sdl",
           "type": "PATH"
+        },
+        {
+          "name": "SDL2_image_DIR",
+          "value": "F:/SDL2/vs/sdl",
+          "type": "PATH"
         }
       ]
     }
