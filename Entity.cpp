@@ -1,25 +1,41 @@
 #include "Entity.hpp"
 
 Entity::Entity() {
+	sprite_index = 0;
+
 	x = y = 0.0f;
 	x_vel = y_vel = 0.0f;
+}
 
+Entity::Entity(uint8_t sprite_index, float x, float y) {
+	this->sprite_index = sprite_index;
+
+	this->x = x;
+	this->y = y;
+	x_vel = y_vel = 0.0f;
+}
+
+void Entity::update(float dt) {
+	
+}
+
+void Entity::render(Spritesheet& spritesheet) {
+	spritesheet.sprite_scaled(sprite_index, x, y);
+}
+
+AnimationHandler::AnimationHandler() {
 	current_frame = 0;
 	animation_timer = 0.0f;
 }
 
-Entity::Entity(float x, float y, AnimationFrames animation_frames) {
-	this->x = x;
-	this->y = y;
-	x_vel = y_vel = 0.0f;
-
+AnimationHandler::AnimationHandler(AnimationFrames animation_frames) {
 	this->animation_frames = animation_frames;
 
 	current_frame = 0;
 	animation_timer = 0.0f;
 }
 
-void Entity::update(float dt) {
+void AnimationHandler::update(float dt) {
 	// Increment timer
 	animation_timer += dt;
 
@@ -35,6 +51,6 @@ void Entity::update(float dt) {
 	}
 }
 
-void Entity::render(Spritesheet& spritesheet) {
-	spritesheet.sprite_scaled(animation_frames[current_frame].first, x, y);
+uint8_t AnimationHandler::get_sprite_index() {
+	return animation_frames[current_frame].first;
 }

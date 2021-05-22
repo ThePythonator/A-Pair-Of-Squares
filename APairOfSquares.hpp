@@ -1,13 +1,16 @@
 #pragma once
 
 #include "SDL.h"
-#include <SDL_image.h>
+#include "SDL_image.h"
 
 #include <stdio.h>
 #include <string>
 
 #include "Square.hpp"
 #include "Spritesheet.hpp"
+#include "InputManager.hpp"
+
+#include "Assets.hpp"
 
 bool init();
 void quit();

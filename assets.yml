@@ -1,0 +1,11 @@
+assets.cpp:
+
+#  assets/level0.tmx:
+#    name: asset_level0
+#    empty_tile: 255
+#    output_struct: true
+    
+  assets/test.tmx:
+    name: test
+    empty_tile: 255
+    output_struct: true

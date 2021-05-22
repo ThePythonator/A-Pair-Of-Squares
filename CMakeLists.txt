@@ -4,14 +4,33 @@ cmake_minimum_required(VERSION 3.9)
 project(APairOfSquares)
 
 # Add your sources here (adding headers is optional, but helps some CMake generators)
-set(PROJECT_SOURCE "APairOfSquares.cpp" "Square.cpp" "Entity.cpp" "Spritesheet.cpp")
+set(PROJECT_SOURCE "APairOfSquares.cpp" "Square.cpp" "Entity.cpp" "Spritesheet.cpp" "InputManager.cpp" "Assets.cpp")
 
 # ... and any other files you want in the release here
 set(PROJECT_DISTRIBS LICENSE README.md)
 
+set(ASSET_OUTPUTS "Assets.hpp" "Assets.cpp")
+set(ASSET_DEPENDS "assets.yml")
+
+# Build configuration; approach this with caution!
+if(MSVC)
+  add_compile_options("/W4" "/wd4244" "/wd4324")
+else()
+  add_compile_options("-Wall" "-Wextra" "-Wdouble-promotion")
+endif()
+
+find_package(PythonInterp 3.6 REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
-include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
+include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR})
+
+# Build assets.hpp/cpp files
+add_custom_command(
+    OUTPUT ${ASSET_OUTPUTS}
+    COMMAND ${PYTHON_EXECUTABLE} -m ttblit pack --config ${CMAKE_CURRENT_SOURCE_DIR}/${ASSET_DEPENDS} --output ${CMAKE_CURRENT_BINARY_DIR} --force
+    DEPENDS ${ASSET_DEPENDS}
+)
+
 
 add_executable(APairOfSquares ${PROJECT_SOURCE})
 

@@ -122,8 +122,7 @@ int main(int argc, char* argv[])
 				// User has pressed a key
 
 				// Check which key is pressed
-				switch (sdl_event.key.keysym.sym)
-				{
+				switch (sdl_event.key.keysym.sym) {
 				default:
 					break;
 				}
@@ -135,7 +134,7 @@ int main(int argc, char* argv[])
 
 		// Calculate dt
 		time = SDL_GetTicks();
-		dt = time / 1000.0f;
+		dt = (time - last_time) / 1000.0f;
 		last_time = time;
 
 		update(dt);
