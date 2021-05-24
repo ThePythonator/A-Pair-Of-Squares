@@ -23,6 +23,11 @@ void Entity::render(Spritesheet& spritesheet) {
 	spritesheet.sprite_scaled(sprite_index, x, y);
 }
 
+// AnimatedEntity?
+// has Frame::IDLE, WALK, FALL, JUMP etc? then render() picks best?
+
+
+
 AnimationHandler::AnimationHandler() {
 	current_frame = 0;
 	animation_timer = 0.0f;

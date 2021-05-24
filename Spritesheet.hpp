@@ -16,11 +16,11 @@ public:
 	void sprite(uint8_t index, float x, float y, float angle, SDL_Point* center, SDL_RendererFlip flip);
 	void sprite(uint8_t index, float x, float y, float scale, float angle, SDL_Point* center, SDL_RendererFlip flip);
 
-	void sprite_scaled(uint8_t index, int x, int y);
+	void sprite_scaled(uint8_t index, float x, float y);
 
-	void sprite_scaled(uint8_t index, int x, int y, float angle, SDL_Point* center, SDL_RendererFlip flip);
+	void sprite_scaled(uint8_t index, float x, float y, float angle, SDL_Point* center, SDL_RendererFlip flip);
 
-	void rect(SDL_Rect* rect, int x, int y);
+	void rect(SDL_Rect* rect, float x, float y);
 
 private:
 	SDL_Renderer* renderer;

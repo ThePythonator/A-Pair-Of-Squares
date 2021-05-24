@@ -1,19 +1,9 @@
 #include "APairOfSquares.hpp"
 
-// Constants
-
-const uint16_t WINDOW_WIDTH = 960;
-const uint16_t WINDOW_HEIGHT = 640; //540
-
-const char* APP_TITLE = "A Pair of Squares";
-
 // Globals
 
 // Main game window
 SDL_Window* window = NULL;
-
-// Main game canvas/screen
-//SDL_Surface* screen = NULL;
 
 // Renderer for window
 SDL_Renderer* renderer = NULL;
@@ -21,6 +11,18 @@ SDL_Renderer* renderer = NULL;
 // Spritesheet
 SDL_Texture* spritesheet_texture = NULL;
 Spritesheet spritesheet;
+
+// Game state
+GameState game_state = GameState::MENU_TITLE;
+
+// Input handler
+InputHandler input_handler;
+
+// Particle handler
+ParticleHandler particle_handler;
+
+// Player
+Player player;
 
 // Methods
 
@@ -110,25 +112,20 @@ int main(int argc, char* argv[])
 
 	SDL_Event sdl_event;
 
+	// Update input handler (updates all key states etc)
+	input_handler.update();
+
 	// Main game loop
 	while (running) {
 		// Handle events
 		while (SDL_PollEvent(&sdl_event) != 0) {
 			if (sdl_event.type == SDL_QUIT) {
-				// X is pressed
+				// X (close) is pressed
 				running = false;
 			}
-			else if (sdl_event.type == SDL_KEYDOWN) {
-				// User has pressed a key
-
-				// Check which key is pressed
-				switch (sdl_event.key.keysym.sym) {
-				default:
-					break;
-				}
-			}
-			else if (sdl_event.type == SDL_KEYUP) {
-				// User has released a key
+			else {
+				// Delegate to InputHandler
+				input_handler.handle_sdl_event(sdl_event);
 			}
 		}
 
@@ -147,6 +144,15 @@ int main(int argc, char* argv[])
 
 		// Update screen
 		SDL_RenderPresent(renderer);
+
+		// Limit framerate - to fix
+		//if (dt < MIN_DT) {
+		//	// Wait remaining time
+		//	SDL_Delay(1000 * (MIN_DT - dt));
+		//}
+
+
+		//printf("FPS: %f\n", 1.0f / dt);
 	}
 
 	// Quit everything
@@ -156,18 +162,42 @@ int main(int argc, char* argv[])
 }
 
 void update(float dt) {
-
+	switch (game_state) {
+	case GameState::MENU_TITLE:
+		update_menu_title(dt);
+		break;
+	default:
+		break;
+	}
 }
 
 void render() {
-	spritesheet.sprite_scaled(0, 16, 16);
+	switch (game_state) {
+	case GameState::MENU_TITLE:
+		render_menu_title();
+		break;
+	default:
+		break;
+	}
+
+	/*spritesheet.sprite_scaled(0, 16, 16);
 
 	spritesheet.sprite_scaled(4, 48, 16);
 
 
 	spritesheet.sprite_scaled(80, 16, 32);
 	spritesheet.sprite_scaled(81, 32, 32);
-	spritesheet.sprite_scaled(82, 48, 32);
+	spritesheet.sprite_scaled(82, 48, 32);*/
+}
+
+void update_menu_title(float dt) {
+	// to remove
+	player.update(input_handler, dt);
+}
+
+void render_menu_title() {
+	// to remove
+	player.render(spritesheet);
 }
 
 SDL_Texture* load_texture(std::string path) {

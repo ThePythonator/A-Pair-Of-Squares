@@ -26,7 +26,7 @@ namespace KeyHandler {
 		KeyState UP, DOWN, LEFT, RIGHT,
 			A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
 			NUM_0, NUM_1, NUM_2, NUM_3, NUM_4, NUM_5, NUM_6, NUM_7, NUM_8, NUM_9,
-			SPACE, RETURN, SHIFT, TAB, ESCAPE;
+			SPACE, RETURN, ESCAPE; //, SHIFT, TAB
 	};
 
 	const uint8_t KEY_COUNT = sizeof(Keys) / sizeof(KeyState);
@@ -45,3 +45,19 @@ namespace KeyHandler {
 
 	void update_key(KeyUnion& key_handler, const SDL_Event& sdl_event);
 }
+
+class InputHandler {
+public:
+	InputHandler();
+
+	void update();
+
+	void handle_sdl_event(const SDL_Event& sdl_event);
+
+	KeyHandler::KeyUnion get_key_union();
+
+protected:
+	KeyHandler::KeyUnion key_data;
+
+	//TODO: mouse handler?
+};
