@@ -77,6 +77,18 @@ void Spritesheet::sprite_scaled(uint8_t index, float x, float y, float angle, SD
 	sprite(index, x, y, scale, angle, center, flip);
 }
 
-void Spritesheet::rect(SDL_Rect* rect, float x, float y) {
+void Spritesheet::rect(SDL_Rect* src_rect, float x, float y) {
+	SDL_Rect dst_rect{ x, y, src_rect->w, src_rect->h };
 
+	SDL_RenderCopy(renderer, spritesheet_texture, src_rect, &dst_rect);
+}
+
+void Spritesheet::rect(SDL_Rect* src_rect, float x, float y, float scale) {
+	SDL_Rect dst_rect{ x * scale, y * scale, src_rect->w * scale, src_rect->h * scale };
+
+	SDL_RenderCopy(renderer, spritesheet_texture, src_rect, &dst_rect);
+}
+
+void Spritesheet::rect_scaled(SDL_Rect* src_rect, float x, float y) {
+	rect(src_rect, x, y, scale);
 }

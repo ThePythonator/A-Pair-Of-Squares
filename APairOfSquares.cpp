@@ -12,14 +12,21 @@ SDL_Renderer* renderer = NULL;
 SDL_Texture* spritesheet_texture = NULL;
 Spritesheet spritesheet;
 
+// Fonts
+SDL_Texture* font_sheet_texture = NULL;
+FontHandler::Font font;
+
 // Game state
-GameState game_state = GameState::MENU_TITLE;
+GameState game_state = GameState::MENU_INTRO;
 
 // Input handler
 InputHandler input_handler;
 
 // Particle handler
 ParticleHandler particle_handler;
+
+// Timer handler
+TimerHandler timer_handler;
 
 // Player
 Player player;
@@ -64,6 +71,7 @@ bool init() {
 
 	// Set renderer color
 	SDL_SetRenderDrawColor(renderer, 0x03, 0x07, 0x10, 0xFF);
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 	return true;
 }
@@ -88,14 +96,24 @@ void quit() {
 void load_data() {
 	// Load data such as images
 	spritesheet_texture = load_texture("F:/Repositories/APairOfSquares/assets/spritesheet.png");
+	font_sheet_texture = load_texture("F:/Repositories/APairOfSquares/assets/font.png");
 
-	spritesheet = Spritesheet(renderer, spritesheet_texture, 16, 4);
+	spritesheet = Spritesheet(renderer, spritesheet_texture, SPRITE_SIZE, SPRITE_SCALE);
+
+	font = FontHandler::Font(renderer, font_sheet_texture, SPRITE_SIZE, SPRITE_SCALE);
+
+	// Load timers
+	TIMER_ID::INTRO_FADE = timer_handler.add_timer();
+	//TIMER_ID::BLAH = timer_handler.add_timer();
 }
 
 void clear_data() {
 	// Free loaded data such as images
 	SDL_DestroyTexture(spritesheet_texture);
 	spritesheet_texture = NULL;
+
+	SDL_DestroyTexture(font_sheet_texture);
+	font_sheet_texture = NULL;
 }
 
 int main(int argc, char* argv[])
@@ -137,6 +155,8 @@ int main(int argc, char* argv[])
 		update(dt);
 
 		// Clear the screen
+		//SDL_SetRenderDrawColor(renderer, 0x03, 0x07, 0x10, 0xFF);
+		SDL_SetRenderDrawColor(renderer, 0xF3, 0xE7, 0xD0, 0xFF);
 		SDL_RenderClear(renderer);
 
 		// Render game
@@ -162,7 +182,13 @@ int main(int argc, char* argv[])
 }
 
 void update(float dt) {
+	// Update timers
+	timer_handler.update(dt);
+
 	switch (game_state) {
+	case GameState::MENU_INTRO:
+		update_menu_intro(dt);
+		break;
 	case GameState::MENU_TITLE:
 		update_menu_title(dt);
 		break;
@@ -173,31 +199,67 @@ void update(float dt) {
 
 void render() {
 	switch (game_state) {
+	case GameState::MENU_INTRO:
+		render_menu_intro();
+		break;
 	case GameState::MENU_TITLE:
 		render_menu_title();
 		break;
 	default:
 		break;
 	}
+}
 
-	/*spritesheet.sprite_scaled(0, 16, 16);
+void update_menu_intro(float dt) {
+	if (timer_handler.get_timer(TIMER_ID::INTRO_FADE) >= DELAY::INTRO_LENGTH) {
+		// Time to end intro and switch to title screen
+		game_state = GameState::MENU_TITLE;
 
-	spritesheet.sprite_scaled(4, 48, 16);
+		// Reset timer ready for use in unfading to title screen
+		timer_handler.reset_timer(TIMER_ID::INTRO_FADE);
+	}
+}
 
+void render_menu_intro() {
+	// Display logo
+	SDL_Rect src_rect{ 0, 224, 32, 32 };
+	spritesheet.rect(&src_rect, SCALED_WINDOW_WIDTH_HALF / 2 - SPRITE_SIZE, SCALED_WINDOW_HEIGHT_HALF / 2 - SPRITE_SIZE, 8);
 
-	spritesheet.sprite_scaled(80, 16, 32);
-	spritesheet.sprite_scaled(81, 32, 32);
-	spritesheet.sprite_scaled(82, 48, 32);*/
+	// Display fade-out black rect
+	if (timer_handler.get_timer(TIMER_ID::INTRO_FADE) >= DELAY::INTRO_FADE_START) {
+		SDL_Rect screen_rect{ 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+
+		// Calculate alpha
+		uint8_t alpha = 255 * (timer_handler.get_timer(TIMER_ID::INTRO_FADE) - DELAY::INTRO_FADE_START) / (float)DELAY::INTRO_FADE_LENGTH;
+
+		// Fill with semi-transparent black
+		SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, alpha);
+		SDL_RenderFillRect(renderer, &screen_rect);
+	}
 }
 
 void update_menu_title(float dt) {
 	// to remove
-	player.update(input_handler, dt);
+	//player.update(input_handler, dt);
 }
 
 void render_menu_title() {
 	// to remove
 	player.render(spritesheet);
+
+	// Display fade-in black rect
+	if (timer_handler.get_timer(TIMER_ID::INTRO_FADE) <= DELAY::TRANSITION_FADE_LENGTH) {
+		SDL_Rect screen_rect{ 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+
+		// Calculate alpha
+		uint8_t alpha = 255 * (1 - timer_handler.get_timer(TIMER_ID::INTRO_FADE) / (float)DELAY::TRANSITION_FADE_LENGTH);
+
+		// Fill with semi-transparent black
+		SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, alpha);
+		SDL_RenderFillRect(renderer, &screen_rect);
+	}
+
+	TextHandler::render_text(font, "TESTING!", 10, 10);
 }
 
 SDL_Texture* load_texture(std::string path) {
