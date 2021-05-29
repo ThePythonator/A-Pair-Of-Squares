@@ -155,8 +155,7 @@ int main(int argc, char* argv[])
 		update(dt);
 
 		// Clear the screen
-		//SDL_SetRenderDrawColor(renderer, 0x03, 0x07, 0x10, 0xFF);
-		SDL_SetRenderDrawColor(renderer, 0xF3, 0xE7, 0xD0, 0xFF);
+		SDL_SetRenderDrawColor(renderer, 0x03, 0x07, 0x10, 0xFF);
 		SDL_RenderClear(renderer);
 
 		// Render game
@@ -259,7 +258,8 @@ void render_menu_title() {
 		SDL_RenderFillRect(renderer, &screen_rect);
 	}
 
-	TextHandler::render_text(font, "TESTING!", 10, 10);
+	//TextHandler::render_text(font, "TESTING!", 0, SCALED_WINDOW_HEIGHT, -3, TextHandler::AnchorPosition::BOTTOM_LEFT);
+	TextHandler::render_text(font, "TESTING!", SCALED_WINDOW_WIDTH_HALF, SCALED_WINDOW_HEIGHT_HALF, -2);
 }
 
 SDL_Texture* load_texture(std::string path) {

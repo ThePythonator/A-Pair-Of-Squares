@@ -15,6 +15,7 @@ namespace FontHandler {
 		Font(SDL_Renderer* renderer, SDL_Texture* font_sheet_texture, uint8_t sprite_size = 16, uint8_t scale = 1);
 
 		void render_char(uint8_t c, float x, float y);
+		SDL_Rect* get_character_rect(uint8_t c);
 
 	protected:
 		Spritesheet font_sheet;
@@ -24,22 +25,27 @@ namespace FontHandler {
 }
 
 namespace TextHandler {
-	enum class AnchorPosition {
-		CENTER_X		= 0x000001,
-		CENTER_Y		= 0x000010,
+	enum AnchorPosition {
+		LEFT			= 0b0100,
+		CENTER_X		= 0b0000,
+		RIGHT			= 0b1000,
 
-		LEFT			= 0x000100,
-		RIGHT			= 0x001000,
-		TOP				= 0x010000,
-		BOTTOM			= 0x100000,
+		TOP				= 0b0001,
+		CENTER_Y		= 0b0000,
+		BOTTOM			= 0b0010,
 
-		CENTER_CENTER	= CENTER_X & CENTER_Y,
+		TOP_RIGHT		= TOP | RIGHT,
+		TOP_CENTER		= TOP | CENTER_X,
+		TOP_LEFT		= TOP | LEFT,
 
-		TOP_RIGHT		= TOP & RIGHT,
-		TOP_LEFT		= TOP & LEFT,
-		BOTTOM_RIGHT	= BOTTOM & RIGHT,
-		BOTTOM_LEFT		= BOTTOM & LEFT
+		CENTER_RIGHT	= CENTER_Y | RIGHT,
+		CENTER_CENTER	= CENTER_X | CENTER_Y,
+		CENTER_LEFT		= CENTER_Y | LEFT,
+
+		BOTTOM_RIGHT	= BOTTOM | RIGHT,
+		BOTTOM_CENTER	= BOTTOM | CENTER_X,
+		BOTTOM_LEFT		= BOTTOM | LEFT
 	};
 
-	void render_text(FontHandler::Font& font, std::string text, float x, float y, AnchorPosition anchor = AnchorPosition::CENTER_CENTER);
+	void render_text(FontHandler::Font& font, std::string text, float x, float y, int8_t space_width = 0, AnchorPosition anchor = AnchorPosition::CENTER_CENTER);
 }
