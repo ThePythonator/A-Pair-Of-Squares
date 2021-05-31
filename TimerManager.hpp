@@ -12,6 +12,6 @@ public:
 	float get_timer(uint8_t id);
 	void reset_timer(uint8_t id);
 
-protected:
+private:
 	std::vector<float> timers;
 };

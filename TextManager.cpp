@@ -7,13 +7,19 @@ FontHandler::Font::Font() {
 	}
 }
 
-FontHandler::Font::Font(SDL_Renderer* renderer, SDL_Texture* font_sheet_texture, uint8_t sprite_size, uint8_t scale) {
+FontHandler::Font::Font(SDL_Renderer* renderer, SDL_Texture* font_sheet_texture, SDL_Surface* font_sheet_surface, uint8_t sprite_size, uint8_t scale) {
 	font_sheet = Spritesheet(renderer, font_sheet_texture, sprite_size, scale);
+
+	uint16_t x, y;
 
 	// Generate character_rects
 	for (uint8_t i = 0; i < ALPHABET_LENGTH; i++) {
 		// change this to actually look for bars, and get correct height
+
 		character_rects[i] = SDL_Rect{ (i % 32) * sprite_size, (i / 32) * sprite_size, sprite_size, sprite_size };
+
+		//IN PROGRESS:
+
 	}
 }
 
@@ -25,15 +31,15 @@ void FontHandler::Font::render_char(uint8_t c, float x, float y) {
 	}
 }
 
-SDL_Rect* FontHandler::Font::get_character_rect(uint8_t c) {
+SDL_Rect FontHandler::Font::get_character_rect(uint8_t c) {
 	// Check character is one we have a rect for
 	if (c >= 32 && c <= 255) {
 		// Render character
-		return &character_rects[c - 32];
+		return character_rects[c - 32];
 	}
 	else {
 		SDL_Rect empty_rect{ 0 };
-		return &empty_rect;
+		return empty_rect;
 	}
 }
 
@@ -45,17 +51,17 @@ void TextHandler::render_text(FontHandler::Font& font, std::string text, float x
 
 	for (uint8_t c : text) {
 		// Get width of that character and update width
-		SDL_Rect* char_rect = font.get_character_rect(c);
+		SDL_Rect char_rect = font.get_character_rect(c);
 
 		// Update width and height
-		width += char_rect->w + space_width;
-		height = char_rect->h;
+		width += char_rect.w + space_width;
+		height = char_rect.h;
 	}
 	// In the above loop, we've offset one space too many (we need one less space than the number of characters)
 	width -= space_width;
 
-	float current_x = 0;
-	float current_y = 0;
+	float current_x = 0.0f;
+	float current_y = 0.0f;
 
 	// Handle positioning
 	if (anchor & AnchorPosition::LEFT) {
@@ -65,7 +71,7 @@ void TextHandler::render_text(FontHandler::Font& font, std::string text, float x
 		current_x = x - width;
 	}
 	else {
-		current_x = x - (width / 2);
+		current_x = x - (width / 2.0f);
 	}
 
 	if (anchor & AnchorPosition::TOP) {
@@ -75,7 +81,7 @@ void TextHandler::render_text(FontHandler::Font& font, std::string text, float x
 		current_y = y - height;
 	}
 	else {
-		current_y = y - (height / 2);
+		current_y = y - (height / 2.0f);
 	}
 
 	for (uint8_t c : text) {
@@ -83,7 +89,7 @@ void TextHandler::render_text(FontHandler::Font& font, std::string text, float x
 		font.render_char(c, current_x, current_y);
 
 		// Get width of that character and update current_x
-		SDL_Rect* char_rect = font.get_character_rect(c);
-		current_x += char_rect->w + space_width;
+		SDL_Rect char_rect = font.get_character_rect(c);
+		current_x += char_rect.w + space_width;
 	}
 }

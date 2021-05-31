@@ -19,10 +19,10 @@ bool KeyHandler::just_down(const KeyState& key_state) {
 void KeyHandler::update(KeyUnion& key_union) {
 	for (uint8_t i = 0; i < KEY_COUNT; i++) {
 		if (key_union.key_array[i] == KeyState::JUST_PRESSED) {
-			key_union.key_array[i] == KeyState::STILL_DOWN;
+			key_union.key_array[i] = KeyState::STILL_DOWN;
 		}
 		else if (key_union.key_array[i] == KeyState::JUST_RELEASED) {
-			key_union.key_array[i] == KeyState::STILL_UP;
+			key_union.key_array[i] = KeyState::STILL_UP;
 		}
 	}
 }

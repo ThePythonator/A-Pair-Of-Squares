@@ -56,7 +56,7 @@ public:
 
 	KeyHandler::KeyUnion get_key_union();
 
-protected:
+private:
 	KeyHandler::KeyUnion key_data;
 
 	//TODO: mouse handler?

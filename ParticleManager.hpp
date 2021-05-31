@@ -50,6 +50,6 @@ public:
 	//void add(ShapeParticle::ShapeParticle);
 	void add(ImageParticle::ImageParticle particle);
 
-protected:
+private:
 	std::vector<ImageParticle::ImageParticle> image_particles;
 };
