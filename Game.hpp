@@ -14,6 +14,7 @@
 #include "TimerManager.hpp"
 #include "Bezier.hpp"
 #include "TextManager.hpp"
+#include "Utilities.hpp"
 
 #include "Assets.hpp"
 
@@ -45,6 +46,10 @@ private:
 	void update_menu_title(float dt);
 	void render_menu_title();
 
+	// Setup functions for each state
+	void setup_menu_intro();
+	void setup_menu_title();
+
 
 	// Loading functions
 	SDL_Texture* load_texture(std::string path);
@@ -55,7 +60,10 @@ private:
 	enum class GameState {
 		MENU_INTRO,
 		MENU_TITLE,
-		GAME_SOMETHING
+		MENU_SETTINGS,
+
+		GAME_RUNNING,
+		GAME_PAUSED
 	};
 
 
@@ -73,7 +81,7 @@ private:
 
 	// Fonts
 	SDL_Texture* font_sheet_texture = NULL;
-	FontHandler::Font font;
+	FontHandler::Font /*font_black,*/ font_white, font_selected;
 
 	// Game state
 	GameState game_state = GameState::MENU_INTRO;
@@ -89,4 +97,12 @@ private:
 
 	// Player
 	Player player;
+
+
+	// State variables
+
+	bool running = false;
+
+	uint8_t option_selected = 0;
+	bool option_confirmed = false;
 };

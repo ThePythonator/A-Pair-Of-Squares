@@ -25,6 +25,8 @@ public:
 
 	void rect_scaled(SDL_Rect* src_rect, float x, float y);
 
+	SDL_Texture* get_texture();
+
 	//SDL_Colour get_pixel(uint16_t x, uint16_t y);
 
 private:

@@ -2,49 +2,98 @@
 
 // Constants
 
-const uint16_t WINDOW_WIDTH = 960;
-const uint16_t WINDOW_HEIGHT = 640; //540
+namespace SPRITES {
+	const uint8_t SCALE = 4;
 
-const uint8_t SPRITE_SCALE = 4;
+	const uint8_t SIZE = 16;
+	const uint8_t SIZE_HALF = SIZE / 2;
 
-const uint8_t SPRITE_SIZE = 16;
-const uint8_t SPRITE_SIZE_HALF = SPRITE_SIZE / 2;
 
-const uint16_t SCALED_WINDOW_WIDTH = WINDOW_WIDTH / SPRITE_SCALE;
-const uint16_t SCALED_WINDOW_HEIGHT = WINDOW_HEIGHT / SPRITE_SCALE;
+	const uint16_t SQUARE_PARTICLE = 228;
+}
 
-const uint16_t SCALED_WINDOW_WIDTH_HALF = SCALED_WINDOW_WIDTH / 2;
-const uint16_t SCALED_WINDOW_HEIGHT_HALF = SCALED_WINDOW_HEIGHT / 2;
+namespace WINDOW {
+	const uint16_t WIDTH = 960;
+	const uint16_t HEIGHT = 640; //540
 
-const char* APP_TITLE = "A Pair of Squares";
+	const uint16_t SCALED_WIDTH = WIDTH / SPRITES::SCALE;
+	const uint16_t SCALED_HEIGHT = HEIGHT / SPRITES::SCALE;
 
-const uint8_t FPS = 120;
-//const float MIN_DT = 1.0f / FPS;
+	const uint16_t SCALED_WIDTH_HALF = SCALED_WIDTH / 2;
+	const uint16_t SCALED_HEIGHT_HALF = SCALED_HEIGHT / 2;
+
+	const uint8_t FPS = 120;
+	//const float MIN_DT = 1.0f / FPS;
+}
+
+namespace MENU {
+	enum TITLE : uint8_t {
+		PLAY,
+		SETTINGS,
+		QUIT,
+
+		OPTION_COUNT
+	};
+}
+
+namespace COLOURS {
+	const Colour BLACK = Colour(0x04, 0x07, 0x10);
+	const Colour WHITE = Colour(0xFF, 0xFF, 0xE4);
+
+	const Colour SELECTED = Colour(0x1C, 0x92, 0xA7);
+}
+
+namespace STRINGS {
+	const char* APP_TITLE = "A Pair of Squares";
+
+	const char* MENU_OPTION_PLAY = "Play";
+	const char* MENU_OPTION_SETTINGS = "Settings";
+	const char* MENU_OPTION_QUIT = "Quit";
+}
+
+namespace FILES {
+	const char* SPRITESHEET = "spritesheet.png";
+
+	const char* FONT_SHEET = "another-font.png";
+	// const char* FONT_SHEET = "font.png";
+}
 
 namespace DELAY {
 	const float TRANSITION_FADE_LENGTH = 0.6f;
 
-	const float INTRO_FADE_START = 2.0f;
-	const float INTRO_FADE_LENGTH = 1.0f;
-	const float INTRO_LENGTH = INTRO_FADE_START + INTRO_FADE_LENGTH;
+	const float MENU_INTRO_FADE_START = 2.0f;
+	const float MENU_INTRO_FADE_LENGTH = 1.0f;
+	const float MENU_INTRO_LENGTH = MENU_INTRO_FADE_START + MENU_INTRO_FADE_LENGTH;
+
+	const float MENU_BEZIER_LENGTH = 1.0f;
 }
 
 // Timer IDs (are set later in program)
 namespace TIMER_ID {
 	const uint8_t UNINITIALISED = 255;
 
-	uint8_t INTRO_FADE = UNINITIALISED;
-	//uint8_t BLAH = UNINITIALISED;
+	uint8_t MENU_INTRO_FADE = UNINITIALISED;
+	uint8_t MENU_BEZIER_TEXT = UNINITIALISED;
 }
 
 // Nodes for bezier transitions
 namespace BEZIER {
-	constexpr std::array<Node, 3> FROM_LEFT(const float y) {
-		return { Node{SCALED_WINDOW_WIDTH_HALF, y}, Node{SCALED_WINDOW_WIDTH, y}, Node{-SCALED_WINDOW_WIDTH, y} };
+	const uint8_t MENU_BEZIER_NODE_COUNT = 3;
+
+	/*constexpr std::array<Node, MENU_BEZIER_NODE_COUNT> FROM_LEFT(const float y) {
+		return { Node{WINDOW::SCALED_WIDTH_HALF, y}, Node{SCALED_WINDOW::WIDTH, y}, Node{-SCALED_WINDOW::WIDTH, y} };
 	}
 
-	constexpr std::array<Node, 3> FROM_RIGHT(const float y) {
-		return { Node{SCALED_WINDOW_WIDTH_HALF, y}, Node{0, y}, Node{SCALED_WINDOW_WIDTH * 2, y} };
+	constexpr std::array<Node, MENU_BEZIER_NODE_COUNT> FROM_RIGHT(const float y) {
+		return { Node{WINDOW::SCALED_WIDTH_HALF, y}, Node{0, y}, Node{SCALED_WINDOW::WIDTH * 2, y} };
+	}*/
+
+	// 1st Node is doubled to make transitions ease in/out more smoothly
+	const std::vector<Node> FROM_LEFT{ Node{WINDOW::SCALED_WIDTH_HALF, 0}, Node{WINDOW::SCALED_WIDTH_HALF, 0}, Node{WINDOW::SCALED_WIDTH, 0}, Node{-WINDOW::SCALED_WIDTH, 0} };
+	const std::vector<Node> FROM_RIGHT{ Node{WINDOW::SCALED_WIDTH_HALF, 0}, Node{WINDOW::SCALED_WIDTH_HALF, 0}, Node{0, 0}, Node{WINDOW::SCALED_WIDTH * 2, 0} };
+
+	float bezier_x(std::vector<Node> nodes, float ratio) {
+		return bezier_curve(nodes, ratio).first;
 	}
 }
 
@@ -80,19 +129,19 @@ bool Game::init() {
 
 	// Create window
 	window = SDL_CreateWindow(
-		APP_TITLE,
+		STRINGS::APP_TITLE,
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
-		WINDOW_WIDTH,
-		WINDOW_HEIGHT,
+		WINDOW::WIDTH,
+		WINDOW::HEIGHT,
 		SDL_WINDOW_SHOWN
 	);
 
 	// Create renderer for window
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-	// Set renderer color
-	SDL_SetRenderDrawColor(renderer, 0x03, 0x07, 0x10, 0xFF);
+	// Set renderer colour and mode
+	SDL_SetRenderDrawColor(renderer, COLOURS::BLACK);
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 	return true;
@@ -117,23 +166,25 @@ void Game::quit() {
 
 void Game::load_data() {
 	// Uses spritesheet_texture as a test to check whether we can find the assets folder.
-	std::string assets_path = find_assets_path("spritesheet.png");
+	std::string assets_path = find_assets_path(FILES::SPRITESHEET);
 
 	// Load data such as images
-	spritesheet_texture = load_texture(assets_path + "spritesheet.png");
-	font_sheet_texture = load_texture(assets_path + "font.png");
+	spritesheet_texture = load_texture(assets_path + FILES::SPRITESHEET);
+	font_sheet_texture = load_texture(assets_path + FILES::FONT_SHEET);
 
-	spritesheet = Spritesheet(renderer, spritesheet_texture, SPRITE_SIZE, SPRITE_SCALE);
+	spritesheet = Spritesheet(renderer, spritesheet_texture, SPRITES::SIZE, SPRITES::SCALE);
 
-	SDL_Surface* font_sheet_surface = load_surface(assets_path + "font.png");
+	SDL_Surface* font_sheet_surface = load_surface(assets_path + FILES::FONT_SHEET);
 
-	font = FontHandler::Font(renderer, font_sheet_texture, font_sheet_surface, SPRITE_SIZE, SPRITE_SCALE);
+	//font_black = FontHandler::Font(renderer, font_sheet_texture, font_sheet_surface, SPRITES::SIZE, SPRITE_SCALE, COLOURS::BLACK);
+	font_white = FontHandler::Font(renderer, font_sheet_texture, font_sheet_surface, SPRITES::SIZE, SPRITES::SCALE, COLOURS::WHITE);
+	font_selected = FontHandler::Font(renderer, font_sheet_texture, font_sheet_surface, SPRITES::SIZE, SPRITES::SCALE, COLOURS::SELECTED);
 
 	SDL_FreeSurface(font_sheet_surface);
 
 	// Load timers
-	TIMER_ID::INTRO_FADE = timer_handler.add_timer();
-	//TIMER_ID::BLAH = timer_handler.add_timer();
+	TIMER_ID::MENU_INTRO_FADE = timer_handler.add_timer();
+	TIMER_ID::MENU_BEZIER_TEXT = timer_handler.add_timer();
 }
 
 void Game::clear_data() {
@@ -176,7 +227,7 @@ std::string Game::find_assets_path(std::string test_file, uint8_t depth) {
 uint8_t Game::run()
 {
 	// Initialise SDL and globals - if it fails, don't run program
-	bool running = init();
+	running = init();
 
 	load_data();
 
@@ -187,11 +238,13 @@ uint8_t Game::run()
 
 	SDL_Event sdl_event;
 
-	// Update input handler (updates all key states etc)
-	input_handler.update();
+	setup_menu_intro();
 
 	// Main game loop
 	while (running) {
+		// Update input handler (updates all key states etc)
+		input_handler.update();
+
 		// Handle events
 		while (SDL_PollEvent(&sdl_event) != 0) {
 			if (sdl_event.type == SDL_QUIT) {
@@ -212,7 +265,7 @@ uint8_t Game::run()
 		update(dt);
 
 		// Clear the screen
-		SDL_SetRenderDrawColor(renderer, 0x03, 0x07, 0x10, 0xFF);
+		SDL_SetRenderDrawColor(renderer, COLOURS::BLACK);
 		SDL_RenderClear(renderer);
 
 		// Render game
@@ -241,6 +294,9 @@ void Game::update(float dt) {
 	// Update timers
 	timer_handler.update(dt);
 
+	// Update particles
+	particle_handler.update(dt);
+
 	switch (game_state) {
 	case GameState::MENU_INTRO:
 		update_menu_intro(dt);
@@ -254,6 +310,9 @@ void Game::update(float dt) {
 }
 
 void Game::render() {
+	// Render particles
+	particle_handler.render(spritesheet);
+
 	switch (game_state) {
 	case GameState::MENU_INTRO:
 		render_menu_intro();
@@ -268,36 +327,104 @@ void Game::render() {
 
 // Update and render functions for each state
 void Game::update_menu_intro(float dt) {
-	if (timer_handler.get_timer(TIMER_ID::INTRO_FADE) >= DELAY::INTRO_LENGTH) {
+	if (timer_handler.get_timer(TIMER_ID::MENU_INTRO_FADE) >= DELAY::MENU_INTRO_LENGTH) {
 		// Time to end intro and switch to title screen
-		game_state = GameState::MENU_TITLE;
+		setup_menu_title();
 
 		// Reset timer ready for use in unfading to title screen
-		timer_handler.reset_timer(TIMER_ID::INTRO_FADE);
+		timer_handler.reset_timer(TIMER_ID::MENU_INTRO_FADE);
 	}
 }
 
 void Game::render_menu_intro() {
 	// Display logo
 	SDL_Rect src_rect{ 0, 224, 32, 32 };
-	spritesheet.rect(&src_rect, SCALED_WINDOW_WIDTH_HALF / 2 - SPRITE_SIZE, SCALED_WINDOW_HEIGHT_HALF / 2 - SPRITE_SIZE, 8);
+	spritesheet.rect(&src_rect, WINDOW::SCALED_WIDTH_HALF / 2 - SPRITES::SIZE, WINDOW::SCALED_HEIGHT_HALF / 2 - SPRITES::SIZE, 8);
 
 	// Display fade-out black rect
-	if (timer_handler.get_timer(TIMER_ID::INTRO_FADE) >= DELAY::INTRO_FADE_START) {
-		SDL_Rect screen_rect{ 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+	if (timer_handler.get_timer(TIMER_ID::MENU_INTRO_FADE) >= DELAY::MENU_INTRO_FADE_START) {
+		SDL_Rect screen_rect{ 0, 0, WINDOW::WIDTH, WINDOW::HEIGHT };
 
 		// Calculate alpha
-		uint8_t alpha = 255 * (timer_handler.get_timer(TIMER_ID::INTRO_FADE) - DELAY::INTRO_FADE_START) / (float)DELAY::INTRO_FADE_LENGTH;
+		uint8_t alpha = 255 * (timer_handler.get_timer(TIMER_ID::MENU_INTRO_FADE) - DELAY::MENU_INTRO_FADE_START) / (float)DELAY::MENU_INTRO_FADE_LENGTH;
 
 		// Fill with semi-transparent black
-		SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, alpha);
+		SDL_SetRenderDrawColor(renderer, Colour(COLOURS::BLACK, alpha));
 		SDL_RenderFillRect(renderer, &screen_rect);
 	}
 }
 
 void Game::update_menu_title(float dt) {
 	// to remove
-	//player.update(input_handler, dt);
+	player.update(input_handler, dt);
+
+
+	// Handle shape particles in background
+	// TO IMPROVE
+	if (rand() % 500 == 0) particle_handler.add(ImageParticle::ImageParticle(SPRITES::SQUARE_PARTICLE, rand() % WINDOW::WIDTH, -SPRITES::SIZE * 2, 0.0f, 8 + rand() % 4, (rand() % 5 - 2) / 5.0f, 0.0f, 0.0f, -50 + rand() % 100, 3 + (rand() % 10) / 2.0f));
+
+
+
+	if (timer_handler.get_timer(TIMER_ID::MENU_BEZIER_TEXT) >= DELAY::MENU_BEZIER_LENGTH) {
+		timer_handler.set_timer_state(TIMER_ID::MENU_BEZIER_TEXT, TimerState::PAUSED);
+	}
+
+	if (!option_confirmed && timer_handler.get_timer_state(TIMER_ID::MENU_BEZIER_TEXT) == TimerState::PAUSED) {
+		// User hasn't selected an option yet
+
+		// Check if up/down has been pressed, and naviagate the menu as necessary
+		if (KeyHandler::just_down(input_handler.get_key_union().keys.UP)) {
+			if (option_selected > 0) {
+				option_selected--;
+			}
+		}
+		if (KeyHandler::just_down(input_handler.get_key_union().keys.DOWN)) {
+			if (option_selected < MENU::TITLE::OPTION_COUNT - 1) {
+				option_selected++;
+			}
+		}
+
+		// Check if user has just selected an option
+		if (KeyHandler::just_down(input_handler.get_key_union().keys.SPACE)) {
+			// Reset timer and set it to running
+			timer_handler.set_timer_state(TIMER_ID::MENU_BEZIER_TEXT, TimerState::RUNNING);
+			timer_handler.reset_timer(TIMER_ID::MENU_BEZIER_TEXT);
+
+			option_confirmed = true;
+		}
+	}
+	else {
+		// User has selected an option, or initial intro is still happening
+
+		// Check if transition is finished
+
+		if (option_confirmed && timer_handler.get_timer_state(TIMER_ID::MENU_BEZIER_TEXT) == TimerState::PAUSED) {
+			// User has selected an option and animation is finished
+
+			switch (option_selected)
+			{
+			case MENU::TITLE::PLAY:
+				//setup_game_blah();
+				setup_menu_title();
+				break;
+
+			case MENU::TITLE::SETTINGS:
+				//setup_menu_settings();
+				setup_menu_title();
+				break;
+
+			case MENU::TITLE::QUIT:
+				running = false;
+				break;
+
+			default:
+				break;
+			}
+		}
+		//else {
+		//	// Still on initial intro bezier transition
+		//}
+	}
 }
 
 void Game::render_menu_title() {
@@ -305,19 +432,58 @@ void Game::render_menu_title() {
 	player.render(spritesheet);
 
 	// Display fade-in black rect
-	if (timer_handler.get_timer(TIMER_ID::INTRO_FADE) <= DELAY::TRANSITION_FADE_LENGTH) {
-		SDL_Rect screen_rect{ 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+	if (timer_handler.get_timer(TIMER_ID::MENU_INTRO_FADE) <= DELAY::TRANSITION_FADE_LENGTH) {
+		SDL_Rect screen_rect{ 0, 0, WINDOW::WIDTH, WINDOW::HEIGHT };
 
 		// Calculate alpha
-		uint8_t alpha = 255 * (1 - timer_handler.get_timer(TIMER_ID::INTRO_FADE) / (float)DELAY::TRANSITION_FADE_LENGTH);
+		uint8_t alpha = 0xFF * (1.0f - timer_handler.get_timer(TIMER_ID::MENU_INTRO_FADE) / DELAY::TRANSITION_FADE_LENGTH);
 
 		// Fill with semi-transparent black
-		SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, alpha);
+		SDL_SetRenderDrawColor(renderer, Colour(COLOURS::BLACK, alpha));
 		SDL_RenderFillRect(renderer, &screen_rect);
 	}
 
-	//TextHandler::render_text(font, "TESTING!", 0, SCALED_WINDOW_HEIGHT, -3, TextHandler::AnchorPosition::BOTTOM_LEFT);
-	TextHandler::render_text(font, "TESTING!", SCALED_WINDOW_WIDTH_HALF, SCALED_WINDOW_HEIGHT_HALF, -2);
+	float left_x, right_x;
+	left_x = right_x = WINDOW::SCALED_WIDTH_HALF;
+
+	if (timer_handler.get_timer_state(TIMER_ID::MENU_BEZIER_TEXT) == TimerState::RUNNING || option_confirmed) {
+		// Modify the x value because bezier curves are running
+		// If option_confirmed, then bezier curves may not be running, but if they aren't, the text should be off the screen anyways
+
+		float ratio = timer_handler.get_timer(TIMER_ID::MENU_BEZIER_TEXT) / DELAY::MENU_BEZIER_LENGTH;
+
+		if (!option_confirmed) {
+			// Entering rather than leaving
+			ratio = 1 - ratio;
+		}
+
+		left_x = BEZIER::bezier_x(BEZIER::FROM_LEFT, ratio);
+		right_x = BEZIER::bezier_x(BEZIER::FROM_RIGHT, ratio);
+
+		//printf("%f\n", timer_handler.get_timer(TIMER_ID::MENU_BEZIER_TEXT));
+	}
+
+	
+	TextHandler::render_text(option_selected == 0 ? font_selected : font_white, STRINGS::MENU_OPTION_PLAY, left_x, WINDOW::SCALED_HEIGHT_HALF - SPRITES::SIZE * 2, 1);
+	TextHandler::render_text(option_selected == 1 ? font_selected : font_white, STRINGS::MENU_OPTION_SETTINGS, right_x, WINDOW::SCALED_HEIGHT_HALF, 1);
+	TextHandler::render_text(option_selected == 2 ? font_selected : font_white, STRINGS::MENU_OPTION_QUIT, left_x, WINDOW::SCALED_HEIGHT_HALF + SPRITES::SIZE * 2, 1);
+}
+
+void Game::setup_menu_intro() {
+	game_state = GameState::MENU_INTRO;
+
+	timer_handler.set_timer_state(TIMER_ID::MENU_INTRO_FADE, TimerState::RUNNING);
+	timer_handler.reset_timer(TIMER_ID::MENU_INTRO_FADE);
+}
+
+void Game::setup_menu_title() {
+	game_state = GameState::MENU_TITLE;
+
+	option_selected = 0;
+	option_confirmed = false;
+
+	timer_handler.set_timer_state(TIMER_ID::MENU_BEZIER_TEXT, TimerState::RUNNING);
+	timer_handler.reset_timer(TIMER_ID::MENU_BEZIER_TEXT);
 }
 
 SDL_Texture* Game::load_texture(std::string path) {

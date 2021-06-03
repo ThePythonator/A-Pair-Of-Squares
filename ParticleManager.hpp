@@ -20,24 +20,32 @@
 //	};
 //}
 
-namespace ImageParticle {
-	struct ImageParticle {
-		uint8_t sprite_index;
+class ImageParticle {
+public:
+	ImageParticle();
+	ImageParticle(uint16_t sprite_index, float x, float y, float x_vel = 0.0f, float y_vel = 0.0f, float x_grav = 0.0f, float y_grav = 0.0f, float angle = 0.0f, float spin = 0.0f, float scale = 1.0f);
 
-		float x, y;
-		float x_vel, y_vel;
-		float x_grav, y_grav;
+	void update(float dt);
 
-		float angle;
-		float spin;
+	void render(Spritesheet& spritesheet);
 
-		float scale;
-	};
+private:
+	uint16_t sprite_index = 0;
 
-	void update(ImageParticle& particle, float dt);
-	
-	void render(ImageParticle& particle, Spritesheet& spritesheet);
-}
+	float x = 0.0f;
+	float y = 0.0f;
+
+	float x_vel = 0.0f;
+	float y_vel = 0.0f;
+
+	float x_grav = 0.0f;
+	float y_grav = 0.0f;
+
+	float angle = 0.0f;
+	float spin = 0.0f;
+
+	float scale = 1;
+};
 
 class ParticleHandler {
 public:
@@ -48,8 +56,8 @@ public:
 	void render(Spritesheet& spritesheet);
 
 	//void add(ShapeParticle::ShapeParticle);
-	void add(ImageParticle::ImageParticle particle);
+	void add(ImageParticle particle);
 
 private:
-	std::vector<ImageParticle::ImageParticle> image_particles;
+	std::vector<ImageParticle> image_particles;
 };

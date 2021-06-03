@@ -4,16 +4,6 @@
 
 #include <utility>
 
-//enum class Keys {
-//	UP, DOWN, LEFT, RIGHT,
-//	A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
-//	N1, N2, N3, N4, N5, N6, N7, N8, N9, N0,
-//	SPACE, RETURN, SHIFT, TAB, ESCAPE
-//};
-
-
-//typedef std::pair<Keys, KeyState> KeyData;
-
 namespace KeyHandler {
 	enum class KeyState {
 		STILL_UP, // Key isn't pressed (has already been up for at least one frame)
@@ -44,6 +34,10 @@ namespace KeyHandler {
 	void update(KeyUnion& key_handler);
 
 	void update_key(KeyUnion& key_handler, const SDL_Event& sdl_event);
+}
+
+namespace MouseHandler {
+	// TODO
 }
 
 class InputHandler {

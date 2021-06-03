@@ -7,25 +7,88 @@ FontHandler::Font::Font() {
 	}
 }
 
-FontHandler::Font::Font(SDL_Renderer* renderer, SDL_Texture* font_sheet_texture, SDL_Surface* font_sheet_surface, uint8_t sprite_size, uint8_t scale) {
+FontHandler::Font::Font(SDL_Renderer* renderer, SDL_Texture* font_sheet_texture, SDL_Surface* font_sheet_surface, uint8_t sprite_size, uint8_t scale, Colour colour) {
+	this->colour = colour;
+
 	font_sheet = Spritesheet(renderer, font_sheet_texture, sprite_size, scale);
 
-	uint16_t x, y;
+	uint16_t base_x, base_y, x, y, left, right;
+	uint8_t r, g, b, a;
+	bool found = false;
+
+	//uint8_t pixel_size = font_sheet_surface->format->BytesPerPixel;
 
 	// Generate character_rects
 	for (uint8_t i = 0; i < ALPHABET_LENGTH; i++) {
-		// change this to actually look for bars, and get correct height
+		//character_rects[i] = SDL_Rect{ (i % 32) * sprite_size, (i / 32) * sprite_size, sprite_size, sprite_size };
 
-		character_rects[i] = SDL_Rect{ (i % 32) * sprite_size, (i / 32) * sprite_size, sprite_size, sprite_size };
+		base_x = (i % 32) * sprite_size;
+		base_y = (i / 32) * sprite_size;
 
-		//IN PROGRESS:
+		left = 0;
+		right = sprite_size - 1;
 
+		found = false;
+
+		x = y = 0;
+		while (!found) {
+			// Get pixel at (x, y)
+			SDL_GetRGBA(((uint32_t*)font_sheet_surface->pixels)[(base_y + y) * font_sheet_surface->w + (base_x + x)], font_sheet_surface->format, &r, &g, &b, &a);
+
+			if (a) {
+				// We found the left edge of the character!
+				left = x;
+				found = true;
+			}
+
+			y++;
+			if (y == sprite_size) {
+				if (x == sprite_size - 1) {
+					// Character is blank
+					found = true;
+				}
+
+				y = 0;
+				x++;
+			}
+		}
+
+		found = false;
+
+		x = sprite_size - 1;
+		y = 0;
+		while (!found) {
+			// Get pixel at (x, y)
+			SDL_GetRGBA(((uint32_t*)font_sheet_surface->pixels)[(base_y + y) * font_sheet_surface->w + (base_x + x)], font_sheet_surface->format, &r, &g, &b, &a);
+
+			if (a) {
+				// We found the left edge of the character!
+				right = x;
+				found = true;
+			}
+
+			y++;
+			if (y == sprite_size) {
+				if (x == 0) {
+					// Character is blank
+					found = true;
+				}
+
+				y = 0;
+				x--;
+			}
+		}
+
+		character_rects[i] = SDL_Rect{ base_x + left, base_y, right - left + 1, sprite_size };
 	}
 }
 
 void FontHandler::Font::render_char(uint8_t c, float x, float y) {
 	// Check character is one we have an image/rect for
 	if (c >= 32 && c <= 255) {
+		// Set colour (need to do this every frame since other fonts may also be using the same texture)
+		SDL_SetTextureColorMod(font_sheet.get_texture(), colour);
+
 		// Render character
 		font_sheet.rect_scaled(&character_rects[c - 32], x, y);
 	}

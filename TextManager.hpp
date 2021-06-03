@@ -5,6 +5,7 @@
 #include <string>
 
 #include "Spritesheet.hpp"
+#include "Utilities.hpp"
 
 namespace FontHandler {
 	const uint8_t ALPHABET_LENGTH = 96;
@@ -12,7 +13,7 @@ namespace FontHandler {
 	class Font {
 	public:
 		Font();
-		Font(SDL_Renderer* renderer, SDL_Texture* font_sheet_texture, SDL_Surface* font_sheet_surface, uint8_t sprite_size = 16, uint8_t scale = 1);
+		Font(SDL_Renderer* renderer, SDL_Texture* font_sheet_texture, SDL_Surface* font_sheet_surface, uint8_t sprite_size = 16, uint8_t scale = 1, Colour colour = Colour());
 
 		void render_char(uint8_t c, float x, float y);
 		SDL_Rect get_character_rect(uint8_t c);
@@ -21,6 +22,8 @@ namespace FontHandler {
 		Spritesheet font_sheet;
 
 		SDL_Rect character_rects[ALPHABET_LENGTH];
+
+		Colour colour = Colour();
 	};
 }
 
