@@ -46,10 +46,20 @@ private:
 	void update_menu_title(float dt);
 	void render_menu_title();
 
+	void update_menu_settings(float dt);
+	void render_menu_settings();
+
+	void update_menu_level_select(float dt);
+	void render_menu_level_select();
+
 	// Setup functions for each state
 	void setup_menu_intro();
 	void setup_menu_title();
+	void setup_menu_settings();
+	void setup_menu_level_select();
 
+	// Utility functions
+	ImageParticle create_menu_shape_particle();
 
 	// Loading functions
 	SDL_Texture* load_texture(std::string path);
@@ -61,6 +71,8 @@ private:
 		MENU_INTRO,
 		MENU_TITLE,
 		MENU_SETTINGS,
+
+		MENU_LEVEL_SELECT,
 
 		GAME_RUNNING,
 		GAME_PAUSED
@@ -90,7 +102,9 @@ private:
 	InputHandler input_handler;
 
 	// Particle handler
-	ParticleHandler particle_handler;
+	struct {
+		ParticleHandler back, front;
+	} particle_handlers;
 
 	// Timer handler
 	TimerHandler timer_handler;

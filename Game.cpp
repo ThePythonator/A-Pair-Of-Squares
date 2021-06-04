@@ -66,6 +66,8 @@ namespace DELAY {
 	const float MENU_INTRO_LENGTH = MENU_INTRO_FADE_START + MENU_INTRO_FADE_LENGTH;
 
 	const float MENU_BEZIER_LENGTH = 1.0f;
+
+	const float MENU_SHAPE_GENERATION = 2.5f;
 }
 
 // Timer IDs (are set later in program)
@@ -74,6 +76,7 @@ namespace TIMER_ID {
 
 	uint8_t MENU_INTRO_FADE = UNINITIALISED;
 	uint8_t MENU_BEZIER_TEXT = UNINITIALISED;
+	uint8_t MENU_SHAPE_GENERATION = UNINITIALISED;
 }
 
 // Nodes for bezier transitions
@@ -185,6 +188,7 @@ void Game::load_data() {
 	// Load timers
 	TIMER_ID::MENU_INTRO_FADE = timer_handler.add_timer();
 	TIMER_ID::MENU_BEZIER_TEXT = timer_handler.add_timer();
+	TIMER_ID::MENU_SHAPE_GENERATION = timer_handler.add_timer();
 }
 
 void Game::clear_data() {
@@ -295,7 +299,8 @@ void Game::update(float dt) {
 	timer_handler.update(dt);
 
 	// Update particles
-	particle_handler.update(dt);
+	particle_handlers.back.update(dt);
+	particle_handlers.front.update(dt);
 
 	switch (game_state) {
 	case GameState::MENU_INTRO:
@@ -304,6 +309,12 @@ void Game::update(float dt) {
 	case GameState::MENU_TITLE:
 		update_menu_title(dt);
 		break;
+	case GameState::MENU_SETTINGS:
+		update_menu_settings(dt);
+		break;
+	case GameState::MENU_LEVEL_SELECT:
+		update_menu_level_select(dt);
+		break;
 	default:
 		break;
 	}
@@ -311,7 +322,7 @@ void Game::update(float dt) {
 
 void Game::render() {
 	// Render particles
-	particle_handler.render(spritesheet);
+	particle_handlers.back.render(spritesheet);
 
 	switch (game_state) {
 	case GameState::MENU_INTRO:
@@ -320,9 +331,18 @@ void Game::render() {
 	case GameState::MENU_TITLE:
 		render_menu_title();
 		break;
+	case GameState::MENU_SETTINGS:
+		render_menu_settings();
+		break;
+	case GameState::MENU_LEVEL_SELECT:
+		render_menu_level_select();
+		break;
 	default:
 		break;
 	}
+
+	// Render particles
+	particle_handlers.front.render(spritesheet);
 }
 
 // Update and render functions for each state
@@ -355,15 +375,15 @@ void Game::render_menu_intro() {
 }
 
 void Game::update_menu_title(float dt) {
-	// to remove
-	player.update(input_handler, dt);
-
-
 	// Handle shape particles in background
 	// TO IMPROVE
-	if (rand() % 500 == 0) particle_handler.add(ImageParticle::ImageParticle(SPRITES::SQUARE_PARTICLE, rand() % WINDOW::WIDTH, -SPRITES::SIZE * 2, 0.0f, 8 + rand() % 4, (rand() % 5 - 2) / 5.0f, 0.0f, 0.0f, -50 + rand() % 100, 3 + (rand() % 10) / 2.0f));
+	if (timer_handler.get_timer(TIMER_ID::MENU_SHAPE_GENERATION) >= DELAY::MENU_SHAPE_GENERATION) {
+		timer_handler.reset_timer(TIMER_ID::MENU_SHAPE_GENERATION);
 
-
+		particle_handlers.back.add(create_menu_shape_particle());
+	}
+	
+	//printf("%f\n", timer_handler.get_timer(TIMER_ID::MENU_SHAPE_GENERATION));
 
 	if (timer_handler.get_timer(TIMER_ID::MENU_BEZIER_TEXT) >= DELAY::MENU_BEZIER_LENGTH) {
 		timer_handler.set_timer_state(TIMER_ID::MENU_BEZIER_TEXT, TimerState::PAUSED);
@@ -404,13 +424,11 @@ void Game::update_menu_title(float dt) {
 			switch (option_selected)
 			{
 			case MENU::TITLE::PLAY:
-				//setup_game_blah();
-				setup_menu_title();
+				setup_menu_level_select();
 				break;
 
 			case MENU::TITLE::SETTINGS:
-				//setup_menu_settings();
-				setup_menu_title();
+				setup_menu_settings();
 				break;
 
 			case MENU::TITLE::QUIT:
@@ -428,9 +446,6 @@ void Game::update_menu_title(float dt) {
 }
 
 void Game::render_menu_title() {
-	// to remove
-	player.render(spritesheet);
-
 	// Display fade-in black rect
 	if (timer_handler.get_timer(TIMER_ID::MENU_INTRO_FADE) <= DELAY::TRANSITION_FADE_LENGTH) {
 		SDL_Rect screen_rect{ 0, 0, WINDOW::WIDTH, WINDOW::HEIGHT };
@@ -459,14 +474,28 @@ void Game::render_menu_title() {
 
 		left_x = BEZIER::bezier_x(BEZIER::FROM_LEFT, ratio);
 		right_x = BEZIER::bezier_x(BEZIER::FROM_RIGHT, ratio);
-
-		//printf("%f\n", timer_handler.get_timer(TIMER_ID::MENU_BEZIER_TEXT));
 	}
 
 	
 	TextHandler::render_text(option_selected == 0 ? font_selected : font_white, STRINGS::MENU_OPTION_PLAY, left_x, WINDOW::SCALED_HEIGHT_HALF - SPRITES::SIZE * 2, 1);
 	TextHandler::render_text(option_selected == 1 ? font_selected : font_white, STRINGS::MENU_OPTION_SETTINGS, right_x, WINDOW::SCALED_HEIGHT_HALF, 1);
 	TextHandler::render_text(option_selected == 2 ? font_selected : font_white, STRINGS::MENU_OPTION_QUIT, left_x, WINDOW::SCALED_HEIGHT_HALF + SPRITES::SIZE * 2, 1);
+}
+
+void Game::update_menu_settings(float dt) {
+
+}
+
+void Game::render_menu_settings() {
+
+}
+
+void Game::update_menu_level_select(float dt) {
+
+}
+
+void Game::render_menu_level_select() {
+
 }
 
 void Game::setup_menu_intro() {
@@ -484,6 +513,27 @@ void Game::setup_menu_title() {
 
 	timer_handler.set_timer_state(TIMER_ID::MENU_BEZIER_TEXT, TimerState::RUNNING);
 	timer_handler.reset_timer(TIMER_ID::MENU_BEZIER_TEXT);
+
+	timer_handler.set_timer_state(TIMER_ID::MENU_SHAPE_GENERATION, TimerState::RUNNING);
+	timer_handler.reset_timer(TIMER_ID::MENU_SHAPE_GENERATION);
+}
+
+void Game::setup_menu_settings() {
+	game_state = GameState::MENU_SETTINGS;
+}
+
+void Game::setup_menu_level_select() {
+	game_state = GameState::MENU_LEVEL_SELECT;
+}
+
+ImageParticle Game::create_menu_shape_particle() {
+	float scale = 3.0f + (rand() % 21) / 4.0f;
+
+	uint8_t colour = rand() % 2;
+
+	float y_speed = 2 + colour * 4 + rand() % 2;
+
+	return ImageParticle(SPRITES::SQUARE_PARTICLE + colour, rand() % (uint16_t)(WINDOW::WIDTH / scale), -SPRITES::SIZE, (rand() % 5 - 2), y_speed, 0.0f, 0.0f, 0.0f, rand() % 90 - 45, scale);
 }
 
 SDL_Texture* Game::load_texture(std::string path) {
