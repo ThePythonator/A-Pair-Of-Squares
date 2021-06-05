@@ -56,3 +56,7 @@ void ParticleHandler::render(Spritesheet& spritesheet) {
 void ParticleHandler::add(ImageParticle particle) {
 	image_particles.push_back(particle);
 }
+
+uint16_t ParticleHandler::count_particles() {
+	return image_particles.size();
+}

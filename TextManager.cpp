@@ -84,8 +84,8 @@ FontHandler::Font::Font(SDL_Renderer* renderer, SDL_Texture* font_sheet_texture,
 }
 
 void FontHandler::Font::render_char(uint8_t c, float x, float y) {
-	// Check character is one we have an image/rect for
-	if (c >= 32 && c <= 255) {
+	// Check character is one we have an image/rect for (don't include c == 32, since that's a space)
+	if (c >= 33 && c <= 255) {
 		// Set colour (need to do this every frame since other fonts may also be using the same texture)
 		SDL_SetTextureColorMod(font_sheet.get_texture(), colour);
 

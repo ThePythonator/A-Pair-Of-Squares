@@ -58,6 +58,8 @@ public:
 	//void add(ShapeParticle::ShapeParticle);
 	void add(ImageParticle particle);
 
+	uint16_t count_particles();
+
 private:
 	std::vector<ImageParticle> image_particles;
 };

@@ -60,6 +60,8 @@ private:
 
 	// Utility functions
 	ImageParticle create_menu_shape_particle();
+	void fill_menu_shape_particle(uint8_t count);
+	void setup_menu_shape_particles();
 
 	// Loading functions
 	SDL_Texture* load_texture(std::string path);
@@ -119,4 +121,11 @@ private:
 
 	uint8_t option_selected = 0;
 	bool option_confirmed = false;
+
+	uint8_t shape_particle_count = 0;
+
+	struct {
+		bool audio_music = true;
+		bool audio_sfx = true;
+	} settings;
 };
