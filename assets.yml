@@ -5,7 +5,7 @@ assets.cpp:
 #    empty_tile: 255
 #    output_struct: true
     
-  assets/test.tmx:
-    name: test
+  assets/level0.tmx:
+    name: asset_level_0
     empty_tile: 255
     output_struct: true

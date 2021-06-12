@@ -5,10 +5,13 @@ FontHandler::Font::Font() {
 	for (uint8_t i = 0; i < ALPHABET_LENGTH; i++) {
 		character_rects[i] = SDL_Rect{ 0 };
 	}
+
+	//scale_ratio = 1.0f;
 }
 
 FontHandler::Font::Font(SDL_Renderer* renderer, SDL_Texture* font_sheet_texture, SDL_Surface* font_sheet_surface, uint8_t sprite_size, uint8_t scale, Colour colour) {
 	this->colour = colour;
+	//this->scale_ratio = (float)sys_scale / (float)scale;
 
 	font_sheet = Spritesheet(renderer, font_sheet_texture, sprite_size, scale);
 

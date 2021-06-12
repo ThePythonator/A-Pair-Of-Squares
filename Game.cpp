@@ -1,13 +1,21 @@
 #include "Game.hpp"
 
+// Game levels
+const uint8_t* asset_levels[] = {
+	asset_level_0
+};
+
 // Constants
 
 namespace SPRITES {
-	const uint8_t SCALE = 4;
+	const uint8_t SCALE = 2;
+
+	const uint8_t TEXT_SCALE = 4;
 
 	const uint8_t SIZE = 16;
 	const uint8_t SIZE_HALF = SIZE / 2;
 
+	const uint8_t SPACE_WIDTH = 1;
 
 	const uint16_t SQUARE_PARTICLE = 228;
 }
@@ -16,14 +24,26 @@ namespace WINDOW {
 	const uint16_t WIDTH = 960;
 	const uint16_t HEIGHT = 640; //540
 
+	// Levels should be 20x13 max if scale == 3
+
 	const uint16_t SCALED_WIDTH = WIDTH / SPRITES::SCALE;
 	const uint16_t SCALED_HEIGHT = HEIGHT / SPRITES::SCALE;
 
 	const uint16_t SCALED_WIDTH_HALF = SCALED_WIDTH / 2;
 	const uint16_t SCALED_HEIGHT_HALF = SCALED_HEIGHT / 2;
 
+	const uint16_t TEXT_SCALED_WIDTH = WIDTH / SPRITES::TEXT_SCALE;
+	const uint16_t TEXT_SCALED_HEIGHT = HEIGHT / SPRITES::TEXT_SCALE;
+
+	const uint16_t TEXT_SCALED_WIDTH_HALF = TEXT_SCALED_WIDTH / 2;
+	const uint16_t TEXT_SCALED_HEIGHT_HALF = TEXT_SCALED_HEIGHT / 2;
+
 	const uint8_t FPS = 120;
 	//const float MIN_DT = 1.0f / FPS;
+}
+
+namespace GAME {
+	const uint8_t LEVEL_COUNT = 12;
 }
 
 namespace MENU {
@@ -43,8 +63,17 @@ namespace MENU {
 		OPTION_COUNT
 	};
 
+	enum class LEVEL_SELECT : uint8_t {
+		BACK = GAME::LEVEL_COUNT,
+
+		OPTION_COUNT
+	};
+
 	const uint8_t SHAPE_PARTICLE_COUNT = 7;
 	const uint8_t SHAPE_PARTICLE_CHANNELS = 4;
+
+	const uint8_t LEVELS_PER_ROW = 4;
+	const uint8_t LEVEL_ROWS = GAME::LEVEL_COUNT / LEVELS_PER_ROW;
 }
 
 namespace COLOURS {
@@ -74,6 +103,10 @@ namespace STRINGS {
 			const std::string OPTION_SFX = "SFX";
 			const std::string OPTION_BACK = "Back";
 		}
+
+		namespace LEVEL_SELECT {
+			const std::string OPTION_BACK = "Back";
+		}
 	}
 }
 
@@ -93,7 +126,7 @@ namespace DELAY {
 
 	const float MENU_BEZIER_LENGTH = 1.0f;
 
-	const float MENU_SHAPE_GENERATION = 2.5f;
+	const float MENU_SHAPE_GENERATION = 3.0f;
 }
 
 // Timer IDs (are set later in program)
@@ -109,9 +142,9 @@ namespace TIMER_ID {
 namespace BEZIER {
 	const uint8_t MENU_BEZIER_NODE_COUNT = 3;
 
-	// 1st Node is doubled to make transitions ease in/out more smoothly
-	const std::vector<Node> FROM_LEFT{ Node{WINDOW::SCALED_WIDTH_HALF, 0}, Node{WINDOW::SCALED_WIDTH_HALF, 0}, Node{WINDOW::SCALED_WIDTH, 0}, Node{-WINDOW::SCALED_WIDTH, 0} };
-	const std::vector<Node> FROM_RIGHT{ Node{WINDOW::SCALED_WIDTH_HALF, 0}, Node{WINDOW::SCALED_WIDTH_HALF, 0}, Node{0, 0}, Node{WINDOW::SCALED_WIDTH * 2, 0} };
+	// 1st Node is doubled to make text transitions ease in/out more smoothly
+	const std::vector<Node> FROM_LEFT{ Node{WINDOW::TEXT_SCALED_WIDTH_HALF, 0}, Node{WINDOW::TEXT_SCALED_WIDTH_HALF, 0}, Node{WINDOW::TEXT_SCALED_WIDTH, 0}, Node{-WINDOW::TEXT_SCALED_WIDTH, 0} };
+	const std::vector<Node> FROM_RIGHT{ Node{WINDOW::TEXT_SCALED_WIDTH_HALF, 0}, Node{WINDOW::TEXT_SCALED_WIDTH_HALF, 0}, Node{0, 0}, Node{WINDOW::TEXT_SCALED_WIDTH * 2, 0} };
 
 	float bezier_x(std::vector<Node> nodes, float ratio) {
 		return bezier_curve(nodes, ratio).first;
@@ -198,8 +231,8 @@ void Game::load_data() {
 	SDL_Surface* font_sheet_surface = load_surface(assets_path + FILES::FONT_SHEET);
 
 	//font_black = FontHandler::Font(renderer, font_sheet_texture, font_sheet_surface, SPRITES::SIZE, SPRITE_SCALE, COLOURS::BLACK);
-	font_white = FontHandler::Font(renderer, font_sheet_texture, font_sheet_surface, SPRITES::SIZE, SPRITES::SCALE, COLOURS::WHITE);
-	font_selected = FontHandler::Font(renderer, font_sheet_texture, font_sheet_surface, SPRITES::SIZE, SPRITES::SCALE, COLOURS::SELECTED);
+	font_white = FontHandler::Font(renderer, font_sheet_texture, font_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::WHITE);
+	font_selected = FontHandler::Font(renderer, font_sheet_texture, font_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::SELECTED);
 
 	SDL_FreeSurface(font_sheet_surface);
 
@@ -207,6 +240,8 @@ void Game::load_data() {
 	TIMER_ID::MENU_INTRO_FADE = timer_handler.add_timer();
 	TIMER_ID::MENU_BEZIER_TEXT = timer_handler.add_timer();
 	TIMER_ID::MENU_SHAPE_GENERATION = timer_handler.add_timer();
+
+	level_handler.sprite_size = SPRITES::SIZE;
 }
 
 void Game::clear_data() {
@@ -333,6 +368,15 @@ void Game::update(float dt) {
 	case GameState::MENU_LEVEL_SELECT:
 		update_menu_level_select(dt);
 		break;
+	case GameState::GAME_RUNNING:
+		update_game_running(dt);
+		break;
+	/*case GameState::GAME_PAUSED:
+		update_game_paused();
+		break;*/
+	case GameState::GAME_END:
+		update_game_end(dt);
+		break;
 	default:
 		break;
 	}
@@ -354,6 +398,15 @@ void Game::render() {
 		break;
 	case GameState::MENU_LEVEL_SELECT:
 		render_menu_level_select();
+		break;
+	case GameState::GAME_RUNNING:
+		render_game_running();
+		break;
+	/*case GameState::GAME_PAUSED:
+		render_game_paused();
+		break;*/
+	case GameState::GAME_END:
+		render_game_end();
 		break;
 	default:
 		break;
@@ -377,7 +430,7 @@ void Game::update_menu_intro(float dt) {
 void Game::render_menu_intro() {
 	// Display logo
 	SDL_Rect src_rect{ 0, 224, 32, 32 };
-	spritesheet.rect(&src_rect, WINDOW::SCALED_WIDTH_HALF / 2 - SPRITES::SIZE, WINDOW::SCALED_HEIGHT_HALF / 2 - SPRITES::SIZE, 8);
+	spritesheet.rect(&src_rect, WINDOW::WIDTH / 16.0f - SPRITES::SIZE, WINDOW::HEIGHT / 16.0f - SPRITES::SIZE, 8);
 
 	// Display fade-out black rect
 	if (timer_handler.get_timer(TIMER_ID::MENU_INTRO_FADE) >= DELAY::MENU_INTRO_FADE_START) {
@@ -472,7 +525,7 @@ void Game::render_menu_title() {
 	}
 
 	float left_x, right_x;
-	left_x = right_x = WINDOW::SCALED_WIDTH_HALF;
+	left_x = right_x = WINDOW::TEXT_SCALED_WIDTH_HALF;
 
 	if (timer_handler.get_timer_state(TIMER_ID::MENU_BEZIER_TEXT) == TimerState::RUNNING || option_confirmed) {
 		// Modify the x value because bezier curves are running
@@ -490,9 +543,9 @@ void Game::render_menu_title() {
 	}
 
 	
-	TextHandler::render_text(option_selected == 0 ? font_selected : font_white, STRINGS::MENU::TITLE::OPTION_PLAY, left_x, WINDOW::SCALED_HEIGHT_HALF - SPRITES::SIZE * 2, 1);
-	TextHandler::render_text(option_selected == 1 ? font_selected : font_white, STRINGS::MENU::TITLE::OPTION_SETTINGS, right_x, WINDOW::SCALED_HEIGHT_HALF, 1);
-	TextHandler::render_text(option_selected == 2 ? font_selected : font_white, STRINGS::MENU::TITLE::OPTION_QUIT, left_x, WINDOW::SCALED_HEIGHT_HALF + SPRITES::SIZE * 2, 1);
+	TextHandler::render_text(option_selected == 0 ? font_selected : font_white, STRINGS::MENU::TITLE::OPTION_PLAY, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE * 2, SPRITES::SPACE_WIDTH);
+	TextHandler::render_text(option_selected == 1 ? font_selected : font_white, STRINGS::MENU::TITLE::OPTION_SETTINGS, right_x, WINDOW::TEXT_SCALED_HEIGHT_HALF, SPRITES::SPACE_WIDTH);
+	TextHandler::render_text(option_selected == 2 ? font_selected : font_white, STRINGS::MENU::TITLE::OPTION_QUIT, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE * 2, SPRITES::SPACE_WIDTH);
 }
 
 void Game::update_menu_settings(float dt) {
@@ -559,18 +612,214 @@ void Game::update_menu_settings(float dt) {
 		if (option_confirmed && timer_handler.get_timer_state(TIMER_ID::MENU_BEZIER_TEXT) == TimerState::PAUSED) {
 			// User has selected an option and animation is finished
 
+			if ((MENU::SETTINGS)option_selected == MENU::SETTINGS::BACK) {
+				setup_menu_title();
+			}
+		}
+	}
+}
+
+void Game::render_menu_settings() {
+	float left_x, right_x;
+	left_x = right_x = WINDOW::TEXT_SCALED_WIDTH_HALF;
+
+	if (timer_handler.get_timer_state(TIMER_ID::MENU_BEZIER_TEXT) == TimerState::RUNNING || option_confirmed) {
+		// Modify the x value because bezier curves are running
+		// If option_confirmed, then bezier curves may not be running, but if they aren't, the text should be off the screen anyways
+
+		float ratio = timer_handler.get_timer(TIMER_ID::MENU_BEZIER_TEXT) / DELAY::MENU_BEZIER_LENGTH;
+
+		if (!option_confirmed) {
+			// Entering rather than leaving
+			ratio = 1 - ratio;
+		}
+
+		left_x = BEZIER::bezier_x(BEZIER::FROM_LEFT, ratio);
+		right_x = BEZIER::bezier_x(BEZIER::FROM_RIGHT, ratio);
+	}
+
+
+	TextHandler::render_text(option_selected == 0 ? font_selected : font_white, STRINGS::MENU::SETTINGS::OPTION_MUSIC + STRINGS::CLN_SPC + (settings.audio_music ? STRINGS::ON : STRINGS::OFF), left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE * 2, SPRITES::SPACE_WIDTH);
+	TextHandler::render_text(option_selected == 1 ? font_selected : font_white, STRINGS::MENU::SETTINGS::OPTION_SFX + STRINGS::CLN_SPC + (settings.audio_sfx ? STRINGS::ON : STRINGS::OFF), right_x, WINDOW::TEXT_SCALED_HEIGHT_HALF, SPRITES::SPACE_WIDTH);
+	TextHandler::render_text(option_selected == 2 ? font_selected : font_white, STRINGS::MENU::SETTINGS::OPTION_BACK, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE * 2, SPRITES::SPACE_WIDTH);
+}
+
+void Game::update_menu_level_select(float dt) {
+	// Handle shape particles in background
+	if (timer_handler.get_timer(TIMER_ID::MENU_SHAPE_GENERATION) >= DELAY::MENU_SHAPE_GENERATION) {
+		timer_handler.reset_timer(TIMER_ID::MENU_SHAPE_GENERATION);
+
+		particle_handlers.back.add(create_menu_shape_particle());
+	}
+
+	// Stop bezier stuff if finished
+	if (timer_handler.get_timer(TIMER_ID::MENU_BEZIER_TEXT) >= DELAY::MENU_BEZIER_LENGTH) {
+		timer_handler.set_timer_state(TIMER_ID::MENU_BEZIER_TEXT, TimerState::PAUSED);
+	}
+
+	if (!option_confirmed && timer_handler.get_timer_state(TIMER_ID::MENU_BEZIER_TEXT) == TimerState::PAUSED) {
+		// User hasn't selected an option yet
+
+		// Check if up/down has been pressed, and naviagate the menu as necessary
+		if (KeyHandler::just_down(input_handler.get_key_union().keys.UP)) {
+			if (option_selected == (uint8_t)MENU::LEVEL_SELECT::BACK) {
+				option_selected--;
+			}
+			else if (option_selected > 3) {
+				option_selected -= 4;
+			}
+		}
+		if (KeyHandler::just_down(input_handler.get_key_union().keys.DOWN)) {
+			if (option_selected < (uint8_t)MENU::LEVEL_SELECT::OPTION_COUNT - 5) {
+				option_selected += 4;
+			}
+			else if (option_selected < (uint8_t)MENU::LEVEL_SELECT::OPTION_COUNT - 1) {
+				option_selected = (uint8_t)MENU::LEVEL_SELECT::BACK;
+			}
+		}
+		if (KeyHandler::just_down(input_handler.get_key_union().keys.LEFT)) {
+			if (option_selected % 4 > 0) {
+				option_selected--;
+			}
+		}
+		if (KeyHandler::just_down(input_handler.get_key_union().keys.RIGHT)) {
+			if (option_selected % 4 < 3 && option_selected != (uint8_t)MENU::LEVEL_SELECT::OPTION_COUNT - 1) {
+				option_selected++;
+			}
+		}
+
+		// Check if user has just selected an option
+		if (KeyHandler::just_down(input_handler.get_key_union().keys.SPACE)) {
+			// Reset timer and set it to running
+			timer_handler.set_timer_state(TIMER_ID::MENU_BEZIER_TEXT, TimerState::RUNNING);
+			timer_handler.reset_timer(TIMER_ID::MENU_BEZIER_TEXT);
+
+			option_confirmed = true;
+		}
+	}
+	else {
+		// User has selected an option, or initial intro is still happening
+
+		// Check if transition is finished
+
+		if (option_confirmed && timer_handler.get_timer_state(TIMER_ID::MENU_BEZIER_TEXT) == TimerState::PAUSED) {
+			// User has selected an option and animation is finished
+
+			if ((MENU::LEVEL_SELECT)option_selected == MENU::LEVEL_SELECT::BACK) {
+				setup_menu_title();
+			}
+			else {
+				// User has selected a level
+				// level number is option_selected
+				setup_game_running();
+			}
+		}
+	}
+}
+
+void Game::render_menu_level_select() {
+	float left_x, right_x;
+	left_x = right_x = WINDOW::TEXT_SCALED_WIDTH_HALF;
+
+	if (timer_handler.get_timer_state(TIMER_ID::MENU_BEZIER_TEXT) == TimerState::RUNNING || option_confirmed) {
+		// Modify the x value because bezier curves are running
+		// If option_confirmed, then bezier curves may not be running, but if they aren't, the text should be off the screen anyways
+
+		float ratio = timer_handler.get_timer(TIMER_ID::MENU_BEZIER_TEXT) / DELAY::MENU_BEZIER_LENGTH;
+
+		if (!option_confirmed) {
+			// Entering rather than leaving
+			ratio = 1 - ratio;
+		}
+
+		left_x = BEZIER::bezier_x(BEZIER::FROM_LEFT, ratio);
+		right_x = BEZIER::bezier_x(BEZIER::FROM_RIGHT, ratio);
+	}
+
+	for (uint8_t i = 0; i < GAME::LEVEL_COUNT; i++) {
+		float x = ((i % MENU::LEVELS_PER_ROW) - MENU::LEVELS_PER_ROW / 2 + 0.5f) * SPRITES::SIZE * 2;
+		float y = (i / MENU::LEVELS_PER_ROW) * SPRITES::SIZE * 2 + SPRITES::SIZE * 2;
+
+		x += (i / 4) % 2 ? left_x : right_x;
+
+		TextHandler::render_text(option_selected == i ? font_selected : font_white, std::to_string(i + 1), x, y, SPRITES::SPACE_WIDTH);
+	}
+	
+	TextHandler::render_text(option_selected == (uint8_t)MENU::LEVEL_SELECT::BACK ? font_selected : font_white, STRINGS::MENU::LEVEL_SELECT::OPTION_BACK, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE * 3, SPRITES::SPACE_WIDTH);
+}
+
+void Game::update_game_running(float dt) {
+	// Handle shape particles in background
+	if (timer_handler.get_timer(TIMER_ID::MENU_SHAPE_GENERATION) >= DELAY::MENU_SHAPE_GENERATION) {
+		timer_handler.reset_timer(TIMER_ID::MENU_SHAPE_GENERATION);
+
+		particle_handlers.back.add(create_menu_shape_particle());
+	}
+
+	//level_handler.update(dt);
+
+	player.update(input_handler, level_handler, dt);
+
+	if (level_is_completed()) {
+		setup_game_end();
+	}
+}
+
+void Game::render_game_running() {
+	level_handler.render(spritesheet, camera);
+
+	player.render(spritesheet);
+}
+//to change
+void Game::update_game_end(float dt) {
+	// Handle shape particles in background
+	if (timer_handler.get_timer(TIMER_ID::MENU_SHAPE_GENERATION) >= DELAY::MENU_SHAPE_GENERATION) {
+		timer_handler.reset_timer(TIMER_ID::MENU_SHAPE_GENERATION);
+
+		particle_handlers.back.add(create_menu_shape_particle());
+	}
+
+	// Stop bezier stuff if finished
+	if (timer_handler.get_timer(TIMER_ID::MENU_BEZIER_TEXT) >= DELAY::MENU_BEZIER_LENGTH) {
+		timer_handler.set_timer_state(TIMER_ID::MENU_BEZIER_TEXT, TimerState::PAUSED);
+	}
+
+	if (!option_confirmed && timer_handler.get_timer_state(TIMER_ID::MENU_BEZIER_TEXT) == TimerState::PAUSED) {
+		// User hasn't selected an option yet
+
+		// Check if up/down has been pressed, and naviagate the menu as necessary
+		if (KeyHandler::just_down(input_handler.get_key_union().keys.UP)) {
+			if (option_selected > 0) {
+				option_selected--;
+			}
+		}
+		if (KeyHandler::just_down(input_handler.get_key_union().keys.DOWN)) {
+			if (option_selected < (uint8_t)MENU::SETTINGS::OPTION_COUNT - 1) {
+				option_selected++;
+			}
+		}
+
+		// Check if user has just selected an option
+		if (KeyHandler::just_down(input_handler.get_key_union().keys.SPACE)) {
+			// Handle settings/back
 			switch ((MENU::SETTINGS)option_selected)
 			{
 			case MENU::SETTINGS::MUSIC:
-				//setup_menu_level_select();
+				settings.audio_music = !settings.audio_music;
 				break;
 
 			case MENU::SETTINGS::SFX:
-				//setup_menu_settings();
+				settings.audio_sfx = !settings.audio_sfx;
 				break;
 
 			case MENU::SETTINGS::BACK:
-				setup_menu_title();
+				// We need bezier curves
+
+				// Reset timer and set it to running
+				timer_handler.set_timer_state(TIMER_ID::MENU_BEZIER_TEXT, TimerState::RUNNING);
+				timer_handler.reset_timer(TIMER_ID::MENU_BEZIER_TEXT);
+
+				option_confirmed = true;
 				break;
 
 			default:
@@ -578,9 +827,22 @@ void Game::update_menu_settings(float dt) {
 			}
 		}
 	}
-}
+	else {
+		// User has selected an option, or initial intro is still happening
 
-void Game::render_menu_settings() {
+		// Check if transition is finished
+
+		if (option_confirmed && timer_handler.get_timer_state(TIMER_ID::MENU_BEZIER_TEXT) == TimerState::PAUSED) {
+			// User has selected an option and animation is finished
+
+			if ((MENU::SETTINGS)option_selected == MENU::SETTINGS::BACK) {
+				setup_menu_title();
+			}
+		}
+	}
+}
+//to change
+void Game::render_game_end() {
 	float left_x, right_x;
 	left_x = right_x = WINDOW::SCALED_WIDTH_HALF;
 
@@ -603,14 +865,6 @@ void Game::render_menu_settings() {
 	TextHandler::render_text(option_selected == 0 ? font_selected : font_white, STRINGS::MENU::SETTINGS::OPTION_MUSIC + STRINGS::CLN_SPC + (settings.audio_music ? STRINGS::ON : STRINGS::OFF), left_x, WINDOW::SCALED_HEIGHT_HALF - SPRITES::SIZE * 2, 1);
 	TextHandler::render_text(option_selected == 1 ? font_selected : font_white, STRINGS::MENU::SETTINGS::OPTION_SFX + STRINGS::CLN_SPC + (settings.audio_sfx ? STRINGS::ON : STRINGS::OFF), right_x, WINDOW::SCALED_HEIGHT_HALF, 1);
 	TextHandler::render_text(option_selected == 2 ? font_selected : font_white, STRINGS::MENU::SETTINGS::OPTION_BACK, left_x, WINDOW::SCALED_HEIGHT_HALF + SPRITES::SIZE * 2, 1);
-}
-
-void Game::update_menu_level_select(float dt) {
-
-}
-
-void Game::render_menu_level_select() {
-
 }
 
 void Game::setup_menu_intro() {
@@ -646,14 +900,37 @@ void Game::setup_menu_settings() {
 
 void Game::setup_menu_level_select() {
 	game_state = GameState::MENU_LEVEL_SELECT;
+
+	option_selected = 0;
+	option_confirmed = false;
+
+	timer_handler.set_timer_state(TIMER_ID::MENU_BEZIER_TEXT, TimerState::RUNNING);
+	timer_handler.reset_timer(TIMER_ID::MENU_BEZIER_TEXT);
+
+	setup_menu_shape_particles();
+}
+
+void Game::setup_game_running() {
+	game_state = GameState::GAME_RUNNING;
+
+	level_handler.load_level(asset_levels[option_selected], SPRITES::SIZE);
+
+	player = Player(level_handler.level_spawn_blue_x, level_handler.level_spawn_blue_y, level_handler.level_spawn_pink_x, level_handler.level_spawn_pink_y);
+
+	camera = Camera(0, 0, 0.9);//, WINDOW::SCALED_WIDTH_HALF, WINDOW::SCALED_HEIGHT_HALF
+}
+
+void Game::setup_game_end() {
+	game_state = GameState::GAME_END;
 }
 
 ImageParticle Game::create_menu_shape_particle() {
 	shape_particle_count++;
 
-	float scale = 3.0f + (rand() % 21) / 4.0f;
+	uint8_t colour = rand() % 3 ? 1 : 0;
+	//uint8_t colour = rand() % 2;
 
-	uint8_t colour = rand() % 2;
+	float scale = 3.0f + (rand() % 17) / 4.0f + colour;
 
 	float y_speed = 2 + colour * 4 + rand() % 2;
 
@@ -664,9 +941,10 @@ ImageParticle Game::create_menu_shape_particle() {
 
 void Game::fill_menu_shape_particle(uint8_t count) {
 	for (uint8_t i = 0; i < count; i++) {
-		float scale = 3.0f + (rand() % 21) / 4.0f;
-
+		//uint8_t colour = rand() % 3 ? 1 : 0;
 		uint8_t colour = rand() % 2;
+
+		float scale = 3.0f + (rand() % 17) / 4.0f + colour;
 
 		float y_speed = 2 + colour * 4 + rand() % 2;
 
@@ -689,6 +967,12 @@ void Game::setup_menu_shape_particles() {
 
 		fill_menu_shape_particle(MENU::SHAPE_PARTICLE_COUNT);
 	}
+}
+
+bool Game::level_is_completed() {
+	// Both are on finish
+	return (is_colliding_with_finish(level_handler.level_finish_x, level_handler.level_finish_y, player.get_blue_x(), player.get_blue_y(), level_handler.sprite_size) &&
+		is_colliding_with_finish(level_handler.level_finish_x, level_handler.level_finish_y, player.get_pink_x(), player.get_pink_y(), level_handler.sprite_size));
 }
 
 SDL_Texture* Game::load_texture(std::string path) {

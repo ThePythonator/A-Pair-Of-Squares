@@ -91,6 +91,10 @@ void Spritesheet::rect_scaled(SDL_Rect* src_rect, float x, float y) {
 	rect(src_rect, x, y, scale);
 }
 
+float Spritesheet::get_scale() {
+	return scale;
+}
+
 SDL_Texture* Spritesheet::get_texture() {
 	return spritesheet_texture;
 }

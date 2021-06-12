@@ -24,6 +24,8 @@ namespace FontHandler {
 		SDL_Rect character_rects[ALPHABET_LENGTH];
 
 		Colour colour = Colour();
+
+		//float scale_ratio;
 	};
 }
 

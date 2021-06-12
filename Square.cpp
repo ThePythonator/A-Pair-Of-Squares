@@ -8,9 +8,52 @@ Square::Square(uint8_t sprite_index, float x, float y) : Entity(sprite_index, x,
 
 }
 
-void Square::update(float dt) {
+void Square::update(std::vector<Tile>& tiles, float dt) {
+	// Move y
 	y += y_vel * dt;
+
+	// Handle y collisions
+	for (Tile& tile : tiles) {
+		if (is_colliding(tile, x, y, SPRITE_SIZE)) {
+			if (y_vel > 0) {
+				// Collided from top
+				y = tile.get_y() - SPRITE_SIZE;
+			}
+			else if (y_vel < 0) {
+				// Collided from bottom
+				y = tile.get_y() + SPRITE_SIZE;
+			}
+			y_vel = 0;
+		}
+	}
+
+	// Move x
 	x += x_vel * dt;
+
+	// Handle x collisions
+	for (Tile& tile : tiles) {
+		if (is_colliding(tile, x, y, SPRITE_SIZE)) {
+			if (x_vel > 0) {
+				// Collided from left
+				x = tile.get_x() - SPRITE_SIZE;
+			}
+			else if (x_vel < 0) {
+				// Collided from right
+				x = tile.get_x() + SPRITE_SIZE;
+			}
+			x_vel = 0;
+		}
+	}
+
+	can_jump = false;
+	for (Tile& tile : tiles) {
+		can_jump = is_on_tile(tile, x, y, SPRITE_SIZE);
+
+		if (can_jump) {
+			// Don't allow can_jump to be set to false after it's been set to true
+			break;
+		}
+	}
 }
 
 void Square::render(Spritesheet& spritesheet) {
@@ -68,4 +111,15 @@ void Square::gravity(float gravity, float maximum, float dt) {
 	// Update gravity
 	y_vel += gravity * dt;
 	y_vel = std::min(y_vel, maximum);
+}
+
+void Square::jump(float strength) {
+	if (can_jump) {
+		y_vel = -strength;
+		// cooldown?
+	}
+}
+
+void Square::set_finished() {
+	finished = true;
 }

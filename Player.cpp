@@ -1,15 +1,20 @@
 #include "Player.hpp"
 
 Player::Player() {
+	// TODO: remove literals ( 0 and 4 )
 	blue = Square(0, 0, 0);
 	pink = Square(4, 0, 0);
-
-	//to remove
-	blue.x = 60;
-	pink.x = 180;
 }
 
-void Player::update(InputHandler& input_handler, float dt) {
+Player::Player(uint16_t blue_x, uint16_t blue_y, uint16_t pink_x, uint16_t pink_y) {
+	// TODO: remove literals
+	blue = Square(0, blue_x, blue_y);
+	pink = Square(4, pink_x, pink_y);
+}
+
+void Player::update(InputHandler& input_handler, LevelHandler& level_handler, float dt) {
+	std::vector<Tile> tiles = level_handler.get_tiles();
+
 	// Handle inputs
 	if (KeyHandler::is_down(input_handler.get_key_union().keys.RIGHT)) {
 		blue.accelerate(SQUARE_ACCELERATION, SQUARE_VELOCITY_MAX, dt);
@@ -25,19 +30,25 @@ void Player::update(InputHandler& input_handler, float dt) {
 		pink.decelerate(SQUARE_DECELERATION, dt);
 	}
 
-	// Update player physics
+	if (KeyHandler::is_down(input_handler.get_key_union().keys.SPACE)) {
+		blue.jump(SQAURE_JUMP_STRENGTH);
+		pink.jump(SQAURE_JUMP_STRENGTH);
+	}
 
-	//blue.gravity(SQUARE_GRAVITY, SQUARE_GRAVITY_MAX, dt);
+	// Update player physics
+	blue.gravity(SQUARE_GRAVITY, SQUARE_GRAVITY_MAX, dt);
 	pink.gravity(SQUARE_GRAVITY, SQUARE_GRAVITY_MAX, dt);
 
-	blue.update(dt);
-	pink.update(dt);
+	blue.update(tiles, dt);
+	pink.update(tiles, dt);
 
-
-	// to remove
-	if (pink.y > 144) {
-		pink.y = 144;
+	// Handle finishing
+	/*if (is_colliding_with_finish(level_handler.level_finish_x, level_handler.level_finish_y, blue.x, blue.y, level_handler.sprite_size)) {
+		blue.set_finished();
 	}
+	if (is_colliding_with_finish(level_handler.level_finish_x, level_handler.level_finish_y, pink.x, pink.y, level_handler.sprite_size)) {
+		pink.set_finished();
+	}*/
 }
 
 void Player::render(Spritesheet& spritesheet) {
@@ -49,3 +60,19 @@ void Player::render(Spritesheet& spritesheet) {
 //	blue = Square(0, blue_x, blue_y);
 //	pink = Square(4, pink_x, pink_y);
 //}
+
+float Player::get_blue_x() {
+	return blue.x;
+}
+
+float Player::get_blue_y() {
+	return blue.y;
+}
+
+float Player::get_pink_x() {
+	return pink.x;
+}
+
+float Player::get_pink_y() {
+	return pink.y;
+}
