@@ -25,7 +25,13 @@ public:
 
 	void rect_scaled(SDL_Rect* src_rect, float x, float y);
 
+
+	void set_blend_mode(SDL_BlendMode blending);
+	void set_alpha(uint8_t alpha);
+
+
 	float get_scale();
+	uint8_t get_alpha();
 
 	SDL_Texture* get_texture();
 

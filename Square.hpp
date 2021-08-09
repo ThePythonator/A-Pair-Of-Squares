@@ -13,7 +13,7 @@ const float SQUARE_ACCELERATION = 500.0f;
 const float SQUARE_DECELERATION = 400.0f;
 const float SQUARE_VELOCITY_MAX = 120.0f;
 
-const float SQAURE_FINISH_PULL_VELOCITY = 0.05f;// 0.5f;
+const float SQAURE_FINISH_PULL_VELOCITY = 0.06f;//0.05f;// 0.5f;
 const float SQAURE_FINISH_STOP_PULL = 1.0f;
 
 const float SQUARE_GRAVITY = 600.0f;

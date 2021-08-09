@@ -72,7 +72,9 @@ private:
 	void setup_game_end();
 
 	// Utility functions
+	void handle_menu_shape_particles();
 	ImageParticle create_menu_shape_particle();
+	ImageParticle create_game_finish_particle(float x, float y, uint8_t id);
 	void fill_menu_shape_particle(uint8_t count);
 	void setup_menu_shape_particles();
 	bool level_is_completed();
@@ -121,7 +123,7 @@ private:
 
 	// Particle handler
 	struct {
-		ParticleHandler back, front;
+		ParticleHandler back, front, spare;
 	} particle_handlers;
 
 	// Timer handler
@@ -144,7 +146,7 @@ private:
 	uint8_t option_selected = 0;
 	bool option_confirmed = false;
 
-	uint8_t shape_particle_count = 0;
+	uint8_t menu_shape_particle_count = 0;
 
 	struct {
 		bool audio_music = true;

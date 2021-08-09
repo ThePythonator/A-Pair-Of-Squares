@@ -57,6 +57,7 @@ void Spritesheet::sprite(uint16_t index, float x, float y, float scale, float an
 	SDL_Rect src_rect{ sprite_size * (index % columns), sprite_size * (index / columns), sprite_size, sprite_size };
 	SDL_Rect dst_rect{ x * scale, y * scale, sprite_size * scale, sprite_size * scale };
 
+	// Note: possible issue here, if center != NULL, the value at that address is altered, i.e. it's modified globally, not just locally
 	if (center != NULL) {
 		center->x *= scale;
 		center->y *= scale;
@@ -91,8 +92,28 @@ void Spritesheet::rect_scaled(SDL_Rect* src_rect, float x, float y) {
 	rect(src_rect, x, y, scale);
 }
 
+
+void Spritesheet::set_blend_mode(SDL_BlendMode blending)
+{
+	// Set blending type
+	SDL_SetTextureBlendMode(spritesheet_texture, blending);
+}
+
+void Spritesheet::set_alpha(uint8_t alpha)
+{
+	// Set texture alpha
+	SDL_SetTextureAlphaMod(spritesheet_texture, alpha);
+}
+
+
 float Spritesheet::get_scale() {
 	return scale;
+}
+
+uint8_t Spritesheet::get_alpha() {
+	uint8_t alpha;
+	SDL_GetTextureAlphaMod(spritesheet_texture, &alpha);
+	return alpha;
 }
 
 SDL_Texture* Spritesheet::get_texture() {

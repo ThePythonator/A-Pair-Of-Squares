@@ -17,7 +17,11 @@ namespace SPRITES {
 
 	const uint8_t SPACE_WIDTH = 1;
 
-	const uint16_t SQUARE_PARTICLE = 228;
+	namespace ID {
+		const uint16_t SQUARE_PARTICLE = 228;
+
+		const uint16_t FINISH_PARTICLE_BLUE = 230;
+	}
 }
 
 namespace WINDOW {
@@ -127,6 +131,8 @@ namespace DELAY {
 	const float MENU_BEZIER_LENGTH = 1.0f;
 
 	const float MENU_SHAPE_GENERATION = 3.0f;
+
+	const float GAME_FINISH_PARTICLE_GENERATION = 0.9f;
 }
 
 // Timer IDs (are set later in program)
@@ -136,6 +142,8 @@ namespace TIMER_ID {
 	uint8_t MENU_TRANSITION_FADE = UNINITIALISED;
 	uint8_t MENU_BEZIER_TEXT = UNINITIALISED;
 	uint8_t MENU_SHAPE_GENERATION = UNINITIALISED;
+
+	uint8_t GAME_FINISH_PARTICLE_GENERATION = UNINITIALISED;
 }
 
 // Nodes for bezier transitions
@@ -240,6 +248,7 @@ void Game::load_data() {
 	TIMER_ID::MENU_TRANSITION_FADE = timer_handler.add_timer();
 	TIMER_ID::MENU_BEZIER_TEXT = timer_handler.add_timer();
 	TIMER_ID::MENU_SHAPE_GENERATION = timer_handler.add_timer();
+	TIMER_ID::GAME_FINISH_PARTICLE_GENERATION = timer_handler.add_timer();
 
 	level_handler = LevelHandler(SPRITES::SIZE);
 }
@@ -353,6 +362,7 @@ void Game::update(float dt) {
 
 	// Update particles
 	particle_handlers.back.update(dt);
+	particle_handlers.spare.update(dt);
 	particle_handlers.front.update(dt);
 
 	switch (game_state) {
@@ -447,12 +457,8 @@ void Game::render_menu_intro() {
 }
 
 void Game::update_menu_title(float dt) {
-	// Handle shape particles in background
-	if (timer_handler.get_timer(TIMER_ID::MENU_SHAPE_GENERATION) >= DELAY::MENU_SHAPE_GENERATION) {
-		timer_handler.reset_timer(TIMER_ID::MENU_SHAPE_GENERATION);
-
-		particle_handlers.back.add(create_menu_shape_particle());
-	}
+	// Handle creation and removal of shape particles in background
+	handle_menu_shape_particles();
 
 	// Stop bezier stuff if finished
 	if (timer_handler.get_timer(TIMER_ID::MENU_BEZIER_TEXT) >= DELAY::MENU_BEZIER_LENGTH) {
@@ -550,12 +556,8 @@ void Game::render_menu_title() {
 }
 
 void Game::update_menu_settings(float dt) {
-	// Handle shape particles in background
-	if (timer_handler.get_timer(TIMER_ID::MENU_SHAPE_GENERATION) >= DELAY::MENU_SHAPE_GENERATION) {
-		timer_handler.reset_timer(TIMER_ID::MENU_SHAPE_GENERATION);
-
-		particle_handlers.back.add(create_menu_shape_particle());
-	}
+	// Handle creation and removal of shape particles in background
+	handle_menu_shape_particles();
 
 	// Stop bezier stuff if finished
 	if (timer_handler.get_timer(TIMER_ID::MENU_BEZIER_TEXT) >= DELAY::MENU_BEZIER_LENGTH) {
@@ -646,12 +648,8 @@ void Game::render_menu_settings() {
 }
 
 void Game::update_menu_level_select(float dt) {
-	// Handle shape particles in background
-	if (timer_handler.get_timer(TIMER_ID::MENU_SHAPE_GENERATION) >= DELAY::MENU_SHAPE_GENERATION) {
-		timer_handler.reset_timer(TIMER_ID::MENU_SHAPE_GENERATION);
-
-		particle_handlers.back.add(create_menu_shape_particle());
-	}
+	// Handle creation and removal of shape particles in background
+	handle_menu_shape_particles();
 
 	// Stop bezier stuff if finished
 	if (timer_handler.get_timer(TIMER_ID::MENU_BEZIER_TEXT) >= DELAY::MENU_BEZIER_LENGTH) {
@@ -663,10 +661,11 @@ void Game::update_menu_level_select(float dt) {
 
 		// Check if up/down has been pressed, and naviagate the menu as necessary
 		if (KeyHandler::just_down(input_handler.get_key_union().keys.UP)) {
-			if (option_selected == (uint8_t)MENU::LEVEL_SELECT::BACK) {
+			/*if (option_selected == (uint8_t)MENU::LEVEL_SELECT::BACK) {
 				option_selected--;
 			}
-			else if (option_selected > 3) {
+			else */
+			if (option_selected > 3) {
 				option_selected -= 4;
 			}
 		}
@@ -777,12 +776,18 @@ void Game::render_menu_level_select() {
 }
 
 void Game::update_game_running(float dt) {
-	// Handle shape particles in background
-	if (timer_handler.get_timer(TIMER_ID::MENU_SHAPE_GENERATION) >= DELAY::MENU_SHAPE_GENERATION) {
-		timer_handler.reset_timer(TIMER_ID::MENU_SHAPE_GENERATION);
+	// Handle creation and removal of shape particles in background
+	handle_menu_shape_particles();
 
-		particle_handlers.back.add(create_menu_shape_particle());
+	// Handle particles from finish
+	if (timer_handler.get_timer(TIMER_ID::GAME_FINISH_PARTICLE_GENERATION) >= DELAY::GAME_FINISH_PARTICLE_GENERATION) {
+		timer_handler.reset_timer(TIMER_ID::GAME_FINISH_PARTICLE_GENERATION);
+
+		particle_handlers.spare.add(create_game_finish_particle(level_handler.level_finish_blue_x, level_handler.level_finish_blue_y + SPRITES::SIZE, 0));
+		particle_handlers.spare.add(create_game_finish_particle(level_handler.level_finish_pink_x, level_handler.level_finish_pink_y + SPRITES::SIZE, 1));
 	}
+	
+	particle_handlers.spare.remove_if([](ImageParticle& particle) { return particle.get_alpha() == 0.0f; });
 
 	//level_handler.update(dt);
 
@@ -794,7 +799,13 @@ void Game::update_game_running(float dt) {
 }
 
 void Game::render_game_running() {
+	// Render spare particle handler in front of background particles but behind everything else
+	particle_handlers.spare.render(spritesheet);
+
 	level_handler.render(spritesheet, camera);
+
+	// Render spare particle handler in front of level but behind players
+	//particle_handlers.spare.render(spritesheet);
 
 	player.render(spritesheet);
 
@@ -966,14 +977,32 @@ void Game::setup_game_running() {
 
 	timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::RUNNING);
 	timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
+
+	// reset finish particle timer??
+
+	// Clear spare particle handler
+	//particle_handlers.spare.clear();
 }
 
 void Game::setup_game_end() {
 	game_state = GameState::GAME_END;
 }
 
+
+void Game::handle_menu_shape_particles() {
+	// Handle shape particles in background
+	if (timer_handler.get_timer(TIMER_ID::MENU_SHAPE_GENERATION) >= DELAY::MENU_SHAPE_GENERATION) {
+		timer_handler.reset_timer(TIMER_ID::MENU_SHAPE_GENERATION);
+
+		particle_handlers.back.add(create_menu_shape_particle());
+	}
+
+	// Remove particles if they're off the screen
+	particle_handlers.back.remove_if([](ImageParticle& particle) { return particle.get_y() * particle.get_scale() > WINDOW::HEIGHT * 1.1f; });
+}
+
 ImageParticle Game::create_menu_shape_particle() {
-	shape_particle_count++;
+	menu_shape_particle_count++;
 
 	uint8_t colour = rand() % 3 ? 1 : 0;
 	//uint8_t colour = rand() % 2;
@@ -982,9 +1011,29 @@ ImageParticle Game::create_menu_shape_particle() {
 
 	float y_speed = 2 + colour * 4 + rand() % 2;
 
-	uint16_t x = WINDOW::WIDTH * (shape_particle_count % MENU::SHAPE_PARTICLE_CHANNELS) / (MENU::SHAPE_PARTICLE_CHANNELS * scale);
+	uint16_t x = WINDOW::WIDTH * (menu_shape_particle_count % MENU::SHAPE_PARTICLE_CHANNELS) / (MENU::SHAPE_PARTICLE_CHANNELS * scale);
 
-	return ImageParticle(SPRITES::SQUARE_PARTICLE + colour, x, -SPRITES::SIZE, (rand() % 5 - 2), y_speed, 0.0f, 0.0f, 0.0f, rand() % 90 - 45, scale);
+	return ImageParticle(SPRITES::ID::SQUARE_PARTICLE + colour, x, -SPRITES::SIZE, (rand() % 5 - 2), y_speed, 0.0f, 0.0f, 0.0f, rand() % 90 - 45, scale);
+}
+
+ImageParticle Game::create_game_finish_particle(float x, float y, uint8_t colour) {
+	//game_finish_particle_count++;
+
+	//uint8_t colour = rand() % 3 ? 1 : 0;
+	//uint8_t colour = rand() % 2;
+
+	float scale = 1.0f + (rand() % 11) / 10.0f;
+
+	float position_scale = SPRITES::SCALE / scale;
+
+	float x_speed = (rand() % 7 - 3);
+	float y_speed = -10.0f;
+
+	float new_x = x + rand() % (uint8_t)(SPRITES::SIZE - SPRITES::SIZE_HALF / position_scale);
+
+	float fade = -40.0f;
+
+	return ImageParticle(SPRITES::ID::FINISH_PARTICLE_BLUE + colour, new_x * position_scale, y * position_scale, x_speed * position_scale, y_speed * position_scale, 0.0f, 0.0f, 0.0f, rand() % 90 - 45, scale, 255, fade);
 }
 
 void Game::fill_menu_shape_particle(uint8_t count) {
@@ -996,15 +1045,15 @@ void Game::fill_menu_shape_particle(uint8_t count) {
 
 		float y_speed = 2 + colour * 4 + rand() % 2;
 
-		uint16_t x = WINDOW::WIDTH * (shape_particle_count % MENU::SHAPE_PARTICLE_CHANNELS) / (MENU::SHAPE_PARTICLE_CHANNELS * scale);
-		uint16_t y = WINDOW::HEIGHT * (shape_particle_count % count) / (count * scale);
+		uint16_t x = WINDOW::WIDTH * (menu_shape_particle_count % MENU::SHAPE_PARTICLE_CHANNELS) / (MENU::SHAPE_PARTICLE_CHANNELS * scale);
+		uint16_t y = WINDOW::HEIGHT * (menu_shape_particle_count % count) / (count * scale);
 
 		x -= rand() % SPRITES::SIZE - SPRITES::SIZE_HALF;
 		y -= (rand() % SPRITES::SIZE - SPRITES::SIZE_HALF) * scale / 4.0f;
 
-		particle_handlers.back.add(ImageParticle(SPRITES::SQUARE_PARTICLE + colour, x, y, (rand() % 5 - 2), y_speed, 0.0f, 0.0f, 0.0f, rand() % 90 - 45, scale));
+		particle_handlers.back.add(ImageParticle(SPRITES::ID::SQUARE_PARTICLE + colour, x, y, (rand() % 5 - 2), y_speed, 0.0f, 0.0f, 0.0f, rand() % 90 - 45, scale));
 
-		shape_particle_count++;
+		menu_shape_particle_count++;
 	}
 }
 
@@ -1018,6 +1067,9 @@ void Game::setup_menu_shape_particles() {
 }
 
 bool Game::level_is_completed() {
+	// TODO: consider delegating to LevelHandler
+
+
 	// Both are on finish
 	/*return (is_colliding_with_finish(level_handler.level_finish_x, level_handler.level_finish_y, player.get_blue_x(), player.get_blue_y(), level_handler.sprite_size) &&
 		is_colliding_with_finish(level_handler.level_finish_x, level_handler.level_finish_y, player.get_pink_x(), player.get_pink_y(), level_handler.sprite_size));*/
