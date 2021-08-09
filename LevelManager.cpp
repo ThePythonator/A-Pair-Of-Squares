@@ -55,21 +55,41 @@ uint16_t Tile::get_y() {
 
 
 LevelHandler::LevelHandler() {
+	sprite_size = 0;
+
 	level_spawn_blue_x = 0;
 	level_spawn_blue_y = 0;
 	level_spawn_pink_x = 0;
 	level_spawn_pink_y = 0;
-	level_finish_x = 0;
-	level_finish_y = 0;
+	level_finish_blue_x = 0;
+	level_finish_blue_y = 0;
+	level_finish_pink_x = 0;
+	level_finish_pink_y = 0;
 }
 
-void LevelHandler::load_level(const uint8_t level_data[], uint8_t sprite_size) {
+LevelHandler::LevelHandler(uint8_t sprite_size) {
+	this->sprite_size = sprite_size;
+
 	level_spawn_blue_x = 0;
 	level_spawn_blue_y = 0;
 	level_spawn_pink_x = 0;
 	level_spawn_pink_y = 0;
-	level_finish_x = 0;
-	level_finish_y = 0;
+	level_finish_blue_x = 0;
+	level_finish_blue_y = 0;
+	level_finish_pink_x = 0;
+	level_finish_pink_y = 0;
+}
+
+
+void LevelHandler::load_level(const uint8_t level_data[]) {
+	level_spawn_blue_x = 0;
+	level_spawn_blue_y = 0;
+	level_spawn_pink_x = 0;
+	level_spawn_pink_y = 0;
+	level_finish_blue_x = 0;
+	level_finish_blue_y = 0;
+	level_finish_pink_x = 0;
+	level_finish_pink_y = 0;
 
 	tiles.clear();
 
@@ -89,12 +109,14 @@ void LevelHandler::load_level(const uint8_t level_data[], uint8_t sprite_size) {
 				level_spawn_pink_y = (i / level_tmx->width) * sprite_size;
 			}
 			else if (level_tmx->data[i] == 96) {
-				// Finish spawn
-				level_finish_x = (i % level_tmx->width) * sprite_size;
-				level_finish_y = (i / level_tmx->width) * sprite_size;
+				// Finish spawn for blue
+				level_finish_blue_x = (i % level_tmx->width) * sprite_size;
+				level_finish_blue_y = (i / level_tmx->width) * sprite_size;
 			}
 			else if (level_tmx->data[i] == 97) {
-				// Don't create a tile because it's the second part of the finish
+				// Finish spawn for pink
+				level_finish_pink_x = (i % level_tmx->width) * sprite_size;
+				level_finish_pink_y = (i / level_tmx->width) * sprite_size;
 			}
 			else {
 				tiles.push_back(Tile(level_tmx->data[i], (i % level_tmx->width) * sprite_size, (i / level_tmx->width) * sprite_size));
@@ -111,12 +133,16 @@ void LevelHandler::render(Spritesheet& spritesheet, Camera& camera) {
 	for (Tile& tile : tiles) {
 		tile.render(spritesheet, camera);
 	}
-	
+
 	// Render finish
-	spritesheet.sprite_scaled(96, camera.get_view_x(level_finish_x), camera.get_view_y(level_finish_y));
-	spritesheet.sprite_scaled(97, camera.get_view_x(level_finish_x + sprite_size), camera.get_view_y(level_finish_y));
+	spritesheet.sprite_scaled(96, camera.get_view_x(level_finish_blue_x), camera.get_view_y(level_finish_blue_y));
+	spritesheet.sprite_scaled(97, camera.get_view_x(level_finish_pink_x), camera.get_view_y(level_finish_pink_y));
 }
 
 std::vector<Tile> LevelHandler::get_tiles() {
 	return tiles;
+}
+
+uint8_t LevelHandler::get_sprite_size() {
+	return sprite_size;
 }

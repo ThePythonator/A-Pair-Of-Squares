@@ -39,16 +39,34 @@ void Player::update(InputHandler& input_handler, LevelHandler& level_handler, fl
 	blue.gravity(SQUARE_GRAVITY, SQUARE_GRAVITY_MAX, dt);
 	pink.gravity(SQUARE_GRAVITY, SQUARE_GRAVITY_MAX, dt);
 
+	// Draw players towards finishes if in both are in range
+	if (
+		std::abs(blue.x - level_handler.level_finish_blue_x) < level_handler.get_sprite_size() &&
+		std::abs(blue.y - level_handler.level_finish_blue_y) < level_handler.get_sprite_size() &&
+		std::abs(pink.x - level_handler.level_finish_pink_x) < level_handler.get_sprite_size() &&
+		std::abs(pink.y - level_handler.level_finish_pink_y) < level_handler.get_sprite_size()) {
+
+		blue.add_velocity(SQAURE_FINISH_PULL_VELOCITY * (level_handler.level_finish_blue_x - blue.x), SQAURE_FINISH_PULL_VELOCITY * (level_handler.level_finish_blue_y - blue.y));
+		pink.add_velocity(SQAURE_FINISH_PULL_VELOCITY * (level_handler.level_finish_pink_x - pink.x), SQAURE_FINISH_PULL_VELOCITY * (level_handler.level_finish_pink_y - pink.y));
+	}
+
 	blue.update(tiles, dt);
 	pink.update(tiles, dt);
 
-	// Handle finishing
-	/*if (is_colliding_with_finish(level_handler.level_finish_x, level_handler.level_finish_y, blue.x, blue.y, level_handler.sprite_size)) {
+	// If players are already on finish, keep them locked
+	if (std::abs(blue.x - level_handler.level_finish_blue_x) < SQAURE_FINISH_STOP_PULL &&
+		std::abs(blue.y - level_handler.level_finish_blue_y) < SQAURE_FINISH_STOP_PULL &&
+		std::abs(pink.x - level_handler.level_finish_pink_x) < SQAURE_FINISH_STOP_PULL &&
+		std::abs(pink.y - level_handler.level_finish_pink_y) < SQAURE_FINISH_STOP_PULL) {
+
+		blue.x = level_handler.level_finish_blue_x;
+		blue.y = level_handler.level_finish_blue_y;
+		pink.x = level_handler.level_finish_pink_x;
+		pink.y = level_handler.level_finish_pink_y;
+
 		blue.set_finished();
-	}
-	if (is_colliding_with_finish(level_handler.level_finish_x, level_handler.level_finish_y, pink.x, pink.y, level_handler.sprite_size)) {
 		pink.set_finished();
-	}*/
+	}
 }
 
 void Player::render(Spritesheet& spritesheet) {

@@ -55,21 +55,25 @@ private:
 
 class LevelHandler {
 public:
-	uint8_t sprite_size;
-
-	uint16_t level_spawn_pink_x, level_spawn_pink_y, level_spawn_blue_x, level_spawn_blue_y, level_finish_x, level_finish_y;
+	uint16_t level_spawn_pink_x, level_spawn_pink_y, level_spawn_blue_x, level_spawn_blue_y;
+	uint16_t level_finish_blue_x, level_finish_blue_y, level_finish_pink_x, level_finish_pink_y;
 
 	LevelHandler();
+	LevelHandler(uint8_t sprite_size);
 
-	void load_level(const uint8_t level_data[], uint8_t sprite_size);
+	void load_level(const uint8_t level_data[]);
 
 	//void update(float dt);
 	void render(Spritesheet& spritesheet, Camera& camera);
 
 	std::vector<Tile> get_tiles();
 
+	uint8_t get_sprite_size();
+
 private:
 	std::vector<Tile> tiles;
+
+	uint8_t sprite_size;
 };
 
 // TODO: add method of loading tmx data into Level

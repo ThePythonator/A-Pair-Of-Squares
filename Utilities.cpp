@@ -45,9 +45,8 @@ bool is_colliding(Tile& tile, float x, float y, uint8_t sprite_size) {
 	return (tile.get_x() + sprite_size > x && tile.get_x() < x + sprite_size && tile.get_y() + sprite_size > y && tile.get_y() < y + sprite_size);
 }
 
-bool is_colliding_with_finish(uint16_t tile_x, uint16_t tile_y, float x, float y, uint8_t sprite_size) {
-	// Handles collisions with a half-height, double width tile.
-	return (tile_x + sprite_size * 2 > x && tile_x < x + sprite_size && tile_y + sprite_size > y && tile_y + sprite_size / 2 < y + sprite_size);
+bool is_colliding(float tile_x, float tile_y, float x, float y, uint8_t sprite_size) {
+	return (tile_x + sprite_size > x && tile_x < x + sprite_size && tile_y + sprite_size > y && tile_y < y + sprite_size);
 }
 
 bool is_on_tile(Tile& tile, float x, float y, uint8_t sprite_size) {

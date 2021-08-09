@@ -9,42 +9,47 @@ Square::Square(uint8_t sprite_index, float x, float y) : Entity(sprite_index, x,
 }
 
 void Square::update(std::vector<Tile>& tiles, float dt) {
-	// Move y
-	y += y_vel * dt;
+	if (finished) {
+		x_vel = y_vel = 0;
+	}
+	else {
+		// Move y
+		y += y_vel * dt;
 
-	// Handle y collisions
-	for (Tile& tile : tiles) {
-		if (is_colliding(tile, x, y, SPRITE_SIZE)) {
-			if (y_vel > 0) {
-				// Collided from top
-				y = tile.get_y() - SPRITE_SIZE;
+		// Handle y collisions
+		for (Tile& tile : tiles) {
+			if (is_colliding(tile, x, y, SPRITE_SIZE)) {
+				if (y_vel > 0) {
+					// Collided from top
+					y = tile.get_y() - SPRITE_SIZE;
+				}
+				else if (y_vel < 0) {
+					// Collided from bottom
+					y = tile.get_y() + SPRITE_SIZE;
+				}
+				y_vel = 0;
 			}
-			else if (y_vel < 0) {
-				// Collided from bottom
-				y = tile.get_y() + SPRITE_SIZE;
+		}
+
+		// Move x
+		x += x_vel * dt;
+
+		// Handle x collisions
+		for (Tile& tile : tiles) {
+			if (is_colliding(tile, x, y, SPRITE_SIZE)) {
+				if (x_vel > 0) {
+					// Collided from left
+					x = tile.get_x() - SPRITE_SIZE;
+				}
+				else if (x_vel < 0) {
+					// Collided from right
+					x = tile.get_x() + SPRITE_SIZE;
+				}
+				x_vel = 0;
 			}
-			y_vel = 0;
 		}
 	}
-
-	// Move x
-	x += x_vel * dt;
-
-	// Handle x collisions
-	for (Tile& tile : tiles) {
-		if (is_colliding(tile, x, y, SPRITE_SIZE)) {
-			if (x_vel > 0) {
-				// Collided from left
-				x = tile.get_x() - SPRITE_SIZE;
-			}
-			else if (x_vel < 0) {
-				// Collided from right
-				x = tile.get_x() + SPRITE_SIZE;
-			}
-			x_vel = 0;
-		}
-	}
-
+	
 	can_jump = false;
 	for (Tile& tile : tiles) {
 		can_jump = is_on_tile(tile, x, y, SPRITE_SIZE);
@@ -120,6 +125,15 @@ void Square::jump(float strength) {
 	}
 }
 
-void Square::set_finished() {
-	finished = true;
+void Square::add_velocity(float x_vel, float y_vel) {
+	this->x_vel += x_vel;
+	this->y_vel += y_vel;
+}
+
+void Square::set_finished(bool finished) {
+	this->finished = finished;
+}
+
+bool Square::get_finished() {
+	return finished;
 }

@@ -13,6 +13,9 @@ const float SQUARE_ACCELERATION = 500.0f;
 const float SQUARE_DECELERATION = 400.0f;
 const float SQUARE_VELOCITY_MAX = 120.0f;
 
+const float SQAURE_FINISH_PULL_VELOCITY = 0.05f;// 0.5f;
+const float SQAURE_FINISH_STOP_PULL = 1.0f;
+
 const float SQUARE_GRAVITY = 600.0f;
 const float SQUARE_GRAVITY_MAX = 250.0f;
 
@@ -36,7 +39,10 @@ public:
 	void gravity(float gravity, float maximum, float dt);
 	void jump(float strength);
 
-	void set_finished();
+	void add_velocity(float x_vel, float y_vel);
+
+	void set_finished(bool finished = true);
+	bool get_finished();
 
 protected:
 	bool can_jump = false;
