@@ -21,7 +21,7 @@ struct TMX {
 class Camera {
 public:
 	Camera();
-	Camera(float x, float y, float ratio);//, uint16_t screen_mid_x, uint16_t screen_mid_y
+	Camera(float x, float y, float ratio = 1.0f, uint16_t screen_mid_x = 0, uint16_t screen_mid_y = 0);
 
 	void update(float dt, float player_x, float player_y);
 
@@ -34,8 +34,8 @@ private:
 
 	float ratio = 1.0f;
 
-	/*uint16_t screen_mid_x = 0;
-	uint16_t screen_mid_y = 0;*/
+	uint16_t screen_mid_x = 0;
+	uint16_t screen_mid_y = 0;
 };
 
 class Tile {
@@ -43,6 +43,7 @@ public:
 	Tile();
 	Tile(uint16_t sprite_index, uint16_t x, uint16_t y);
 
+	void render(Spritesheet& spritesheet);
 	void render(Spritesheet& spritesheet, Camera& camera);
 
 	uint16_t get_x();
@@ -64,6 +65,7 @@ public:
 	void load_level(const uint8_t level_data[]);
 
 	//void update(float dt);
+	void render(Spritesheet& spritesheet);
 	void render(Spritesheet& spritesheet, Camera& camera);
 
 	std::vector<Tile> get_tiles();

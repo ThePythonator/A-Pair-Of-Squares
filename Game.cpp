@@ -44,6 +44,8 @@ namespace WINDOW {
 
 	const uint8_t FPS = 120;
 	//const float MIN_DT = 1.0f / FPS;
+
+	//const float CAMERA_MOVEMENT_RATIO = 0.95f;
 }
 
 namespace GAME {
@@ -124,9 +126,8 @@ namespace FILES {
 namespace DELAY {
 	const float TRANSITION_FADE_LENGTH = 0.6f;
 
-	const float MENU_INTRO_TRANSITION_FADE_START = 2.0f;
-	const float MENU_TRANSITION_FADE_LENGTH = 1.0f;
-	const float MENU_INTRO_LENGTH = MENU_INTRO_TRANSITION_FADE_START + MENU_TRANSITION_FADE_LENGTH;
+	const float MENU_INTRO_LENGTH = 2.0f;
+	const float MENU_INTRO_FADE_LENGTH = 1.0f;
 
 	const float MENU_BEZIER_LENGTH = 1.0f;
 
@@ -138,6 +139,8 @@ namespace DELAY {
 // Timer IDs (are set later in program)
 namespace TIMER_ID {
 	const uint8_t UNINITIALISED = 255;
+
+	uint8_t INTRO_LENGTH = UNINITIALISED;
 
 	uint8_t MENU_TRANSITION_FADE = UNINITIALISED;
 	uint8_t MENU_BEZIER_TEXT = UNINITIALISED;
@@ -245,6 +248,7 @@ void Game::load_data() {
 	SDL_FreeSurface(font_sheet_surface);
 
 	// Load timers
+	TIMER_ID::INTRO_LENGTH = timer_handler.add_timer();
 	TIMER_ID::MENU_TRANSITION_FADE = timer_handler.add_timer();
 	TIMER_ID::MENU_BEZIER_TEXT = timer_handler.add_timer();
 	TIMER_ID::MENU_SHAPE_GENERATION = timer_handler.add_timer();
@@ -428,11 +432,22 @@ void Game::render() {
 
 // Update and render functions for each state
 void Game::update_menu_intro(float dt) {
-	if (timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) >= DELAY::MENU_INTRO_LENGTH) {
+	if (timer_handler.get_timer_state(TIMER_ID::MENU_TRANSITION_FADE) == TimerState::RUNNING &&
+		timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) >= DELAY::MENU_INTRO_FADE_LENGTH) {
+
 		// Time to end intro and switch to title screen
 		setup_menu_title();
 
 		// Reset timer ready for use in unfading to title screen
+		timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
+		timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::RUNNING);
+	}
+	else if (timer_handler.get_timer_state(TIMER_ID::INTRO_LENGTH) == TimerState::RUNNING &&
+		timer_handler.get_timer(TIMER_ID::INTRO_LENGTH) >= DELAY::MENU_INTRO_LENGTH) {
+
+		timer_handler.reset_timer(TIMER_ID::INTRO_LENGTH);
+		timer_handler.set_timer_state(TIMER_ID::INTRO_LENGTH, TimerState::PAUSED);
+
 		timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
 		timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::RUNNING);
 	}
@@ -444,16 +459,17 @@ void Game::render_menu_intro() {
 	spritesheet.rect(&src_rect, WINDOW::WIDTH / 16.0f - SPRITES::SIZE, WINDOW::HEIGHT / 16.0f - SPRITES::SIZE, 8);
 
 	// Display fade-out black rect
-	if (timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) >= DELAY::MENU_INTRO_TRANSITION_FADE_START) {
-		SDL_Rect screen_rect{ 0, 0, WINDOW::WIDTH, WINDOW::HEIGHT };
+	render_fade_out_rect(DELAY::MENU_INTRO_FADE_LENGTH);
+	//if (timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) >= DELAY::MENU_INTRO_TRANSITION_FADE_START) {
+	//	SDL_Rect screen_rect{ 0, 0, WINDOW::WIDTH, WINDOW::HEIGHT };
 
-		// Calculate alpha
-		uint8_t alpha = 255 * (timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) - DELAY::MENU_INTRO_TRANSITION_FADE_START) / (float)DELAY::MENU_TRANSITION_FADE_LENGTH;
+	//	// Calculate alpha
+	//	uint8_t alpha = 255 * (timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) - DELAY::MENU_INTRO_TRANSITION_FADE_START) / (float)DELAY::MENU_TRANSITION_FADE_LENGTH;
 
-		// Fill with semi-transparent black
-		SDL_SetRenderDrawColor(renderer, Colour(COLOURS::BLACK, alpha));
-		SDL_RenderFillRect(renderer, &screen_rect);
-	}
+	//	// Fill with semi-transparent black
+	//	SDL_SetRenderDrawColor(renderer, Colour(COLOURS::BLACK, alpha));
+	//	SDL_RenderFillRect(renderer, &screen_rect);
+	//}
 }
 
 void Game::update_menu_title(float dt) {
@@ -543,16 +559,7 @@ void Game::render_menu_title() {
 	TextHandler::render_text(option_selected == 2 ? font_selected : font_white, STRINGS::MENU::TITLE::OPTION_QUIT, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE * 2, SPRITES::SPACE_WIDTH);
 
 	// Display fade-in black rect
-	if (timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) <= DELAY::TRANSITION_FADE_LENGTH) {
-		SDL_Rect screen_rect{ 0, 0, WINDOW::WIDTH, WINDOW::HEIGHT };
-
-		// Calculate alpha
-		uint8_t alpha = 0xFF * (1.0f - timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) / DELAY::TRANSITION_FADE_LENGTH);
-
-		// Fill with semi-transparent black
-		SDL_SetRenderDrawColor(renderer, Colour(COLOURS::BLACK, alpha));
-		SDL_RenderFillRect(renderer, &screen_rect);
-	}
+	render_fade_in_rect(DELAY::TRANSITION_FADE_LENGTH);
 }
 
 void Game::update_menu_settings(float dt) {
@@ -763,16 +770,19 @@ void Game::render_menu_level_select() {
 	TextHandler::render_text(option_selected == (uint8_t)MENU::LEVEL_SELECT::BACK ? font_selected : font_white, STRINGS::MENU::LEVEL_SELECT::OPTION_BACK, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE * 3, SPRITES::SPACE_WIDTH);
 
 	// Display fade-out black rect
-	if (timer_handler.get_timer_state(TIMER_ID::MENU_TRANSITION_FADE) == TimerState::RUNNING && timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) <= DELAY::MENU_TRANSITION_FADE_LENGTH) {
-		SDL_Rect screen_rect{ 0, 0, WINDOW::WIDTH, WINDOW::HEIGHT };
+	render_fade_out_rect(DELAY::TRANSITION_FADE_LENGTH);
+	//if (timer_handler.get_timer_state(TIMER_ID::MENU_TRANSITION_FADE) == TimerState::RUNNING) {
+	//	if (timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) <= DELAY::MENU_TRANSITION_FADE_LENGTH) {
+	//		SDL_Rect screen_rect{ 0, 0, WINDOW::WIDTH, WINDOW::HEIGHT };
 
-		// Calculate alpha
-		uint8_t alpha = 255 * (timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) - DELAY::MENU_INTRO_TRANSITION_FADE_START) / (float)DELAY::MENU_TRANSITION_FADE_LENGTH;
+	//		// Calculate alpha
+	//		uint8_t alpha = 255 * (timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) - DELAY::MENU_INTRO_TRANSITION_FADE_START) / (float)DELAY::MENU_TRANSITION_FADE_LENGTH;
 
-		// Fill with semi-transparent black
-		SDL_SetRenderDrawColor(renderer, Colour(COLOURS::BLACK, alpha));
-		SDL_RenderFillRect(renderer, &screen_rect);
-	}
+	//		// Fill with semi-transparent black
+	//		SDL_SetRenderDrawColor(renderer, Colour(COLOURS::BLACK, alpha));
+	//		SDL_RenderFillRect(renderer, &screen_rect);
+	//	}
+	//}
 }
 
 void Game::update_game_running(float dt) {
@@ -792,6 +802,7 @@ void Game::update_game_running(float dt) {
 	//level_handler.update(dt);
 
 	player.update(input_handler, level_handler, dt);
+	//camera.update(dt, player.get_blue_x(), player.get_blue_y());
 
 	if (level_is_completed()) {
 		setup_game_end();
@@ -802,7 +813,7 @@ void Game::render_game_running() {
 	// Render spare particle handler in front of background particles but behind everything else
 	particle_handlers.spare.render(spritesheet);
 
-	level_handler.render(spritesheet, camera);
+	level_handler.render(spritesheet);
 
 	// Render spare particle handler in front of level but behind players
 	//particle_handlers.spare.render(spritesheet);
@@ -810,16 +821,7 @@ void Game::render_game_running() {
 	player.render(spritesheet);
 
 	// Display fade-in black rect
-	if (timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) <= DELAY::TRANSITION_FADE_LENGTH) {
-		SDL_Rect screen_rect{ 0, 0, WINDOW::WIDTH, WINDOW::HEIGHT };
-
-		// Calculate alpha
-		uint8_t alpha = 0xFF * (1.0f - timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) / DELAY::TRANSITION_FADE_LENGTH);
-
-		// Fill with semi-transparent black
-		SDL_SetRenderDrawColor(renderer, Colour(COLOURS::BLACK, alpha));
-		SDL_RenderFillRect(renderer, &screen_rect);
-	}
+	render_fade_in_rect(DELAY::TRANSITION_FADE_LENGTH);
 }
 
 //to change
@@ -923,8 +925,11 @@ void Game::render_game_end() {
 void Game::setup_menu_intro() {
 	game_state = GameState::MENU_INTRO;
 
-	timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::RUNNING);
+	timer_handler.reset_timer(TIMER_ID::INTRO_LENGTH);
+	timer_handler.set_timer_state(TIMER_ID::INTRO_LENGTH, TimerState::RUNNING);
+
 	timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
+	timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::PAUSED);
 }
 
 void Game::setup_menu_title() {
@@ -973,7 +978,7 @@ void Game::setup_game_running() {
 
 	player = Player(level_handler.level_spawn_blue_x, level_handler.level_spawn_blue_y, level_handler.level_spawn_pink_x, level_handler.level_spawn_pink_y);
 
-	camera = Camera(0, 0, 0.9);//, WINDOW::SCALED_WIDTH_HALF, WINDOW::SCALED_HEIGHT_HALF
+	//camera = Camera(0, 0, WINDOW::CAMERA_MOVEMENT_RATIO, WINDOW::SCALED_WIDTH_HALF, WINDOW::SCALED_HEIGHT_HALF);
 
 	timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::RUNNING);
 	timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
@@ -981,11 +986,43 @@ void Game::setup_game_running() {
 	// reset finish particle timer??
 
 	// Clear spare particle handler
-	//particle_handlers.spare.clear();
+	particle_handlers.spare.clear();
 }
 
 void Game::setup_game_end() {
 	game_state = GameState::GAME_END;
+}
+
+
+
+void Game::render_fade_in_rect(float delay) {
+	if (timer_handler.get_timer_state(TIMER_ID::MENU_TRANSITION_FADE) == TimerState::RUNNING && 
+		timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) <= delay) {
+
+		SDL_Rect screen_rect{ 0, 0, WINDOW::WIDTH, WINDOW::HEIGHT };
+
+		// Calculate alpha
+		uint8_t alpha = 0xFF * (1.0f - timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) / delay);
+
+		// Fill with semi-transparent black
+		SDL_SetRenderDrawColor(renderer, Colour(COLOURS::BLACK, alpha));
+		SDL_RenderFillRect(renderer, &screen_rect);
+	}
+}
+
+void Game::render_fade_out_rect(float delay) {
+	if (timer_handler.get_timer_state(TIMER_ID::MENU_TRANSITION_FADE) == TimerState::RUNNING &&
+		timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) <= delay) {
+
+		SDL_Rect screen_rect{ 0, 0, WINDOW::WIDTH, WINDOW::HEIGHT };
+
+		// Calculate alpha
+		uint8_t alpha = 0xFF * (timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) / delay); // -DELAY::MENU_INTRO_TRANSITION_FADE_START
+
+		// Fill with semi-transparent black
+		SDL_SetRenderDrawColor(renderer, Colour(COLOURS::BLACK, alpha));
+		SDL_RenderFillRect(renderer, &screen_rect);
+	}
 }
 
 

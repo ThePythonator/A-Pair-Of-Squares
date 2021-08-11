@@ -13,6 +13,7 @@ public:
 	void update(InputHandler& input_handler, LevelHandler& level_handler, float dt);
 
 	void render(Spritesheet& spritesheet);
+	void render(Spritesheet& spritesheet, Camera& camera);
 
 	float get_blue_x();
 	float get_blue_y();

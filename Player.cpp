@@ -74,6 +74,11 @@ void Player::render(Spritesheet& spritesheet) {
 	pink.render(spritesheet);
 }
 
+void Player::render(Spritesheet& spritesheet, Camera& camera) {
+	blue.render(spritesheet, camera);
+	pink.render(spritesheet, camera);
+}
+
 //void Player::set_spawns(int blue_x, int blue_y, int pink_x, int pink_y) {
 //	blue = Square(0, blue_x, blue_y);
 //	pink = Square(4, pink_x, pink_y);

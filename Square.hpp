@@ -33,6 +33,7 @@ public:
 	void update(std::vector<Tile>& tiles, float dt);
 
 	void render(Spritesheet& spritesheet);
+	void render(Spritesheet& spritesheet, Camera& camera);
 
 	void accelerate(float acceleration, float maximum, float dt);
 	void decelerate(float deceleration, float dt);

@@ -4,14 +4,14 @@ Camera::Camera() {
 
 }
 
-Camera::Camera(float x, float y, float ratio) {//, uint16_t screen_mid_x, uint16_t screen_mid_y
+Camera::Camera(float x, float y, float ratio, uint16_t screen_mid_x, uint16_t screen_mid_y) {
 	this->x = x;
 	this->y = y;
 
 	this->ratio = ratio;
 
-	/*this->screen_mid_x = screen_mid_x;
-	this->screen_mid_y = screen_mid_y;*/
+	this->screen_mid_x = screen_mid_x;
+	this->screen_mid_y = screen_mid_y;
 }
 
 void Camera::update(float dt, float player_x, float player_y) {
@@ -20,11 +20,11 @@ void Camera::update(float dt, float player_x, float player_y) {
 }
 
 float Camera::get_view_x(float x) {
-	return x - this->x;// +screen_mid_x;
+	return x - this->x + screen_mid_x;
 }
 
 float Camera::get_view_y(float y) {
-	return y - this->y;// +screen_mid_y;
+	return y - this->y + screen_mid_y;
 }
 
 
@@ -39,6 +39,10 @@ Tile::Tile(uint16_t sprite_index, uint16_t x, uint16_t y) {
 
 	this->x = x;
 	this->y = y;
+}
+
+void Tile::render(Spritesheet& spritesheet) {
+	spritesheet.sprite_scaled(sprite_index, x, y);
 }
 
 void Tile::render(Spritesheet& spritesheet, Camera& camera) {
@@ -128,6 +132,16 @@ void LevelHandler::load_level(const uint8_t level_data[]) {
 //void LevelHandler::update(float dt) {
 //
 //}
+
+void LevelHandler::render(Spritesheet& spritesheet) {
+	for (Tile& tile : tiles) {
+		tile.render(spritesheet);
+	}
+
+	// Render finish
+	spritesheet.sprite_scaled(96, level_finish_blue_x, level_finish_blue_y);
+	spritesheet.sprite_scaled(97, level_finish_pink_x, level_finish_pink_y);
+}
 
 void LevelHandler::render(Spritesheet& spritesheet, Camera& camera) {
 	for (Tile& tile : tiles) {

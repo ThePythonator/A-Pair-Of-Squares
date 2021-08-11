@@ -71,6 +71,10 @@ private:
 	//void setup_game_paused();
 	void setup_game_end();
 
+	// Transition functions
+	void render_fade_in_rect(float delay);
+	void render_fade_out_rect(float delay);
+
 	// Utility functions
 	void handle_menu_shape_particles();
 	ImageParticle create_menu_shape_particle();
@@ -133,7 +137,7 @@ private:
 	Player player;
 
 	// Camera
-	Camera camera;
+	//Camera camera;
 
 	// Level handler
 	LevelHandler level_handler;
