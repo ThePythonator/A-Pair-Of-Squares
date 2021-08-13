@@ -41,17 +41,6 @@ void SDL_SetTextureColorMod(SDL_Texture* texture, const Colour& colour) {
 }
 
 
-bool is_colliding(Tile& tile, float x, float y, uint8_t sprite_size) {
-	return (tile.get_x() + sprite_size > x && tile.get_x() < x + sprite_size && tile.get_y() + sprite_size > y && tile.get_y() < y + sprite_size);
-}
-
-bool is_colliding(float tile_x, float tile_y, float x, float y, uint8_t sprite_size) {
-	return (tile_x + sprite_size > x && tile_x < x + sprite_size && tile_y + sprite_size > y && tile_y < y + sprite_size);
-}
-
-bool is_on_tile(Tile& tile, float x, float y, uint8_t sprite_size) {
-	return (tile.get_x() + sprite_size > x && tile.get_x() < x + sprite_size && tile.get_y() == y + sprite_size);
-}
 
 
 std::string trim_precision(std::string string, uint8_t precision) {

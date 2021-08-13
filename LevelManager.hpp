@@ -4,7 +4,7 @@
 
 #include "Spritesheet.hpp"
 //#include "Player.hpp"
-#include "Star.hpp"
+#include "Orb.hpp"
 
 // Struct header generated for the tmx files
 #pragma pack(push,1)
@@ -72,16 +72,24 @@ public:
 	void render(Spritesheet& spritesheet);
 	void render(Spritesheet& spritesheet, Camera& camera);
 
+	uint8_t handle_orb_collisions(float x, float y, uint8_t type);
+
 	std::vector<Tile> get_tiles();
-	std::vector<Star> get_stars();
+	//std::vector<Orb> get_orbs();
 
 	uint8_t get_sprite_size();
 
 private:
 	std::vector<Tile> tiles;
-	std::vector<Star> stars;
+	std::vector<Orb> orbs;
 
 	uint8_t sprite_size;
 };
 
 // TODO: add method of loading tmx data into Level
+
+
+bool is_colliding(Tile& tile, float x, float y, uint8_t sprite_size);
+bool is_colliding(float tile_x, float tile_y, float x, float y, uint8_t sprite_size);
+
+bool is_on_tile(Tile& tile, float x, float y, uint8_t sprite_size);

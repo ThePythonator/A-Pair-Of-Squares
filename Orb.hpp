@@ -3,10 +3,10 @@
 #include "Entity.hpp"
 #include "Spritesheet.hpp"
 
-class Star : public Entity {
+class Orb : public Entity {
 public:
-	Star();
-	Star(uint8_t sprite_index, float x, float y);
+	Orb();
+	Orb(uint8_t sprite_index, uint8_t type, float x, float y);
 
 	//void update(std::vector<Tile>& tiles, float dt);
 
@@ -21,7 +21,12 @@ public:
 	//void add_velocity(float x_vel, float y_vel);
 
 	void set_collected();
+	bool get_collected();
+
+	uint8_t get_type();
 
 protected:
 	bool collected = false;
+
+	uint8_t type = 0;
 };

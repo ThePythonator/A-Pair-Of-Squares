@@ -4,7 +4,8 @@
 const uint8_t* asset_levels[] = {
 	asset_level_0,
 	asset_level_1,
-	asset_level_2
+	asset_level_2,
+	asset_level_3
 };
 
 // Constants
@@ -120,7 +121,7 @@ namespace STRINGS {
 
 		namespace LEVEL_COMPLETED {
 			const std::string TEXT_TIME_TAKEN = "Time taken";
-			const std::string TEXT_STARS_COLLECTED = "Stars collected";
+			const std::string TEXT_ORBS_COLLECTED = "Orbs collected";
 			const std::string TEXT_NUMBER_OF_DEATHS = "Number of deaths";
 			const std::string TEXT_SCORE = "Score";
 			const std::string OPTION_CONTINUE = "Continue";
@@ -854,19 +855,19 @@ void Game::render_game_end() {
 	// Calculate score
 	//TODO - remove hard coded constants
 	uint16_t score = 200;
-	score += 10 * player.get_star_count();
+	score += 10 * player.get_orb_count();
 	score -= (uint16_t)timer_handler.get_timer(TIMER_ID::GAME_DURATION);
 	score -= 40 * player.get_death_count();
 
 	// Convert to strings
 	std::string time_string = trim_precision(std::to_string(timer_handler.get_timer(TIMER_ID::GAME_DURATION)), MENU::FLOAT_TEXT_PRECISION);
-	std::string stars_string = std::to_string(player.get_star_count());
+	std::string orbs_string = std::to_string(player.get_orb_count());
 	std::string death_count_string = std::to_string(player.get_death_count());
 	std::string score_string = std::to_string(score);
 
 	// Display stats
 	TextHandler::render_text(font_white, STRINGS::MENU::LEVEL_COMPLETED::TEXT_TIME_TAKEN + STRINGS::COLON_SPACE + time_string, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 7, SPRITES::SPACE_WIDTH);
-	TextHandler::render_text(font_white, STRINGS::MENU::LEVEL_COMPLETED::TEXT_STARS_COLLECTED + STRINGS::COLON_SPACE + stars_string, right_x, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 4, SPRITES::SPACE_WIDTH);
+	TextHandler::render_text(font_white, STRINGS::MENU::LEVEL_COMPLETED::TEXT_ORBS_COLLECTED + STRINGS::COLON_SPACE + orbs_string, right_x, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 4, SPRITES::SPACE_WIDTH);
 	TextHandler::render_text(font_white, STRINGS::MENU::LEVEL_COMPLETED::TEXT_NUMBER_OF_DEATHS + STRINGS::COLON_SPACE + death_count_string, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 1, SPRITES::SPACE_WIDTH);
 	TextHandler::render_text(font_white, STRINGS::MENU::LEVEL_COMPLETED::TEXT_SCORE + STRINGS::COLON_SPACE + score_string, right_x, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE_HALF * 2, SPRITES::SPACE_WIDTH);
 	

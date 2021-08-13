@@ -157,6 +157,11 @@ void Square::add_velocity(float x_vel, float y_vel) {
 	this->y_vel += y_vel;
 }
 
+//void Square::add_velocity(float x_vel, float y_vel, float dt) {
+//	this->x_vel += x_vel * dt;
+//	this->y_vel += y_vel * dt;
+//}
+
 void Square::set_finished(bool finished) {
 	this->finished = finished;
 }

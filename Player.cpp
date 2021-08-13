@@ -31,8 +31,8 @@ void Player::update(InputHandler& input_handler, LevelHandler& level_handler, fl
 	}
 
 	if (KeyHandler::is_down(input_handler.get_key_union().keys.SPACE)) {
-		blue.jump(SQAURE_JUMP_STRENGTH);
-		pink.jump(SQAURE_JUMP_STRENGTH);
+		blue.jump(SQUARE_JUMP_STRENGTH);
+		pink.jump(SQUARE_JUMP_STRENGTH);
 	}
 
 	// Update player physics
@@ -41,9 +41,9 @@ void Player::update(InputHandler& input_handler, LevelHandler& level_handler, fl
 
 	// Draw players towards finishes if in both are in range
 	if (std::abs(blue.get_x() - level_handler.level_finish_blue_x) < level_handler.get_sprite_size() &&
-		std::abs(blue.get_y() - level_handler.level_finish_blue_y) < level_handler.get_sprite_size() &&
+		std::abs(blue.get_y() - level_handler.level_finish_blue_y) < level_handler.get_sprite_size() / 2 &&
 		std::abs(pink.get_x() - level_handler.level_finish_pink_x) < level_handler.get_sprite_size() &&
-		std::abs(pink.get_y() - level_handler.level_finish_pink_y) < level_handler.get_sprite_size() &&
+		std::abs(pink.get_y() - level_handler.level_finish_pink_y) < level_handler.get_sprite_size() / 2 &&
 		!blue.get_finished() && !pink.get_finished()) {
 
 		//float blue_vel_x = SQUARE_FINISH_PULL_VELOCITY * (level_handler.level_finish_blue_x - blue.get_x());
@@ -62,8 +62,24 @@ void Player::update(InputHandler& input_handler, LevelHandler& level_handler, fl
 		//blue.add_velocity(blue_vel_x, blue_vel_y);
 		//pink.add_velocity(pink_vel_x, pink_vel_y);
 
-		blue.add_velocity(SQUARE_FINISH_PULL_VELOCITY * (level_handler.level_finish_blue_x - blue.get_x() > 0 ? 1 : -1), 0.0f);
-		pink.add_velocity(SQUARE_FINISH_PULL_VELOCITY * (level_handler.level_finish_pink_x - pink.get_x() > 0 ? 1 : -1), 0.0f);
+		//blue.add_velocity(SQUARE_FINISH_PULL_VELOCITY * (level_handler.level_finish_blue_x - blue.get_x() > 0 ? 1 : -1), 0.0f);
+		//pink.add_velocity(SQUARE_FINISH_PULL_VELOCITY * (level_handler.level_finish_pink_x - pink.get_x() > 0 ? 1 : -1), 0.0f);
+
+		float blue_vel_x = SQUARE_FINISH_PULL_VELOCITY * (level_handler.level_finish_blue_x - blue.get_x());
+		float blue_vel_y = SQUARE_FINISH_PULL_VELOCITY * (level_handler.level_finish_blue_y - blue.get_y());
+
+		float pink_vel_x = SQUARE_FINISH_PULL_VELOCITY * (level_handler.level_finish_pink_x - pink.get_x());
+		float pink_vel_y = SQUARE_FINISH_PULL_VELOCITY * (level_handler.level_finish_pink_y - pink.get_y());
+
+		if (std::abs(blue_vel_x) < SQUARE_FINISH_PULL_MIN_VELOCITY) {
+			blue_vel_x = SQUARE_FINISH_PULL_MIN_VELOCITY * blue_vel_x > 0 ? 1 : -1;
+		}
+		if (std::abs(pink_vel_x) < SQUARE_FINISH_PULL_MIN_VELOCITY) {
+			pink_vel_x = SQUARE_FINISH_PULL_MIN_VELOCITY * pink_vel_x > 0 ? 1 : -1;
+		}
+
+		blue.add_velocity(blue_vel_x, blue_vel_y);
+		pink.add_velocity(pink_vel_x, pink_vel_y);
 	}
 
 	blue.update(tiles, dt);
@@ -85,14 +101,8 @@ void Player::update(InputHandler& input_handler, LevelHandler& level_handler, fl
 	}
 
 	// Handle star collisions
-	for (Star& star : level_handler.get_stars()) {
-		if (is_colliding(star.get_x(), star.get_y(), blue.get_x(), blue.get_y(), level_handler.get_sprite_size())) {
-			star.set_collected();
-		}
-		else if (is_colliding(star.get_x(), star.get_y(), pink.get_x(), pink.get_y(), level_handler.get_sprite_size())) {
-			star.set_collected();
-		}
-	}
+	orb_count += level_handler.handle_orb_collisions(blue.get_x(), blue.get_y(), 0);
+	orb_count += level_handler.handle_orb_collisions(pink.get_x(), pink.get_y(), 1);
 }
 
 void Player::render(Spritesheet& spritesheet) {
@@ -112,15 +122,15 @@ void Player::render(Spritesheet& spritesheet, Camera& camera) {
 
 void Player::reset_stats() {
 	death_count = 0;
-	star_count = 0;
+	orb_count = 0;
 }
 
 uint8_t Player::get_death_count() {
 	return death_count;
 }
 
-uint8_t Player::get_star_count() {
-	return star_count;
+uint8_t Player::get_orb_count() {
+	return orb_count;
 }
 
 float Player::get_blue_x() {

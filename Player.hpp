@@ -18,7 +18,7 @@ public:
 	void reset_stats();
 
 	uint8_t get_death_count();
-	uint8_t get_star_count();
+	uint8_t get_orb_count();
 
 	float get_blue_x();
 	float get_blue_y();
@@ -31,5 +31,5 @@ protected:
 	Square blue, pink;
 
 	uint8_t death_count = 0;
-	uint8_t star_count = 0;
+	uint8_t orb_count = 0;
 };

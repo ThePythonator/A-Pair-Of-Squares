@@ -7,12 +7,17 @@ namespace TILE_ID {
 	}
 
 	namespace TILE {
-		const uint16_t STAR = 8;
+		//const uint16_t STAR = 8;
 	}
 
 	namespace FINISH {
 		const uint16_t BLUE = 96;
 		const uint16_t PINK = 97;
+	}
+
+	namespace ORB {
+		const uint16_t BLUE = 98;
+		const uint16_t PINK = 99;
 	}
 }
 
@@ -138,9 +143,13 @@ void LevelHandler::load_level(const uint8_t level_data[]) {
 				level_finish_pink_x = (i % level_tmx->width) * sprite_size;
 				level_finish_pink_y = (i / level_tmx->width) * sprite_size;
 			}
-			else if (level_tmx->data[i] == TILE_ID::TILE::STAR) {
+			else if (level_tmx->data[i] == TILE_ID::ORB::BLUE) {
 				// Star
-				stars.push_back(Star(level_tmx->data[i], (i % level_tmx->width) * sprite_size, (i / level_tmx->width) * sprite_size));
+				orbs.push_back(Orb(level_tmx->data[i], 0, (i % level_tmx->width) * sprite_size, (i / level_tmx->width) * sprite_size));
+			}
+			else if (level_tmx->data[i] == TILE_ID::ORB::PINK) {
+				// Star
+				orbs.push_back(Orb(level_tmx->data[i], 1, (i % level_tmx->width) * sprite_size, (i / level_tmx->width) * sprite_size));
 			}
 			else {
 				tiles.push_back(Tile(level_tmx->data[i], (i % level_tmx->width) * sprite_size, (i / level_tmx->width) * sprite_size));
@@ -158,8 +167,8 @@ void LevelHandler::render(Spritesheet& spritesheet) {
 		tile.render(spritesheet);
 	}
 
-	for (Star& star : stars) {
-		star.render(spritesheet);
+	for (Orb& orb : orbs) {
+		orb.render(spritesheet);
 	}
 
 	// Render finish
@@ -177,14 +186,47 @@ void LevelHandler::render(Spritesheet& spritesheet, Camera& camera) {
 	spritesheet.sprite_scaled(TILE_ID::FINISH::PINK, camera.get_view_x(level_finish_pink_x), camera.get_view_y(level_finish_pink_y));
 }
 
+uint8_t LevelHandler::handle_orb_collisions(float x, float y, uint8_t type) {
+	// Handle star collisions
+	uint8_t count = 0;
+
+	for (Orb& orb : orbs) {
+		// Orb hasn't been collected and is same colour as player
+		if (!orb.get_collected() && type == orb.get_type()) {
+			// Orb is colliding
+			if (is_colliding(orb.get_x(), orb.get_y(), x, y, sprite_size)) {
+				orb.set_collected();
+				count++;
+				//printf("orb %u, %u, collected: %u\n", type, orb.get_type(), orb.get_collected());
+			}
+		}
+	}
+
+	return count;
+}
+
 std::vector<Tile> LevelHandler::get_tiles() {
 	return tiles;
 }
 
-std::vector<Star> LevelHandler::get_stars() {
-	return stars;
-}
+//std::vector<Orb> LevelHandler::get_orbs() {
+//	return orbs;
+//}
 
 uint8_t LevelHandler::get_sprite_size() {
 	return sprite_size;
+}
+
+
+
+bool is_colliding(Tile& tile, float x, float y, uint8_t sprite_size) {
+	return (tile.get_x() + sprite_size > x && tile.get_x() < x + sprite_size && tile.get_y() + sprite_size > y && tile.get_y() < y + sprite_size);
+}
+
+bool is_colliding(float tile_x, float tile_y, float x, float y, uint8_t sprite_size) {
+	return (tile_x + sprite_size > x && tile_x < x + sprite_size && tile_y + sprite_size > y && tile_y < y + sprite_size);
+}
+
+bool is_on_tile(Tile& tile, float x, float y, uint8_t sprite_size) {
+	return (tile.get_x() + sprite_size > x && tile.get_x() < x + sprite_size && tile.get_y() == y + sprite_size);
 }
