@@ -52,3 +52,9 @@ bool is_colliding(float tile_x, float tile_y, float x, float y, uint8_t sprite_s
 bool is_on_tile(Tile& tile, float x, float y, uint8_t sprite_size) {
 	return (tile.get_x() + sprite_size > x && tile.get_x() < x + sprite_size && tile.get_y() == y + sprite_size);
 }
+
+
+std::string trim_precision(std::string string, uint8_t precision) {
+	// Trim string to precision
+	return string.substr(0, string.find('.') + precision + 1);
+}

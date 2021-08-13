@@ -2,6 +2,8 @@
 
 #include "SDL.h"
 
+#include <string>
+
 #include "LevelManager.hpp"
 
 // Struct for colours
@@ -27,3 +29,5 @@ bool is_colliding(Tile& tile, float x, float y, uint8_t sprite_size);
 bool is_colliding(float tile_x, float tile_y, float x, float y, uint8_t sprite_size);
 
 bool is_on_tile(Tile& tile, float x, float y, uint8_t sprite_size);
+
+std::string trim_precision(std::string string, uint8_t precision);

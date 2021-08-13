@@ -75,13 +75,20 @@ private:
 	void render_fade_in_rect(float delay);
 	void render_fade_out_rect(float delay);
 
+	std::pair<float, float> get_bezier_text_positions();
+
 	// Utility functions
 	void handle_menu_shape_particles();
 	ImageParticle create_menu_shape_particle();
+
 	ImageParticle create_game_finish_particle(float x, float y, uint8_t id);
+
 	void fill_menu_shape_particle(uint8_t count);
 	void setup_menu_shape_particles();
+
 	bool level_is_completed();
+
+	void reset_level_stats();
 
 
 	// Loading functions
@@ -143,7 +150,7 @@ private:
 	LevelHandler level_handler;
 
 
-	// State variables
+	// State/data variables
 
 	bool running = false;
 

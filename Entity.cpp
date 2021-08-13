@@ -23,6 +23,23 @@ void Entity::render(Spritesheet& spritesheet) {
 	spritesheet.sprite_scaled(sprite_index, x, y);
 }
 
+float Entity::get_x() {
+	return x;
+}
+
+float Entity::get_y() {
+	return y;
+}
+
+void Entity::set_x(float x) {
+	this->x = x;
+}
+
+void Entity::set_y(float y) {
+	this->y = y;
+}
+
+
 // AnimatedEntity?
 // has Frame::IDLE, WALK, FALL, JUMP etc? then render() picks best?
 

@@ -40,32 +40,58 @@ void Player::update(InputHandler& input_handler, LevelHandler& level_handler, fl
 	pink.gravity(SQUARE_GRAVITY, SQUARE_GRAVITY_MAX, dt);
 
 	// Draw players towards finishes if in both are in range
-	if (
-		std::abs(blue.x - level_handler.level_finish_blue_x) < level_handler.get_sprite_size() &&
-		std::abs(blue.y - level_handler.level_finish_blue_y) < level_handler.get_sprite_size() &&
-		std::abs(pink.x - level_handler.level_finish_pink_x) < level_handler.get_sprite_size() &&
-		std::abs(pink.y - level_handler.level_finish_pink_y) < level_handler.get_sprite_size()) {
+	if (std::abs(blue.get_x() - level_handler.level_finish_blue_x) < level_handler.get_sprite_size() &&
+		std::abs(blue.get_y() - level_handler.level_finish_blue_y) < level_handler.get_sprite_size() &&
+		std::abs(pink.get_x() - level_handler.level_finish_pink_x) < level_handler.get_sprite_size() &&
+		std::abs(pink.get_y() - level_handler.level_finish_pink_y) < level_handler.get_sprite_size() &&
+		!blue.get_finished() && !pink.get_finished()) {
 
-		blue.add_velocity(SQAURE_FINISH_PULL_VELOCITY * (level_handler.level_finish_blue_x - blue.x), SQAURE_FINISH_PULL_VELOCITY * (level_handler.level_finish_blue_y - blue.y));
-		pink.add_velocity(SQAURE_FINISH_PULL_VELOCITY * (level_handler.level_finish_pink_x - pink.x), SQAURE_FINISH_PULL_VELOCITY * (level_handler.level_finish_pink_y - pink.y));
+		//float blue_vel_x = SQUARE_FINISH_PULL_VELOCITY * (level_handler.level_finish_blue_x - blue.get_x());
+		//float blue_vel_y = 0.0f;//SQAURE_FINISH_PULL_VELOCITY * (level_handler.level_finish_blue_y - blue.get_y());
+
+		//float pink_vel_x = SQUARE_FINISH_PULL_VELOCITY * (level_handler.level_finish_pink_x - pink.get_x());
+		//float pink_vel_y = 0.0f;//SQUARE_FINISH_PULL_MIN_VELOCITY * (level_handler.level_finish_pink_y - pink.get_y());
+
+		/*if (std::abs(blue_vel_x) < SQUARE_FINISH_PULL_MIN_VELOCITY) {
+			blue_vel_x = SQUARE_FINISH_PULL_MIN_VELOCITY * blue_vel_x > 0 ? 1 : -1;
+		}
+		if (std::abs(pink_vel_x) < SQUARE_FINISH_PULL_MIN_VELOCITY) {
+			pink_vel_x = SQUARE_FINISH_PULL_MIN_VELOCITY * pink_vel_x > 0 ? 1 : -1;
+		}*/
+
+		//blue.add_velocity(blue_vel_x, blue_vel_y);
+		//pink.add_velocity(pink_vel_x, pink_vel_y);
+
+		blue.add_velocity(SQUARE_FINISH_PULL_VELOCITY * (level_handler.level_finish_blue_x - blue.get_x() > 0 ? 1 : -1), 0.0f);
+		pink.add_velocity(SQUARE_FINISH_PULL_VELOCITY * (level_handler.level_finish_pink_x - pink.get_x() > 0 ? 1 : -1), 0.0f);
 	}
 
 	blue.update(tiles, dt);
 	pink.update(tiles, dt);
 
 	// If players are already on finish, keep them locked
-	if (std::abs(blue.x - level_handler.level_finish_blue_x) < SQAURE_FINISH_STOP_PULL &&
-		std::abs(blue.y - level_handler.level_finish_blue_y) < SQAURE_FINISH_STOP_PULL &&
-		std::abs(pink.x - level_handler.level_finish_pink_x) < SQAURE_FINISH_STOP_PULL &&
-		std::abs(pink.y - level_handler.level_finish_pink_y) < SQAURE_FINISH_STOP_PULL) {
+	if (std::abs(blue.get_x() - level_handler.level_finish_blue_x) < SQUARE_FINISH_MIN_DISTANCE &&
+		std::abs(blue.get_y() - level_handler.level_finish_blue_y) < SQUARE_FINISH_MIN_DISTANCE &&
+		std::abs(pink.get_x() - level_handler.level_finish_pink_x) < SQUARE_FINISH_MIN_DISTANCE &&
+		std::abs(pink.get_y() - level_handler.level_finish_pink_y) < SQUARE_FINISH_MIN_DISTANCE) {
 
-		blue.x = level_handler.level_finish_blue_x;
-		blue.y = level_handler.level_finish_blue_y;
-		pink.x = level_handler.level_finish_pink_x;
-		pink.y = level_handler.level_finish_pink_y;
+		blue.set_x(level_handler.level_finish_blue_x);
+		blue.set_y(level_handler.level_finish_blue_y);
+		pink.set_x(level_handler.level_finish_pink_x);
+		pink.set_y(level_handler.level_finish_pink_y);
 
 		blue.set_finished();
 		pink.set_finished();
+	}
+
+	// Handle star collisions
+	for (Star& star : level_handler.get_stars()) {
+		if (is_colliding(star.get_x(), star.get_y(), blue.get_x(), blue.get_y(), level_handler.get_sprite_size())) {
+			star.set_collected();
+		}
+		else if (is_colliding(star.get_x(), star.get_y(), pink.get_x(), pink.get_y(), level_handler.get_sprite_size())) {
+			star.set_collected();
+		}
 	}
 }
 
@@ -84,18 +110,31 @@ void Player::render(Spritesheet& spritesheet, Camera& camera) {
 //	pink = Square(4, pink_x, pink_y);
 //}
 
+void Player::reset_stats() {
+	death_count = 0;
+	star_count = 0;
+}
+
+uint8_t Player::get_death_count() {
+	return death_count;
+}
+
+uint8_t Player::get_star_count() {
+	return star_count;
+}
+
 float Player::get_blue_x() {
-	return blue.x;
+	return blue.get_x();
 }
 
 float Player::get_blue_y() {
-	return blue.y;
+	return blue.get_y();
 }
 
 float Player::get_pink_x() {
-	return pink.x;
+	return pink.get_x();
 }
 
 float Player::get_pink_y() {
-	return pink.y;
+	return pink.get_y();
 }

@@ -3,6 +3,8 @@
 #include <vector>
 
 #include "Spritesheet.hpp"
+//#include "Player.hpp"
+#include "Star.hpp"
 
 // Struct header generated for the tmx files
 #pragma pack(push,1)
@@ -64,16 +66,20 @@ public:
 
 	void load_level(const uint8_t level_data[]);
 
-	//void update(float dt);
+	//void update(Player& player, float dt);
+
+
 	void render(Spritesheet& spritesheet);
 	void render(Spritesheet& spritesheet, Camera& camera);
 
 	std::vector<Tile> get_tiles();
+	std::vector<Star> get_stars();
 
 	uint8_t get_sprite_size();
 
 private:
 	std::vector<Tile> tiles;
+	std::vector<Star> stars;
 
 	uint8_t sprite_size;
 };

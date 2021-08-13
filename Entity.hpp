@@ -12,8 +12,6 @@ typedef std::vector<AnimationFrame> AnimationFrames;
 
 class Entity {
 public:
-	float x, y;
-
 	Entity();
 	Entity(uint8_t sprite_index, float x, float y);
 
@@ -21,7 +19,14 @@ public:
 
 	void render(Spritesheet& spritesheet);
 
+	float get_x();
+	float get_y();
+
+	void set_x(float x);
+	void set_y(float y);
+
 protected:
+	float x, y;
 	float x_vel, y_vel;
 
 	uint8_t sprite_index;

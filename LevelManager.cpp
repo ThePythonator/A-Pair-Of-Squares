@@ -1,5 +1,21 @@
 #include "LevelManager.hpp"
 
+namespace TILE_ID {
+	namespace PLAYER {
+		const uint16_t BLUE = 0;
+		const uint16_t PINK = 4;
+	}
+
+	namespace TILE {
+		const uint16_t STAR = 8;
+	}
+
+	namespace FINISH {
+		const uint16_t BLUE = 96;
+		const uint16_t PINK = 97;
+	}
+}
+
 Camera::Camera() {
 
 }
@@ -102,25 +118,29 @@ void LevelHandler::load_level(const uint8_t level_data[]) {
 	for (uint16_t i = 0; i < level_tmx->height * level_tmx->width; i++) {
 		if (level_tmx->data[i] != level_tmx->empty_tile) {
 			// TODO: remove literals
-			if (level_tmx->data[i] == 0) {
+			if (level_tmx->data[i] == TILE_ID::PLAYER::BLUE) {
 				// Blue spawn
 				level_spawn_blue_x = (i % level_tmx->width) * sprite_size;
 				level_spawn_blue_y = (i / level_tmx->width) * sprite_size;
 			}
-			else if (level_tmx->data[i] == 4) {
+			else if (level_tmx->data[i] == TILE_ID::PLAYER::PINK) {
 				// Pink spawn
 				level_spawn_pink_x = (i % level_tmx->width) * sprite_size;
 				level_spawn_pink_y = (i / level_tmx->width) * sprite_size;
 			}
-			else if (level_tmx->data[i] == 96) {
+			else if (level_tmx->data[i] == TILE_ID::FINISH::BLUE) {
 				// Finish spawn for blue
 				level_finish_blue_x = (i % level_tmx->width) * sprite_size;
 				level_finish_blue_y = (i / level_tmx->width) * sprite_size;
 			}
-			else if (level_tmx->data[i] == 97) {
+			else if (level_tmx->data[i] == TILE_ID::FINISH::PINK) {
 				// Finish spawn for pink
 				level_finish_pink_x = (i % level_tmx->width) * sprite_size;
 				level_finish_pink_y = (i / level_tmx->width) * sprite_size;
+			}
+			else if (level_tmx->data[i] == TILE_ID::TILE::STAR) {
+				// Star
+				stars.push_back(Star(level_tmx->data[i], (i % level_tmx->width) * sprite_size, (i / level_tmx->width) * sprite_size));
 			}
 			else {
 				tiles.push_back(Tile(level_tmx->data[i], (i % level_tmx->width) * sprite_size, (i / level_tmx->width) * sprite_size));
@@ -129,8 +149,8 @@ void LevelHandler::load_level(const uint8_t level_data[]) {
 	}
 }
 
-//void LevelHandler::update(float dt) {
-//
+//void LevelHandler::update(Player& player, float dt) {
+//	// todo: check if player is colliding with any star
 //}
 
 void LevelHandler::render(Spritesheet& spritesheet) {
@@ -138,9 +158,13 @@ void LevelHandler::render(Spritesheet& spritesheet) {
 		tile.render(spritesheet);
 	}
 
+	for (Star& star : stars) {
+		star.render(spritesheet);
+	}
+
 	// Render finish
-	spritesheet.sprite_scaled(96, level_finish_blue_x, level_finish_blue_y);
-	spritesheet.sprite_scaled(97, level_finish_pink_x, level_finish_pink_y);
+	spritesheet.sprite_scaled(TILE_ID::FINISH::BLUE, level_finish_blue_x, level_finish_blue_y);
+	spritesheet.sprite_scaled(TILE_ID::FINISH::PINK, level_finish_pink_x, level_finish_pink_y);
 }
 
 void LevelHandler::render(Spritesheet& spritesheet, Camera& camera) {
@@ -149,12 +173,16 @@ void LevelHandler::render(Spritesheet& spritesheet, Camera& camera) {
 	}
 
 	// Render finish
-	spritesheet.sprite_scaled(96, camera.get_view_x(level_finish_blue_x), camera.get_view_y(level_finish_blue_y));
-	spritesheet.sprite_scaled(97, camera.get_view_x(level_finish_pink_x), camera.get_view_y(level_finish_pink_y));
+	spritesheet.sprite_scaled(TILE_ID::FINISH::BLUE, camera.get_view_x(level_finish_blue_x), camera.get_view_y(level_finish_blue_y));
+	spritesheet.sprite_scaled(TILE_ID::FINISH::PINK, camera.get_view_x(level_finish_pink_x), camera.get_view_y(level_finish_pink_y));
 }
 
 std::vector<Tile> LevelHandler::get_tiles() {
 	return tiles;
+}
+
+std::vector<Star> LevelHandler::get_stars() {
+	return stars;
 }
 
 uint8_t LevelHandler::get_sprite_size() {
