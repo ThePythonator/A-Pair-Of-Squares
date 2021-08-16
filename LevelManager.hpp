@@ -5,6 +5,7 @@
 #include "Spritesheet.hpp"
 //#include "Player.hpp"
 #include "Orb.hpp"
+#include "Spike.hpp"
 
 // Struct header generated for the tmx files
 #pragma pack(push,1)
@@ -73,15 +74,19 @@ public:
 	void render(Spritesheet& spritesheet, Camera& camera);
 
 	uint8_t handle_orb_collisions(float x, float y, uint8_t type);
+	bool handle_spike_collisions(float x, float y);
 
 	std::vector<Tile> get_tiles();
 	//std::vector<Orb> get_orbs();
+
+	Spike::SpikeDirection parse_spike_id(uint16_t spike_id);
 
 	uint8_t get_sprite_size();
 
 private:
 	std::vector<Tile> tiles;
 	std::vector<Orb> orbs;
+	std::vector<Spike> spikes;
 
 	uint8_t sprite_size;
 };

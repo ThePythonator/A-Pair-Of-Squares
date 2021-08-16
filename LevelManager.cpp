@@ -6,8 +6,23 @@ namespace TILE_ID {
 		const uint16_t PINK = 4;
 	}
 
-	namespace TILE {
-		//const uint16_t STAR = 8;
+	namespace SPIKE {
+		const uint16_t DOUBLE_BOTTOM = 44;
+		const uint16_t DOUBLE_LEFT = 45;
+		const uint16_t DOUBLE_TOP = 46;
+		const uint16_t DOUBLE_RIGHT = 47;
+
+		const uint16_t SINGLE_BOTTOM_LEFT = 60;
+		const uint16_t SINGLE_BOTTOM_RIGHT = 61;
+
+		const uint16_t SINGLE_LEFT_TOP = 62;
+		const uint16_t SINGLE_LEFT_BOTTOM = 63;
+
+		const uint16_t SINGLE_TOP_LEFT = 76;
+		const uint16_t SINGLE_TOP_RIGHT = 77;
+
+		const uint16_t SINGLE_RIGHT_TOP = 78;
+		const uint16_t SINGLE_RIGHT_BOTTOM = 79;
 	}
 
 	namespace FINISH {
@@ -122,37 +137,66 @@ void LevelHandler::load_level(const uint8_t level_data[]) {
 
 	for (uint16_t i = 0; i < level_tmx->height * level_tmx->width; i++) {
 		if (level_tmx->data[i] != level_tmx->empty_tile) {
-			// TODO: remove literals
-			if (level_tmx->data[i] == TILE_ID::PLAYER::BLUE) {
-				// Blue spawn
-				level_spawn_blue_x = (i % level_tmx->width) * sprite_size;
-				level_spawn_blue_y = (i / level_tmx->width) * sprite_size;
-			}
-			else if (level_tmx->data[i] == TILE_ID::PLAYER::PINK) {
-				// Pink spawn
-				level_spawn_pink_x = (i % level_tmx->width) * sprite_size;
-				level_spawn_pink_y = (i / level_tmx->width) * sprite_size;
-			}
-			else if (level_tmx->data[i] == TILE_ID::FINISH::BLUE) {
-				// Finish spawn for blue
-				level_finish_blue_x = (i % level_tmx->width) * sprite_size;
-				level_finish_blue_y = (i / level_tmx->width) * sprite_size;
-			}
-			else if (level_tmx->data[i] == TILE_ID::FINISH::PINK) {
-				// Finish spawn for pink
-				level_finish_pink_x = (i % level_tmx->width) * sprite_size;
-				level_finish_pink_y = (i / level_tmx->width) * sprite_size;
-			}
-			else if (level_tmx->data[i] == TILE_ID::ORB::BLUE) {
-				// Star
-				orbs.push_back(Orb(level_tmx->data[i], 0, (i % level_tmx->width) * sprite_size, (i / level_tmx->width) * sprite_size));
-			}
-			else if (level_tmx->data[i] == TILE_ID::ORB::PINK) {
-				// Star
-				orbs.push_back(Orb(level_tmx->data[i], 1, (i % level_tmx->width) * sprite_size, (i / level_tmx->width) * sprite_size));
-			}
-			else {
-				tiles.push_back(Tile(level_tmx->data[i], (i % level_tmx->width) * sprite_size, (i / level_tmx->width) * sprite_size));
+			switch (level_tmx->data[i]) {
+				case TILE_ID::PLAYER::BLUE:
+					// Blue spawn
+					level_spawn_blue_x = (i % level_tmx->width) * sprite_size;
+					level_spawn_blue_y = (i / level_tmx->width) * sprite_size;
+					break;
+
+				case TILE_ID::PLAYER::PINK:
+					// Pink spawn
+					level_spawn_pink_x = (i % level_tmx->width) * sprite_size;
+					level_spawn_pink_y = (i / level_tmx->width) * sprite_size;
+					break;
+
+				case TILE_ID::FINISH::BLUE:
+					// Finish spawn for blue
+					level_finish_blue_x = (i % level_tmx->width) * sprite_size;
+					level_finish_blue_y = (i / level_tmx->width) * sprite_size;
+					break;
+
+				case TILE_ID::FINISH::PINK:
+					// Finish spawn for pink
+					level_finish_pink_x = (i % level_tmx->width) * sprite_size;
+					level_finish_pink_y = (i / level_tmx->width) * sprite_size;
+					break;
+
+				case TILE_ID::ORB::BLUE:
+					// Blue orb
+					orbs.push_back(Orb(level_tmx->data[i], 0, (i% level_tmx->width)* sprite_size, (i / level_tmx->width)* sprite_size));
+					break;
+
+				case TILE_ID::ORB::PINK:
+					// Pink Orb
+					orbs.push_back(Orb(level_tmx->data[i], 1, (i% level_tmx->width)* sprite_size, (i / level_tmx->width)* sprite_size));
+					break;
+
+				case TILE_ID::SPIKE::DOUBLE_BOTTOM:
+				case TILE_ID::SPIKE::DOUBLE_LEFT:
+				case TILE_ID::SPIKE::DOUBLE_TOP:
+				case TILE_ID::SPIKE::DOUBLE_RIGHT:
+
+				case TILE_ID::SPIKE::SINGLE_BOTTOM_LEFT:
+				case TILE_ID::SPIKE::SINGLE_BOTTOM_RIGHT:
+
+				case TILE_ID::SPIKE::SINGLE_LEFT_TOP:
+				case TILE_ID::SPIKE::SINGLE_LEFT_BOTTOM:
+
+				case TILE_ID::SPIKE::SINGLE_TOP_LEFT:
+				case TILE_ID::SPIKE::SINGLE_TOP_RIGHT:
+
+				case TILE_ID::SPIKE::SINGLE_RIGHT_TOP:
+				case TILE_ID::SPIKE::SINGLE_RIGHT_BOTTOM:
+
+					// Spike
+					spikes.push_back(Spike(level_tmx->data[i], parse_spike_id(level_tmx->data[i]), (i% level_tmx->width)* sprite_size, (i / level_tmx->width)* sprite_size));
+					break;
+
+				default:
+					// Normal tile
+					tiles.push_back(Tile(level_tmx->data[i], (i % level_tmx->width) * sprite_size, (i / level_tmx->width) * sprite_size));
+					break;
 			}
 		}
 	}
@@ -198,11 +242,26 @@ uint8_t LevelHandler::handle_orb_collisions(float x, float y, uint8_t type) {
 				orb.set_collected();
 				count++;
 				//printf("orb %u, %u, collected: %u\n", type, orb.get_type(), orb.get_collected());
+
+				//TODO: create particle or something with same image which rotates, grows larger and fades at location of orb just collected
 			}
 		}
 	}
 
 	return count;
+}
+
+bool LevelHandler::handle_spike_collisions(float x, float y) {
+	for (Spike& spike : spikes) {
+		// Spike is colliding
+		if (is_colliding(spike.get_x(), spike.get_y(), x, y, sprite_size)) {
+			return true;
+
+			//TODO: create something to show player was killed
+		}
+	}
+
+	return false;
 }
 
 std::vector<Tile> LevelHandler::get_tiles() {
@@ -212,6 +271,50 @@ std::vector<Tile> LevelHandler::get_tiles() {
 //std::vector<Orb> LevelHandler::get_orbs() {
 //	return orbs;
 //}
+
+Spike::SpikeDirection LevelHandler::parse_spike_id(uint16_t spike_id) {
+	switch (spike_id) {
+	case TILE_ID::SPIKE::DOUBLE_BOTTOM:
+		return Spike::SpikeDirection::DOUBLE_BOTTOM;
+
+	case TILE_ID::SPIKE::DOUBLE_LEFT:
+		return Spike::SpikeDirection::DOUBLE_LEFT;
+
+	case TILE_ID::SPIKE::DOUBLE_TOP:
+		return Spike::SpikeDirection::DOUBLE_TOP;
+
+	case TILE_ID::SPIKE::DOUBLE_RIGHT:
+		return Spike::SpikeDirection::DOUBLE_RIGHT;
+
+	case TILE_ID::SPIKE::SINGLE_BOTTOM_LEFT:
+		return Spike::SpikeDirection::SINGLE_BOTTOM_LEFT;
+
+	case TILE_ID::SPIKE::SINGLE_BOTTOM_RIGHT:
+		return Spike::SpikeDirection::SINGLE_BOTTOM_RIGHT;
+
+	case TILE_ID::SPIKE::SINGLE_LEFT_TOP:
+		return Spike::SpikeDirection::SINGLE_LEFT_TOP;
+
+	case TILE_ID::SPIKE::SINGLE_LEFT_BOTTOM:
+		return Spike::SpikeDirection::SINGLE_LEFT_BOTTOM;
+
+	case TILE_ID::SPIKE::SINGLE_TOP_LEFT:
+		return Spike::SpikeDirection::SINGLE_TOP_LEFT;
+
+	case TILE_ID::SPIKE::SINGLE_TOP_RIGHT:
+		return Spike::SpikeDirection::SINGLE_TOP_RIGHT;
+
+	case TILE_ID::SPIKE::SINGLE_RIGHT_TOP:
+		return Spike::SpikeDirection::SINGLE_RIGHT_TOP;
+
+	case TILE_ID::SPIKE::SINGLE_RIGHT_BOTTOM:
+		return Spike::SpikeDirection::SINGLE_RIGHT_BOTTOM;
+
+	default:
+		// Pick one
+		return Spike::SpikeDirection::DOUBLE_BOTTOM;
+	}
+}
 
 uint8_t LevelHandler::get_sprite_size() {
 	return sprite_size;

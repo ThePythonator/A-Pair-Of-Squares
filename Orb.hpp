@@ -13,13 +13,6 @@ public:
 	void render(Spritesheet& spritesheet);
 	//void render(Spritesheet& spritesheet, Camera& camera);
 
-	/*void accelerate(float acceleration, float maximum, float dt);
-	void decelerate(float deceleration, float dt);
-	void gravity(float gravity, float maximum, float dt);
-	void jump(float strength);*/
-
-	//void add_velocity(float x_vel, float y_vel);
-
 	void set_collected();
 	bool get_collected();
 

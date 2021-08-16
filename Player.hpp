@@ -17,6 +17,8 @@ public:
 
 	void reset_stats();
 
+	void reset_player_positions(LevelHandler& level_handler);
+
 	uint8_t get_death_count();
 	uint8_t get_orb_count();
 

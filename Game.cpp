@@ -20,6 +20,8 @@ namespace SPRITES {
 
 	const uint8_t SPACE_WIDTH = 1;
 
+	const uint8_t TEXT_OFFSET_X = SIZE * 4;// 5 or 6 work too, but text looks too wide when beziering
+
 	namespace ID {
 		const uint16_t SQUARE_PARTICLE = 228;
 
@@ -866,10 +868,15 @@ void Game::render_game_end() {
 	std::string score_string = std::to_string(score);
 
 	// Display stats
-	TextHandler::render_text(font_white, STRINGS::MENU::LEVEL_COMPLETED::TEXT_TIME_TAKEN + STRINGS::COLON_SPACE + time_string, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 7, SPRITES::SPACE_WIDTH);
-	TextHandler::render_text(font_white, STRINGS::MENU::LEVEL_COMPLETED::TEXT_ORBS_COLLECTED + STRINGS::COLON_SPACE + orbs_string, right_x, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 4, SPRITES::SPACE_WIDTH);
-	TextHandler::render_text(font_white, STRINGS::MENU::LEVEL_COMPLETED::TEXT_NUMBER_OF_DEATHS + STRINGS::COLON_SPACE + death_count_string, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 1, SPRITES::SPACE_WIDTH);
-	TextHandler::render_text(font_white, STRINGS::MENU::LEVEL_COMPLETED::TEXT_SCORE + STRINGS::COLON_SPACE + score_string, right_x, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE_HALF * 2, SPRITES::SPACE_WIDTH);
+	TextHandler::render_text(font_white, STRINGS::MENU::LEVEL_COMPLETED::TEXT_TIME_TAKEN + STRINGS::COLON_SPACE, left_x - SPRITES::TEXT_OFFSET_X, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 7, SPRITES::SPACE_WIDTH, TextHandler::CENTER_LEFT);
+	TextHandler::render_text(font_white, STRINGS::MENU::LEVEL_COMPLETED::TEXT_ORBS_COLLECTED + STRINGS::COLON_SPACE, right_x - SPRITES::TEXT_OFFSET_X, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 4, SPRITES::SPACE_WIDTH, TextHandler::CENTER_LEFT);
+	TextHandler::render_text(font_white, STRINGS::MENU::LEVEL_COMPLETED::TEXT_NUMBER_OF_DEATHS + STRINGS::COLON_SPACE, left_x - SPRITES::TEXT_OFFSET_X, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 1, SPRITES::SPACE_WIDTH, TextHandler::CENTER_LEFT);
+	TextHandler::render_text(font_white, STRINGS::MENU::LEVEL_COMPLETED::TEXT_SCORE + STRINGS::COLON_SPACE, right_x - SPRITES::TEXT_OFFSET_X, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE_HALF * 2, SPRITES::SPACE_WIDTH, TextHandler::CENTER_LEFT);
+
+	TextHandler::render_text(font_white, time_string, left_x + SPRITES::TEXT_OFFSET_X, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 7, SPRITES::SPACE_WIDTH, TextHandler::CENTER_RIGHT);
+	TextHandler::render_text(font_white, orbs_string, right_x + SPRITES::TEXT_OFFSET_X, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 4, SPRITES::SPACE_WIDTH, TextHandler::CENTER_RIGHT);
+	TextHandler::render_text(font_white, death_count_string, left_x + SPRITES::TEXT_OFFSET_X, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 1, SPRITES::SPACE_WIDTH, TextHandler::CENTER_RIGHT);
+	TextHandler::render_text(font_white, score_string, right_x + SPRITES::TEXT_OFFSET_X, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE_HALF * 2, SPRITES::SPACE_WIDTH, TextHandler::CENTER_RIGHT);
 	
 	TextHandler::render_text(font_selected, STRINGS::MENU::LEVEL_COMPLETED::OPTION_CONTINUE, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE_HALF * 7, SPRITES::SPACE_WIDTH);
 

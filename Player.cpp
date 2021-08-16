@@ -100,9 +100,22 @@ void Player::update(InputHandler& input_handler, LevelHandler& level_handler, fl
 		pink.set_finished();
 	}
 
-	// Handle star collisions
+	// Handle orb collisions
 	orb_count += level_handler.handle_orb_collisions(blue.get_x(), blue.get_y(), 0);
 	orb_count += level_handler.handle_orb_collisions(pink.get_x(), pink.get_y(), 1);
+
+	// Handle spike collisions
+	if (level_handler.handle_spike_collisions(blue.get_x(), blue.get_y())) {
+		// Blue hit spikes
+		// Reset position
+		reset_player_positions(level_handler);
+		
+	}
+	else if (level_handler.handle_spike_collisions(pink.get_x(), pink.get_y())) {
+		// Pink hit spikes
+		// Reset position
+		reset_player_positions(level_handler);
+	}
 }
 
 void Player::render(Spritesheet& spritesheet) {
@@ -123,6 +136,16 @@ void Player::render(Spritesheet& spritesheet, Camera& camera) {
 void Player::reset_stats() {
 	death_count = 0;
 	orb_count = 0;
+}
+
+void Player::reset_player_positions(LevelHandler& level_handler) {
+	// Reset blue
+	blue.set_x(level_handler.level_spawn_blue_x);
+	blue.set_y(level_handler.level_spawn_blue_y);
+
+	// Reset pink
+	pink.set_x(level_handler.level_spawn_pink_x);
+	pink.set_y(level_handler.level_spawn_pink_y);
 }
 
 uint8_t Player::get_death_count() {
