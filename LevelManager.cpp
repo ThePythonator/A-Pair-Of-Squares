@@ -190,7 +190,7 @@ void LevelHandler::load_level(const uint8_t level_data[]) {
 				case TILE_ID::SPIKE::SINGLE_RIGHT_BOTTOM:
 
 					// Spike
-					spikes.push_back(Spike(level_tmx->data[i], parse_spike_id(level_tmx->data[i]), (i% level_tmx->width)* sprite_size, (i / level_tmx->width)* sprite_size));
+					spikes.push_back(Spike(level_tmx->data[i], parse_spike_id(level_tmx->data[i]), (i % level_tmx->width) * sprite_size, (i / level_tmx->width) * sprite_size));
 					break;
 
 				default:
@@ -215,20 +215,24 @@ void LevelHandler::render(Spritesheet& spritesheet) {
 		orb.render(spritesheet);
 	}
 
+	for (Spike& spike : spikes) {
+		spike.render(spritesheet);
+	}
+
 	// Render finish
 	spritesheet.sprite_scaled(TILE_ID::FINISH::BLUE, level_finish_blue_x, level_finish_blue_y);
 	spritesheet.sprite_scaled(TILE_ID::FINISH::PINK, level_finish_pink_x, level_finish_pink_y);
 }
 
-void LevelHandler::render(Spritesheet& spritesheet, Camera& camera) {
-	for (Tile& tile : tiles) {
-		tile.render(spritesheet, camera);
-	}
-
-	// Render finish
-	spritesheet.sprite_scaled(TILE_ID::FINISH::BLUE, camera.get_view_x(level_finish_blue_x), camera.get_view_y(level_finish_blue_y));
-	spritesheet.sprite_scaled(TILE_ID::FINISH::PINK, camera.get_view_x(level_finish_pink_x), camera.get_view_y(level_finish_pink_y));
-}
+//void LevelHandler::render(Spritesheet& spritesheet, Camera& camera) {
+//	for (Tile& tile : tiles) {
+//		tile.render(spritesheet, camera);
+//	}
+//
+//	// Render finish
+//	spritesheet.sprite_scaled(TILE_ID::FINISH::BLUE, camera.get_view_x(level_finish_blue_x), camera.get_view_y(level_finish_blue_y));
+//	spritesheet.sprite_scaled(TILE_ID::FINISH::PINK, camera.get_view_x(level_finish_pink_x), camera.get_view_y(level_finish_pink_y));
+//}
 
 uint8_t LevelHandler::handle_orb_collisions(float x, float y, uint8_t type) {
 	// Handle star collisions
@@ -240,7 +244,7 @@ uint8_t LevelHandler::handle_orb_collisions(float x, float y, uint8_t type) {
 			// Orb is colliding
 			if (is_colliding(orb.get_x(), orb.get_y(), x, y, sprite_size)) {
 				orb.set_collected();
-				count++;
+				count++; // Note: sometimes (rarely) player gets awarded many orbs when there aren't that many in the level
 				//printf("orb %u, %u, collected: %u\n", type, orb.get_type(), orb.get_collected());
 
 				//TODO: create particle or something with same image which rotates, grows larger and fades at location of orb just collected
@@ -254,7 +258,7 @@ uint8_t LevelHandler::handle_orb_collisions(float x, float y, uint8_t type) {
 bool LevelHandler::handle_spike_collisions(float x, float y) {
 	for (Spike& spike : spikes) {
 		// Spike is colliding
-		if (is_colliding(spike.get_x(), spike.get_y(), x, y, sprite_size)) {
+		if (spike.check_collision(x, y, sprite_size)) {
 			return true;
 
 			//TODO: create something to show player was killed
@@ -272,7 +276,27 @@ std::vector<Tile> LevelHandler::get_tiles() {
 //	return orbs;
 //}
 
-Spike::SpikeDirection LevelHandler::parse_spike_id(uint16_t spike_id) {
+
+uint8_t LevelHandler::get_sprite_size() {
+	return sprite_size;
+}
+
+
+
+bool is_colliding(Tile& tile, float x, float y, uint8_t sprite_size) {
+	return (tile.get_x() + sprite_size > x && tile.get_x() < x + sprite_size && tile.get_y() + sprite_size > y && tile.get_y() < y + sprite_size);
+}
+
+bool is_colliding(float tile_x, float tile_y, float x, float y, uint8_t sprite_size) {
+	return (tile_x + sprite_size > x && tile_x < x + sprite_size && tile_y + sprite_size > y && tile_y < y + sprite_size);
+}
+
+bool is_on_tile(Tile& tile, float x, float y, uint8_t sprite_size) {
+	return (tile.get_x() + sprite_size > x && tile.get_x() < x + sprite_size && tile.get_y() == y + sprite_size);
+}
+
+
+Spike::SpikeDirection parse_spike_id(uint16_t spike_id) {
 	switch (spike_id) {
 	case TILE_ID::SPIKE::DOUBLE_BOTTOM:
 		return Spike::SpikeDirection::DOUBLE_BOTTOM;
@@ -314,22 +338,4 @@ Spike::SpikeDirection LevelHandler::parse_spike_id(uint16_t spike_id) {
 		// Pick one
 		return Spike::SpikeDirection::DOUBLE_BOTTOM;
 	}
-}
-
-uint8_t LevelHandler::get_sprite_size() {
-	return sprite_size;
-}
-
-
-
-bool is_colliding(Tile& tile, float x, float y, uint8_t sprite_size) {
-	return (tile.get_x() + sprite_size > x && tile.get_x() < x + sprite_size && tile.get_y() + sprite_size > y && tile.get_y() < y + sprite_size);
-}
-
-bool is_colliding(float tile_x, float tile_y, float x, float y, uint8_t sprite_size) {
-	return (tile_x + sprite_size > x && tile_x < x + sprite_size && tile_y + sprite_size > y && tile_y < y + sprite_size);
-}
-
-bool is_on_tile(Tile& tile, float x, float y, uint8_t sprite_size) {
-	return (tile.get_x() + sprite_size > x && tile.get_x() < x + sprite_size && tile.get_y() == y + sprite_size);
 }

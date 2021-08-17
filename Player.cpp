@@ -110,11 +110,17 @@ void Player::update(InputHandler& input_handler, LevelHandler& level_handler, fl
 		// Reset position
 		reset_player_positions(level_handler);
 		
+		// Add to death count
+		death_count++;
+		
 	}
 	else if (level_handler.handle_spike_collisions(pink.get_x(), pink.get_y())) {
 		// Pink hit spikes
 		// Reset position
 		reset_player_positions(level_handler);
+
+		// Add to death count
+		death_count++;
 	}
 }
 

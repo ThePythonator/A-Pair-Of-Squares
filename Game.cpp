@@ -5,7 +5,8 @@ const uint8_t* asset_levels[] = {
 	asset_level_0,
 	asset_level_1,
 	asset_level_2,
-	asset_level_3
+	asset_level_3,
+	asset_level_4
 };
 
 // Constants
@@ -55,6 +56,13 @@ namespace WINDOW {
 
 namespace GAME {
 	const uint8_t LEVEL_COUNT = 12;
+
+	namespace SCORE {
+		const uint16_t INITIAL = 1000;
+		const uint8_t DEATH = 30;
+		const uint8_t ORB = 10;
+		const uint8_t TIME = 1;
+	}
 }
 
 namespace MENU {
@@ -854,12 +862,15 @@ void Game::render_game_end() {
 	float right_x = positions.second;
 
 
-	// Calculate score
-	//TODO - remove hard coded constants
-	uint16_t score = 200;
-	score += 10 * player.get_orb_count();
-	score -= (uint16_t)timer_handler.get_timer(TIMER_ID::GAME_DURATION);
-	score -= 40 * player.get_death_count();
+	// Calculate score (has to be signed so that it can be stopped from going below 0)
+	int16_t score = GAME::SCORE::INITIAL;
+	score += GAME::SCORE::ORB * player.get_orb_count();
+	score -= GAME::SCORE::TIME * (uint16_t)timer_handler.get_timer(TIMER_ID::GAME_DURATION);
+	score -= GAME::SCORE::DEATH * player.get_death_count();
+
+	if (score < 0) {
+		score = 0;
+	}
 
 	// Convert to strings
 	std::string time_string = trim_precision(std::to_string(timer_handler.get_timer(TIMER_ID::GAME_DURATION)), MENU::FLOAT_TEXT_PRECISION);

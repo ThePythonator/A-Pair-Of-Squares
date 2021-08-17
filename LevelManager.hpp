@@ -71,15 +71,13 @@ public:
 
 
 	void render(Spritesheet& spritesheet);
-	void render(Spritesheet& spritesheet, Camera& camera);
+	//void render(Spritesheet& spritesheet, Camera& camera);
 
 	uint8_t handle_orb_collisions(float x, float y, uint8_t type);
 	bool handle_spike_collisions(float x, float y);
 
 	std::vector<Tile> get_tiles();
 	//std::vector<Orb> get_orbs();
-
-	Spike::SpikeDirection parse_spike_id(uint16_t spike_id);
 
 	uint8_t get_sprite_size();
 
@@ -98,3 +96,6 @@ bool is_colliding(Tile& tile, float x, float y, uint8_t sprite_size);
 bool is_colliding(float tile_x, float tile_y, float x, float y, uint8_t sprite_size);
 
 bool is_on_tile(Tile& tile, float x, float y, uint8_t sprite_size);
+
+
+Spike::SpikeDirection parse_spike_id(uint16_t spike_id);
