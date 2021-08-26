@@ -35,16 +35,14 @@ public:
 
 	SDL_Texture* get_texture();
 
-	//SDL_Colour get_pixel(uint16_t x, uint16_t y);
+	uint8_t get_sprite_size();
 
 private:
 	SDL_Renderer* renderer = NULL;
 
 	SDL_Texture* spritesheet_texture = NULL;
 
-	void* pixels = NULL;
-
-	int w, h, pitch;
+	int w, h;
 	uint8_t rows, columns;
 
 	uint8_t sprite_size;

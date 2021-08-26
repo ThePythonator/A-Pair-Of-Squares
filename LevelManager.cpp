@@ -164,12 +164,12 @@ void LevelHandler::load_level(const uint8_t level_data[]) {
 
 				case TILE_ID::ORB::BLUE:
 					// Blue orb
-					orbs.push_back(Orb(level_tmx->data[i], 0, (i% level_tmx->width)* sprite_size, (i / level_tmx->width)* sprite_size));
+					orbs.push_back(Orb(level_tmx->data[i], 0, (i % level_tmx->width) * sprite_size, (i / level_tmx->width) * sprite_size));
 					break;
 
 				case TILE_ID::ORB::PINK:
 					// Pink Orb
-					orbs.push_back(Orb(level_tmx->data[i], 1, (i% level_tmx->width)* sprite_size, (i / level_tmx->width)* sprite_size));
+					orbs.push_back(Orb(level_tmx->data[i], 1, (i % level_tmx->width) * sprite_size, (i / level_tmx->width) * sprite_size));
 					break;
 
 				case TILE_ID::SPIKE::DOUBLE_BOTTOM:
@@ -202,9 +202,11 @@ void LevelHandler::load_level(const uint8_t level_data[]) {
 	}
 }
 
-//void LevelHandler::update(Player& player, float dt) {
-//	// todo: check if player is colliding with any star
-//}
+void LevelHandler::update(float dt) { //Player& player,
+	for (Orb& orb : orbs) {
+		orb.update(dt);
+	}
+}
 
 void LevelHandler::render(Spritesheet& spritesheet) {
 	for (Tile& tile : tiles) {

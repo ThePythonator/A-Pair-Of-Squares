@@ -13,11 +13,10 @@ public:
 	void update(InputHandler& input_handler, LevelHandler& level_handler, float dt);
 
 	void render(Spritesheet& spritesheet);
-	void render(Spritesheet& spritesheet, Camera& camera);
 
 	void reset_stats();
 
-	void reset_player_positions(LevelHandler& level_handler);
+	void reset_players(LevelHandler& level_handler);
 
 	uint8_t get_death_count();
 	uint8_t get_orb_count();

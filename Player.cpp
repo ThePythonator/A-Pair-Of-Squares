@@ -105,19 +105,19 @@ void Player::update(InputHandler& input_handler, LevelHandler& level_handler, fl
 	orb_count += level_handler.handle_orb_collisions(pink.get_x(), pink.get_y(), 1);
 
 	// Handle spike collisions
-	if (level_handler.handle_spike_collisions(blue.get_x(), blue.get_y())) {
-		// Blue hit spikes
-		// Reset position
-		reset_player_positions(level_handler);
-		
-		// Add to death count
-		death_count++;
-		
+	if (level_handler.handle_spike_collisions(blue.get_x(), blue.get_y()) ||
+		level_handler.handle_spike_collisions(pink.get_x(), pink.get_y())) {
+		// Blue or pink hit spikes
+
+		// Start square death animation
+		blue.set_dead();
+		pink.set_dead();
 	}
-	else if (level_handler.handle_spike_collisions(pink.get_x(), pink.get_y())) {
-		// Pink hit spikes
+
+	// Check if square death animations have completed
+	if (blue.get_fade_finished() && pink.get_fade_finished()) {
 		// Reset position
-		reset_player_positions(level_handler);
+		reset_players(level_handler);
 
 		// Add to death count
 		death_count++;
@@ -127,11 +127,6 @@ void Player::update(InputHandler& input_handler, LevelHandler& level_handler, fl
 void Player::render(Spritesheet& spritesheet) {
 	blue.render(spritesheet);
 	pink.render(spritesheet);
-}
-
-void Player::render(Spritesheet& spritesheet, Camera& camera) {
-	blue.render(spritesheet, camera);
-	pink.render(spritesheet, camera);
 }
 
 //void Player::set_spawns(int blue_x, int blue_y, int pink_x, int pink_y) {
@@ -144,14 +139,18 @@ void Player::reset_stats() {
 	orb_count = 0;
 }
 
-void Player::reset_player_positions(LevelHandler& level_handler) {
-	// Reset blue
+void Player::reset_players(LevelHandler& level_handler) {
+	// Reset blue position
 	blue.set_x(level_handler.level_spawn_blue_x);
 	blue.set_y(level_handler.level_spawn_blue_y);
 
-	// Reset pink
+	// Reset pink position
 	pink.set_x(level_handler.level_spawn_pink_x);
 	pink.set_y(level_handler.level_spawn_pink_y);
+
+	// Reset fade variables
+	blue.reset_dead_fade();
+	pink.reset_dead_fade();
 }
 
 uint8_t Player::get_death_count() {

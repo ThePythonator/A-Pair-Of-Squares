@@ -1,7 +1,7 @@
 #include "Spritesheet.hpp"
 
 Spritesheet::Spritesheet() {
-	w = h = pitch = 0;
+	w = h = 0;
 	rows = columns = 0;
 
 	sprite_size = 8;
@@ -14,7 +14,6 @@ Spritesheet::Spritesheet(SDL_Renderer* renderer, SDL_Texture* spritesheet_textur
 
 	// Get width and height of spritesheet
 	SDL_QueryTexture(spritesheet_texture, NULL, NULL, &w, &h);
-	pitch = 0;
 
 	rows = h / sprite_size;
 	columns = w / sprite_size;
@@ -120,6 +119,6 @@ SDL_Texture* Spritesheet::get_texture() {
 	return spritesheet_texture;
 }
 
-//SDL_Colour get_pixel(uint16_t x, uint16_t y) {
-//
-//}
+uint8_t Spritesheet::get_sprite_size() {
+	return sprite_size;
+}

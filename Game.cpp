@@ -63,6 +63,11 @@ namespace GAME {
 		const uint8_t ORB = 10;
 		const uint8_t TIME = 1;
 	}
+
+	/*namespace ORB {
+		const float FADE_MAX_SCALE_BOOST = 4.0f;
+		const float FADE_MAX_AGE = 0.3f;
+	}*/
 }
 
 namespace MENU {
@@ -84,6 +89,13 @@ namespace MENU {
 
 	enum class LEVEL_SELECT : uint8_t {
 		BACK = GAME::LEVEL_COUNT,
+
+		OPTION_COUNT
+	};
+
+	enum class LEVEL_PAUSED : uint8_t {
+		RESUME,
+		EXIT,
 
 		OPTION_COUNT
 	};
@@ -127,6 +139,11 @@ namespace STRINGS {
 
 		namespace LEVEL_SELECT {
 			const std::string OPTION_BACK = "Back";
+		}
+
+		namespace LEVEL_PAUSED {
+			const std::string OPTION_RESUME = "Resume";
+			const std::string OPTION_EXIT = "Exit";
 		}
 
 		namespace LEVEL_COMPLETED {
@@ -740,7 +757,7 @@ void Game::render_menu_level_select() {
 
 	for (uint8_t i = 0; i < GAME::LEVEL_COUNT; i++) {
 		float x = ((i % MENU::LEVELS_PER_ROW) - MENU::LEVELS_PER_ROW / 2 + 0.5f) * SPRITES::SIZE * 2;
-		float y = (i / MENU::LEVELS_PER_ROW) * SPRITES::SIZE * 2 + SPRITES::SIZE * 2;
+		float y = (i / MENU::LEVELS_PER_ROW) * SPRITES::SIZE * 2 + SPRITES::SIZE * 2; // The division is intentionally truncated before casting to float.
 
 		x += (i / 4) % 2 ? left_x : right_x;
 
@@ -769,11 +786,7 @@ void Game::update_game_running(float dt) {
 
 	player.update(input_handler, level_handler, dt);
 
-
-	//level_handler.update(player, dt);
-
-
-	//camera.update(dt, player.get_blue_x(), player.get_blue_y());
+	level_handler.update(dt);//player,
 
 	if (timer_handler.get_timer(TIMER_ID::GAME_DURATION) == 0.0f && timer_handler.get_timer_state(TIMER_ID::GAME_DURATION) == TimerState::PAUSED) {
 		// Level has not started yet
@@ -820,6 +833,95 @@ void Game::render_game_running() {
 	else {
 		render_fade_out_rect(DELAY::TRANSITION_FADE_LENGTH);
 	}
+}
+
+void Game::update_game_paused(float dt) {
+	// Handle creation and removal of shape particles in background
+	handle_menu_shape_particles();
+
+	// Stop bezier stuff if finished
+	if (timer_handler.get_timer(TIMER_ID::MENU_BEZIER_TEXT) >= DELAY::MENU_BEZIER_LENGTH) {
+		timer_handler.set_timer_state(TIMER_ID::MENU_BEZIER_TEXT, TimerState::PAUSED);
+	}
+
+	//if (!option_confirmed && timer_handler.get_timer_state(TIMER_ID::MENU_BEZIER_TEXT) == TimerState::PAUSED) {
+	//	// User hasn't selected an option yet
+
+	//	// Check if up/down has been pressed, and naviagate the menu as necessary
+	//	if (KeyHandler::just_down(input_handler.get_key_union().keys.UP)) {
+	//		if (option_selected > 0) {
+	//			option_selected--;
+	//		}
+	//	}
+	//	if (KeyHandler::just_down(input_handler.get_key_union().keys.DOWN)) {
+	//		if (option_selected < (uint8_t)MENU::LEVEL_PAUSED::OPTION_COUNT - 1) {
+	//			option_selected++;
+	//		}
+	//	}
+
+	//	// Check if user has just selected an option
+	//	if (KeyHandler::just_down(input_handler.get_key_union().keys.SPACE)) {
+	//		// Handle paused options
+	//		switch ((MENU::LEVEL_PAUSED)option_selected)
+	//		{
+	//		case MENU::LEVEL_PAUSED::RESUME:
+	//			// We need bezier curves
+
+	//			// Reset timer and set it to running
+	//			timer_handler.set_timer_state(TIMER_ID::MENU_BEZIER_TEXT, TimerState::RUNNING);
+	//			timer_handler.reset_timer(TIMER_ID::MENU_BEZIER_TEXT);
+
+	//			option_confirmed = true;
+	//			break;
+
+	//		case MENU::LEVEL_PAUSED::EXIT:
+	//			// We need bezier curves
+
+	//			// Reset timer and set it to running
+	//			timer_handler.set_timer_state(TIMER_ID::MENU_BEZIER_TEXT, TimerState::RUNNING);
+	//			timer_handler.reset_timer(TIMER_ID::MENU_BEZIER_TEXT);
+
+	//			option_confirmed = true;
+	//			break;
+
+	//		default:
+	//			break;
+	//		}
+	//	}
+	//}
+	//else {
+	//	// User has selected an option, or initial intro is still happening
+
+	//	// Check if transition is finished
+	//	if (option_confirmed && timer_handler.get_timer_state(TIMER_ID::MENU_BEZIER_TEXT) == TimerState::PAUSED) {
+	//		// User has selected an option and animation is finished
+
+	//		if ((MENU::LEVEL_PAUSED)option_selected == MENU::LEVEL_PAUSED::RESUME) {
+	//			//setup_menu_title(); // return to game
+	//		}
+	//		else if ((MENU::LEVEL_PAUSED)option_selected == MENU::LEVEL_PAUSED::EXIT) {
+	//			// Exit to title
+	//			setup_menu_title();
+	//		}
+	//	}
+	//}
+}
+
+void Game::render_game_paused() {
+	render_game_running();
+
+	// Todo: render fade out background? only partly faded
+
+	// Get x positions of text
+	std::pair<float, float> positions = get_bezier_text_positions();
+
+	float left_x = positions.first;
+	float right_x = positions.second;
+
+
+	TextHandler::render_text(option_selected == 0 ? font_selected : font_white, STRINGS::MENU::LEVEL_PAUSED::OPTION_RESUME + STRINGS::COLON_SPACE + (settings.audio_music ? STRINGS::ON : STRINGS::OFF), left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE, SPRITES::SPACE_WIDTH);
+	//TextHandler::render_text(option_selected == 1 ? font_selected : font_white, STRINGS::MENU::LEVEL_PAUSED::OPTION_SFX + STRINGS::COLON_SPACE + (settings.audio_sfx ? STRINGS::ON : STRINGS::OFF), right_x, WINDOW::TEXT_SCALED_HEIGHT_HALF, SPRITES::SPACE_WIDTH);
+	TextHandler::render_text(option_selected == 2 ? font_selected : font_white, STRINGS::MENU::LEVEL_PAUSED::OPTION_EXIT, right_x, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE, SPRITES::SPACE_WIDTH);//left_x
 }
 
 void Game::update_game_end(float dt) {
@@ -964,6 +1066,19 @@ void Game::setup_game_running() {
 
 	// Clear spare particle handler
 	particle_handlers.spare.clear();
+}
+
+void Game::setup_game_paused() {
+	game_state = GameState::GAME_PAUSED;
+
+	option_selected = 0;
+	option_confirmed = false;
+
+	timer_handler.set_timer_state(TIMER_ID::MENU_BEZIER_TEXT, TimerState::RUNNING);
+	timer_handler.reset_timer(TIMER_ID::MENU_BEZIER_TEXT);
+
+	timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::RUNNING);
+	timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
 }
 
 void Game::setup_game_end() {

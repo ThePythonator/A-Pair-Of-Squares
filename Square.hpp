@@ -34,7 +34,6 @@ public:
 	void update(std::vector<Tile>& tiles, float dt);
 
 	void render(Spritesheet& spritesheet);
-	void render(Spritesheet& spritesheet, Camera& camera);
 
 	void accelerate(float acceleration, float maximum, float dt);
 	void decelerate(float deceleration, float dt);
@@ -46,7 +45,17 @@ public:
 	void set_finished(bool finished = true);
 	bool get_finished();
 
+
+	void set_dead();
+	void reset_dead_fade();
+
+	bool get_fade_finished();
+
 protected:
 	bool can_jump = false;
 	bool finished = false;
+
+	bool dead = false;
+
+	float fade_age = 0.0f;
 };

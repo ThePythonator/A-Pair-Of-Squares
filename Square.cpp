@@ -1,5 +1,8 @@
 #include "Square.hpp"
 
+const float SQUARE_FADE_MAX_SCALE_BOOST = 3.0f;
+const float SQUARE_FADE_MAX_AGE = 0.3f;
+
 Square::Square() : Entity() {
 
 }
@@ -9,6 +12,10 @@ Square::Square(uint8_t sprite_index, float x, float y) : Entity(sprite_index, x,
 }
 
 void Square::update(std::vector<Tile>& tiles, float dt) {
+	if (dead) {
+		fade_age += dt;
+	}
+
 	if (finished) {
 		x_vel = y_vel = 0;
 	}
@@ -72,46 +79,39 @@ void Square::render(Spritesheet& spritesheet) {
 		index_base += 17;
 	}
 
-	if (std::abs(x_vel) < SQUARE_IDLE_VELOCITY_MIN) {
-		// Todo: add blinking
-		spritesheet.sprite_scaled(index_base, x, y);
-	}
-	else {
+	if (std::abs(x_vel) > SQUARE_IDLE_VELOCITY_MIN) {
 		if (y_vel == 0.0f) {
 			index_base += 3;
 		}
 		else {
 			index_base += 2;
 		}
+	}
 
+	if (dead && fade_age < SQUARE_FADE_MAX_AGE) {
+		// Calculate age ratio
+		float age_ratio = (fade_age / SQUARE_FADE_MAX_AGE);
+
+		// Get alpha from age
+		uint8_t alpha = (1.0f - age_ratio) * 0xFF;
+
+		// Get scale from age
+		float scale = age_ratio * SQUARE_FADE_MAX_SCALE_BOOST + spritesheet.get_scale();
+
+		// Calculate scale ratio
+		float scale_ratio = spritesheet.get_scale() / scale;
+
+		// Get offset to keep sprites centered
+		float offset = spritesheet.get_sprite_size() * (scale - spritesheet.get_scale()) / 4.0f;
+		//float offset = (spritesheet.get_sprite_size() / 2.0f) * (scale - spritesheet.get_scale()) / 2.0f; // Same as line above but less optimized.
+
+		uint8_t old_alpha = spritesheet.get_alpha();
+		spritesheet.set_alpha(alpha);
+		spritesheet.sprite(sprite_index, (x - offset) * scale_ratio, (y - offset) * scale_ratio, scale, 0.0f, NULL, x_vel < 0 ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
+		spritesheet.set_alpha(old_alpha);
+	}
+	else {
 		spritesheet.sprite_scaled(index_base, x, y, 0.0, NULL, x_vel < 0 ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
-	}
-}
-
-void Square::render(Spritesheet& spritesheet, Camera& camera) {
-	// if AnimatedEntity is created, this will be handled by it for us (but that's a TODO)
-	uint8_t index_base = sprite_index;
-
-	if (y_vel < 0.0f) {
-		index_base += 16;
-	}
-	else if (y_vel > 0.0f) {
-		index_base += 17;
-	}
-
-	if (std::abs(x_vel) < SQUARE_IDLE_VELOCITY_MIN) {
-		// Todo: add blinking
-		spritesheet.sprite_scaled(index_base, camera.get_view_x(x), camera.get_view_y(y));
-	}
-	else {
-		if (y_vel == 0.0f) {
-			index_base += 3;
-		}
-		else {
-			index_base += 2;
-		}
-
-		spritesheet.sprite_scaled(index_base, camera.get_view_x(x), camera.get_view_y(y), 0.0, NULL, x_vel < 0 ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
 	}
 }
 
@@ -168,4 +168,17 @@ void Square::set_finished(bool finished) {
 
 bool Square::get_finished() {
 	return finished;
+}
+
+void Square::set_dead() {
+	dead = true;
+}
+
+void Square::reset_dead_fade() {
+	dead = false;
+	fade_age = 0.0f;
+}
+
+bool Square::get_fade_finished() {
+	return dead && fade_age >= SQUARE_FADE_MAX_AGE;
 }

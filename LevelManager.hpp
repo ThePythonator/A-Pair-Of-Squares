@@ -67,7 +67,7 @@ public:
 
 	void load_level(const uint8_t level_data[]);
 
-	//void update(Player& player, float dt);
+	void update(float dt); //Player& player,
 
 
 	void render(Spritesheet& spritesheet);

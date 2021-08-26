@@ -56,8 +56,8 @@ private:
 	void update_game_running(float dt);
 	void render_game_running();
 
-	/*void update_game_paused(float dt);
-	void render_game_paused();*/
+	void update_game_paused(float dt);
+	void render_game_paused();
 
 	void update_game_end(float dt);
 	void render_game_end();
@@ -68,7 +68,7 @@ private:
 	void setup_menu_settings();
 	void setup_menu_level_select();
 	void setup_game_running();
-	//void setup_game_paused();
+	void setup_game_paused();
 	void setup_game_end();
 
 	// Transition functions
@@ -88,8 +88,6 @@ private:
 
 	bool level_is_completed();
 
-	void reset_level_stats();
-
 
 	// Loading functions
 	SDL_Texture* load_texture(std::string path);
@@ -105,7 +103,7 @@ private:
 		MENU_LEVEL_SELECT,
 
 		GAME_RUNNING,
-		//GAME_PAUSED,
+		GAME_PAUSED,
 		GAME_END
 	};
 
@@ -142,9 +140,6 @@ private:
 
 	// Player
 	Player player;
-
-	// Camera
-	//Camera camera;
 
 	// Level handler
 	LevelHandler level_handler;
