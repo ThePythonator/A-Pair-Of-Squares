@@ -1,17 +1,21 @@
 #include "Square.hpp"
 
-const float SQUARE_FADE_MAX_SCALE_BOOST = 3.0f;
-const float SQUARE_FADE_MAX_AGE = 0.3f;
-
 Square::Square() : Entity() {
 
 }
 
-Square::Square(uint8_t sprite_index, float x, float y) : Entity(sprite_index, x, y) {
+Square::Square(uint16_t sprite_index, float x, float y) : Entity(sprite_index, x, y) {
 
 }
 
 void Square::update(std::vector<Tile>& tiles, float dt) {
+	if (can_blink) {
+		blink_timer -= dt;
+		if (blink_timer <= 0.0f) {
+			set_blink_timer();
+		}
+	}
+
 	if (dead) {
 		fade_age += dt;
 	}
@@ -25,16 +29,17 @@ void Square::update(std::vector<Tile>& tiles, float dt) {
 
 		// Handle y collisions
 		for (Tile& tile : tiles) {
-			if (is_colliding(tile, x, y, SPRITE_SIZE)) {
-				if (y_vel > 0) {
+			if (is_colliding(tile, x, y, SPRITES::SIZE)) {
+				if (y_vel > 0.0f) {
 					// Collided from top
-					y = tile.get_y() - SPRITE_SIZE;
+					y = tile.get_y() - SPRITES::SIZE;
 				}
-				else if (y_vel < 0) {
+				else if (y_vel < 0.0f) {
 					// Collided from bottom
-					y = tile.get_y() + SPRITE_SIZE;
+					y = tile.get_y() + SPRITES::SIZE;
 				}
-				y_vel = 0;
+
+				y_vel = 0.0f;
 			}
 		}
 
@@ -43,14 +48,14 @@ void Square::update(std::vector<Tile>& tiles, float dt) {
 
 		// Handle x collisions
 		for (Tile& tile : tiles) {
-			if (is_colliding(tile, x, y, SPRITE_SIZE)) {
+			if (is_colliding(tile, x, y, SPRITES::SIZE)) {
 				if (x_vel > 0) {
 					// Collided from left
-					x = tile.get_x() - SPRITE_SIZE;
+					x = tile.get_x() - SPRITES::SIZE;
 				}
 				else if (x_vel < 0) {
 					// Collided from right
-					x = tile.get_x() + SPRITE_SIZE;
+					x = tile.get_x() + SPRITES::SIZE;
 				}
 				x_vel = 0;
 			}
@@ -59,7 +64,7 @@ void Square::update(std::vector<Tile>& tiles, float dt) {
 	
 	can_jump = false;
 	for (Tile& tile : tiles) {
-		can_jump = is_on_tile(tile, x, y, SPRITE_SIZE);
+		can_jump = is_on_tile(tile, x, y, SPRITES::SIZE);
 
 		if (can_jump) {
 			// Don't allow can_jump to be set to false after it's been set to true
@@ -79,7 +84,7 @@ void Square::render(Spritesheet& spritesheet) {
 		index_base += 17;
 	}
 
-	if (std::abs(x_vel) > SQUARE_IDLE_VELOCITY_MIN) {
+	if (std::abs(x_vel) > GAME::SQUARE::IDLE_VELOCITY_MIN) {
 		if (y_vel == 0.0f) {
 			index_base += 3;
 		}
@@ -88,21 +93,49 @@ void Square::render(Spritesheet& spritesheet) {
 		}
 	}
 
-	if (dead && fade_age < SQUARE_FADE_MAX_AGE) {
+	if (index_base == sprite_index) {
+		// Check if we need to blink
+		if (can_blink) {
+			if (blink_timer <= GAME::SQUARE::BLINK::DURATION) {
+				if (blink_timer <= GAME::SQUARE::BLINK::FRAME_DURATIONS[1]) {
+					// 2nd frame of blink
+					index_base += 2;
+				}
+				else {
+					// 1st frame of blink
+					index_base += 1;
+				}
+			}
+			else {
+				// Not blinking
+			}
+		}
+		else {
+			can_blink = true;
+		}
+	}
+	else {
+		// Reset blink timer so that when player is next on stationary image it gets updated
+		blink_timer = 0.0f;
+		can_blink = false;
+	}
+
+	if (dead && fade_age < GAME::SQUARE::FADE::MAX_AGE) {
 		// Calculate age ratio
-		float age_ratio = (fade_age / SQUARE_FADE_MAX_AGE);
+		float age_ratio = (fade_age / GAME::SQUARE::FADE::MAX_AGE);
 
 		// Get alpha from age
 		uint8_t alpha = (1.0f - age_ratio) * 0xFF;
 
 		// Get scale from age
-		float scale = age_ratio * SQUARE_FADE_MAX_SCALE_BOOST + spritesheet.get_scale();
+		float scale = age_ratio * GAME::SQUARE::FADE::MAX_SCALE_BOOST + spritesheet.get_scale();
 
 		// Calculate scale ratio
 		float scale_ratio = spritesheet.get_scale() / scale;
 
 		// Get offset to keep sprites centered
-		float offset = spritesheet.get_sprite_size() * (scale - spritesheet.get_scale()) / 4.0f;
+		float offset = SPRITES::SIZE * (scale - spritesheet.get_scale()) / 4.0f;
+		//float offset = spritesheet.get_sprite_size() * (scale - spritesheet.get_scale()) / 4.0f;
 		//float offset = (spritesheet.get_sprite_size() / 2.0f) * (scale - spritesheet.get_scale()) / 2.0f; // Same as line above but less optimized.
 
 		uint8_t old_alpha = spritesheet.get_alpha();
@@ -180,5 +213,9 @@ void Square::reset_dead_fade() {
 }
 
 bool Square::get_fade_finished() {
-	return dead && fade_age >= SQUARE_FADE_MAX_AGE;
+	return dead && fade_age >= GAME::SQUARE::FADE::MAX_AGE;
+}
+
+void Square::set_blink_timer() {
+	blink_timer = GAME::SQUARE::BLINK::DURATION + GAME::SQUARE::BLINK::DELAY_MIN + (GAME::SQUARE::BLINK::DELAY_MAX - GAME::SQUARE::BLINK::DELAY_MIN) * randf();
 }

@@ -53,7 +53,7 @@ public:
 	} direction;
 
 	Spike();
-	Spike(uint8_t sprite_index, SpikeDirection direction, float x, float y);
+	Spike(uint16_t sprite_index, SpikeDirection direction, float x, float y);
 
 	//void update(std::vector<Tile>& tiles, float dt);
 

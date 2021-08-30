@@ -119,6 +119,6 @@ SDL_Texture* Spritesheet::get_texture() {
 	return spritesheet_texture;
 }
 
-uint8_t Spritesheet::get_sprite_size() {
-	return sprite_size;
-}
+//uint8_t Spritesheet::get_sprite_size() {
+//	return sprite_size;
+//}

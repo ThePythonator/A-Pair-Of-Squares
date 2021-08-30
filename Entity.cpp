@@ -7,7 +7,7 @@ Entity::Entity() {
 	x_vel = y_vel = 0.0f;
 }
 
-Entity::Entity(uint8_t sprite_index, float x, float y) {
+Entity::Entity(uint16_t sprite_index, float x, float y) {
 	this->sprite_index = sprite_index;
 
 	this->x = x;
@@ -73,6 +73,14 @@ void AnimationHandler::update(float dt) {
 	}
 }
 
-uint8_t AnimationHandler::get_sprite_index() {
+void AnimationHandler::reset() {
+	// Reset timer
+	animation_timer = 0.0f;
+
+	// Reset current frame
+	current_frame = 0;
+}
+
+uint16_t AnimationHandler::get_sprite_index() {
 	return animation_frames[current_frame].first;
 }

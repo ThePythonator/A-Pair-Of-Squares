@@ -1,12 +1,14 @@
 #pragma once
 
+#include "Constants.hpp"
+
 #include "Entity.hpp"
 #include "Spritesheet.hpp"
 
 class Orb : public Entity {
 public:
 	Orb();
-	Orb(uint8_t sprite_index, uint8_t type, float x, float y);
+	Orb(uint16_t sprite_index, uint8_t type, float x, float y);
 
 	void update(float dt);
 

@@ -2,34 +2,18 @@
 
 #include "SDL.h"
 
+#include "Constants.hpp"
+
 #include "Entity.hpp"
 #include "Spritesheet.hpp"
 #include "InputManager.hpp"
 #include "LevelManager.hpp"
-//#include "Utilities.hpp"
-
-//const float DEFAULT_DRAG = 0.98f;
-const float SQUARE_ACCELERATION = 500.0f;
-const float SQUARE_DECELERATION = 400.0f;
-const float SQUARE_VELOCITY_MAX = 120.0f;
-
-const float SQUARE_FINISH_PULL_VELOCITY = 0.06f;//0.9f;//0.05f;//0.05f;// 0.5f;
-const float SQUARE_FINISH_PULL_MIN_VELOCITY = 0.2f;
-const float SQUARE_FINISH_MIN_DISTANCE = 1.0f;
-
-const float SQUARE_GRAVITY = 600.0f;
-const float SQUARE_GRAVITY_MAX = 250.0f;
-
-const float SQUARE_IDLE_VELOCITY_MIN = 40.0f;
-
-const float SQUARE_JUMP_STRENGTH = 210.0f;
-
-const uint8_t SPRITE_SIZE = 16; // should be in Game.cpp
+#include "Utilities.hpp"
 
 class Square : public Entity {
 public:
 	Square();
-	Square(uint8_t sprite_index, float x, float y);
+	Square(uint16_t sprite_index, float x, float y);
 
 	void update(std::vector<Tile>& tiles, float dt);
 
@@ -52,10 +36,17 @@ public:
 	bool get_fade_finished();
 
 protected:
+
+	void set_blink_timer();
+
 	bool can_jump = false;
 	bool finished = false;
 
 	bool dead = false;
 
 	float fade_age = 0.0f;
+
+	float blink_timer = 0.0f;
+
+	bool can_blink = false;
 };

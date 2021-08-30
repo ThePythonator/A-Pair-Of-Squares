@@ -7,6 +7,9 @@
 #include <string>
 #include <array>
 
+
+#include "Constants.hpp"
+
 #include "Player.hpp"
 #include "Spritesheet.hpp"
 #include "InputManager.hpp"

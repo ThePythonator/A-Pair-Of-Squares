@@ -7,13 +7,13 @@
 
 #include "Spritesheet.hpp"
 
-typedef std::pair<uint8_t, float> AnimationFrame;
+typedef std::pair<uint16_t, float> AnimationFrame;
 typedef std::vector<AnimationFrame> AnimationFrames;
 
 class Entity {
 public:
 	Entity();
-	Entity(uint8_t sprite_index, float x, float y);
+	Entity(uint16_t sprite_index, float x, float y);
 
 	void update(float dt);
 
@@ -29,7 +29,7 @@ protected:
 	float x, y;
 	float x_vel, y_vel;
 
-	uint8_t sprite_index;
+	uint16_t sprite_index;
 };
 
 class AnimationHandler {
@@ -39,11 +39,13 @@ public:
 
 	void update(float dt);
 
-	uint8_t get_sprite_index();
+	void reset();
+
+	uint16_t get_sprite_index();
 
 protected:
 	AnimationFrames animation_frames;
 
-	uint8_t current_frame;
+	uint16_t current_frame;
 	float animation_timer;
 };

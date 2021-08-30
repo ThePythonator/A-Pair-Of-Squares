@@ -132,6 +132,8 @@ void LevelHandler::load_level(const uint8_t level_data[]) {
 	level_finish_pink_y = 0;
 
 	tiles.clear();
+	orbs.clear();
+	spikes.clear();
 
 	TMX* level_tmx = (TMX*)level_data;
 

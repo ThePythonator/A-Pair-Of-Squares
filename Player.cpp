@@ -17,27 +17,27 @@ void Player::update(InputHandler& input_handler, LevelHandler& level_handler, fl
 
 	// Handle inputs
 	if (KeyHandler::is_down(input_handler.get_key_union().keys.RIGHT)) {
-		blue.accelerate(SQUARE_ACCELERATION, SQUARE_VELOCITY_MAX, dt);
-		pink.accelerate(-SQUARE_DECELERATION, SQUARE_VELOCITY_MAX, dt);
+		blue.accelerate(GAME::SQUARE::ACCELERATION, GAME::SQUARE::VELOCITY_MAX, dt);
+		pink.accelerate(-GAME::SQUARE::DECELERATION, GAME::SQUARE::VELOCITY_MAX, dt);
 	}
 	else if (KeyHandler::is_down(input_handler.get_key_union().keys.LEFT)) {
-		blue.accelerate(-SQUARE_ACCELERATION, SQUARE_VELOCITY_MAX, dt);
-		pink.accelerate(SQUARE_DECELERATION, SQUARE_VELOCITY_MAX, dt);
+		blue.accelerate(-GAME::SQUARE::ACCELERATION, GAME::SQUARE::VELOCITY_MAX, dt);
+		pink.accelerate(GAME::SQUARE::DECELERATION, GAME::SQUARE::VELOCITY_MAX, dt);
 	}
 	else {
 		// Handle deceleration
-		blue.decelerate(SQUARE_DECELERATION, dt);
-		pink.decelerate(SQUARE_DECELERATION, dt);
+		blue.decelerate(GAME::SQUARE::DECELERATION, dt);
+		pink.decelerate(GAME::SQUARE::DECELERATION, dt);
 	}
 
 	if (KeyHandler::is_down(input_handler.get_key_union().keys.SPACE)) {
-		blue.jump(SQUARE_JUMP_STRENGTH);
-		pink.jump(SQUARE_JUMP_STRENGTH);
+		blue.jump(GAME::SQUARE::JUMP_STRENGTH);
+		pink.jump(GAME::SQUARE::JUMP_STRENGTH);
 	}
 
 	// Update player physics
-	blue.gravity(SQUARE_GRAVITY, SQUARE_GRAVITY_MAX, dt);
-	pink.gravity(SQUARE_GRAVITY, SQUARE_GRAVITY_MAX, dt);
+	blue.gravity(GAME::ENVIRONMENT::GRAVITY::ACCELERATION, GAME::ENVIRONMENT::GRAVITY::MAX, dt);
+	pink.gravity(GAME::ENVIRONMENT::GRAVITY::ACCELERATION, GAME::ENVIRONMENT::GRAVITY::MAX, dt);
 
 	// Draw players towards finishes if in both are in range
 	if (std::abs(blue.get_x() - level_handler.level_finish_blue_x) < level_handler.get_sprite_size() &&
@@ -46,36 +46,36 @@ void Player::update(InputHandler& input_handler, LevelHandler& level_handler, fl
 		std::abs(pink.get_y() - level_handler.level_finish_pink_y) < level_handler.get_sprite_size() / 2 &&
 		!blue.get_finished() && !pink.get_finished()) {
 
-		//float blue_vel_x = SQUARE_FINISH_PULL_VELOCITY * (level_handler.level_finish_blue_x - blue.get_x());
+		//float blue_vel_x = GAME::SQUARE::FINISH_PULL_VELOCITY * (level_handler.level_finish_blue_x - blue.get_x());
 		//float blue_vel_y = 0.0f;//SQAURE_FINISH_PULL_VELOCITY * (level_handler.level_finish_blue_y - blue.get_y());
 
-		//float pink_vel_x = SQUARE_FINISH_PULL_VELOCITY * (level_handler.level_finish_pink_x - pink.get_x());
-		//float pink_vel_y = 0.0f;//SQUARE_FINISH_PULL_MIN_VELOCITY * (level_handler.level_finish_pink_y - pink.get_y());
+		//float pink_vel_x = GAME::SQUARE::FINISH_PULL_VELOCITY * (level_handler.level_finish_pink_x - pink.get_x());
+		//float pink_vel_y = 0.0f;//GAME::SQUARE::FINISH_PULL_MIN_VELOCITY * (level_handler.level_finish_pink_y - pink.get_y());
 
-		/*if (std::abs(blue_vel_x) < SQUARE_FINISH_PULL_MIN_VELOCITY) {
-			blue_vel_x = SQUARE_FINISH_PULL_MIN_VELOCITY * blue_vel_x > 0 ? 1 : -1;
+		/*if (std::abs(blue_vel_x) < GAME::SQUARE::FINISH_PULL_MIN_VELOCITY) {
+			blue_vel_x = GAME::SQUARE::FINISH_PULL_MIN_VELOCITY * blue_vel_x > 0 ? 1 : -1;
 		}
-		if (std::abs(pink_vel_x) < SQUARE_FINISH_PULL_MIN_VELOCITY) {
-			pink_vel_x = SQUARE_FINISH_PULL_MIN_VELOCITY * pink_vel_x > 0 ? 1 : -1;
+		if (std::abs(pink_vel_x) < GAME::SQUARE::FINISH_PULL_MIN_VELOCITY) {
+			pink_vel_x = GAME::SQUARE::FINISH_PULL_MIN_VELOCITY * pink_vel_x > 0 ? 1 : -1;
 		}*/
 
 		//blue.add_velocity(blue_vel_x, blue_vel_y);
 		//pink.add_velocity(pink_vel_x, pink_vel_y);
 
-		//blue.add_velocity(SQUARE_FINISH_PULL_VELOCITY * (level_handler.level_finish_blue_x - blue.get_x() > 0 ? 1 : -1), 0.0f);
-		//pink.add_velocity(SQUARE_FINISH_PULL_VELOCITY * (level_handler.level_finish_pink_x - pink.get_x() > 0 ? 1 : -1), 0.0f);
+		//blue.add_velocity(GAME::SQUARE::FINISH_PULL_VELOCITY * (level_handler.level_finish_blue_x - blue.get_x() > 0 ? 1 : -1), 0.0f);
+		//pink.add_velocity(GAME::SQUARE::FINISH_PULL_VELOCITY * (level_handler.level_finish_pink_x - pink.get_x() > 0 ? 1 : -1), 0.0f);
 
-		float blue_vel_x = SQUARE_FINISH_PULL_VELOCITY * (level_handler.level_finish_blue_x - blue.get_x());
-		float blue_vel_y = SQUARE_FINISH_PULL_VELOCITY * (level_handler.level_finish_blue_y - blue.get_y());
+		float blue_vel_x = GAME::FINISH::PULL_VELOCITY * (level_handler.level_finish_blue_x - blue.get_x());
+		float blue_vel_y = GAME::FINISH::PULL_VELOCITY * (level_handler.level_finish_blue_y - blue.get_y());
 
-		float pink_vel_x = SQUARE_FINISH_PULL_VELOCITY * (level_handler.level_finish_pink_x - pink.get_x());
-		float pink_vel_y = SQUARE_FINISH_PULL_VELOCITY * (level_handler.level_finish_pink_y - pink.get_y());
+		float pink_vel_x = GAME::FINISH::PULL_VELOCITY * (level_handler.level_finish_pink_x - pink.get_x());
+		float pink_vel_y = GAME::FINISH::PULL_VELOCITY * (level_handler.level_finish_pink_y - pink.get_y());
 
-		if (std::abs(blue_vel_x) < SQUARE_FINISH_PULL_MIN_VELOCITY) {
-			blue_vel_x = SQUARE_FINISH_PULL_MIN_VELOCITY * blue_vel_x > 0 ? 1 : -1;
+		if (std::abs(blue_vel_x) < GAME::FINISH::PULL_MIN_VELOCITY) {
+			blue_vel_x = GAME::FINISH::PULL_MIN_VELOCITY * blue_vel_x > 0 ? 1 : -1;
 		}
-		if (std::abs(pink_vel_x) < SQUARE_FINISH_PULL_MIN_VELOCITY) {
-			pink_vel_x = SQUARE_FINISH_PULL_MIN_VELOCITY * pink_vel_x > 0 ? 1 : -1;
+		if (std::abs(pink_vel_x) < GAME::FINISH::PULL_MIN_VELOCITY) {
+			pink_vel_x = GAME::FINISH::PULL_MIN_VELOCITY * pink_vel_x > 0 ? 1 : -1;
 		}
 
 		blue.add_velocity(blue_vel_x, blue_vel_y);
@@ -86,10 +86,10 @@ void Player::update(InputHandler& input_handler, LevelHandler& level_handler, fl
 	pink.update(tiles, dt);
 
 	// If players are already on finish, keep them locked
-	if (std::abs(blue.get_x() - level_handler.level_finish_blue_x) < SQUARE_FINISH_MIN_DISTANCE &&
-		std::abs(blue.get_y() - level_handler.level_finish_blue_y) < SQUARE_FINISH_MIN_DISTANCE &&
-		std::abs(pink.get_x() - level_handler.level_finish_pink_x) < SQUARE_FINISH_MIN_DISTANCE &&
-		std::abs(pink.get_y() - level_handler.level_finish_pink_y) < SQUARE_FINISH_MIN_DISTANCE) {
+	if (std::abs(blue.get_x() - level_handler.level_finish_blue_x) < GAME::FINISH::MIN_DISTANCE &&
+		std::abs(blue.get_y() - level_handler.level_finish_blue_y) < GAME::FINISH::MIN_DISTANCE &&
+		std::abs(pink.get_x() - level_handler.level_finish_pink_x) < GAME::FINISH::MIN_DISTANCE &&
+		std::abs(pink.get_y() - level_handler.level_finish_pink_y) < GAME::FINISH::MIN_DISTANCE) {
 
 		blue.set_x(level_handler.level_finish_blue_x);
 		blue.set_y(level_handler.level_finish_blue_y);

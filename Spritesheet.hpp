@@ -35,7 +35,7 @@ public:
 
 	SDL_Texture* get_texture();
 
-	uint8_t get_sprite_size();
+	//uint8_t get_sprite_size();
 
 private:
 	SDL_Renderer* renderer = NULL;
