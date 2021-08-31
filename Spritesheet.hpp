@@ -10,15 +10,13 @@ public:
 	/*void sprite(uint8_t index, int x, int y);
 	void sprite(uint8_t index, int x, int y, float scale);*/
 
-	void sprite(uint16_t index, float x, float y);
-	void sprite(uint16_t index, float x, float y, float scale);
-
-	void sprite(uint16_t index, float x, float y, float angle, SDL_Point* center, SDL_RendererFlip flip);
-	void sprite(uint16_t index, float x, float y, float scale, float angle, SDL_Point* center, SDL_RendererFlip flip);
+	void sprite(uint16_t index, float x, float y, float scale = 1.0f);
+	void sprite(uint16_t index, float x, float y, float scale, SDL_RendererFlip flip);
+	void sprite(uint16_t index, float x, float y, float scale, float angle, SDL_Point* center, SDL_RendererFlip flip = SDL_RendererFlip::SDL_FLIP_NONE);
 
 	void sprite_scaled(uint16_t index, float x, float y);
-
-	void sprite_scaled(uint16_t index, float x, float y, float angle, SDL_Point* center, SDL_RendererFlip flip);
+	void sprite_scaled(uint16_t index, float x, float y, SDL_RendererFlip flip);
+	void sprite_scaled(uint16_t index, float x, float y, float angle, SDL_Point* center, SDL_RendererFlip flip = SDL_RendererFlip::SDL_FLIP_NONE);
 
 	void rect(SDL_Rect* src_rect, float x, float y);
 	void rect(SDL_Rect* src_rect, float x, float y, float scale);

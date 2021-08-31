@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Constants.hpp"
+
 #include "Square.hpp"
 #include "InputManager.hpp"
 #include "LevelManager.hpp"

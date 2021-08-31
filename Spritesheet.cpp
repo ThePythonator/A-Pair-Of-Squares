@@ -22,14 +22,6 @@ Spritesheet::Spritesheet(SDL_Renderer* renderer, SDL_Texture* spritesheet_textur
 	this->scale = scale;
 }
 
-void Spritesheet::sprite(uint16_t index, float x, float y) {
-	// Render sprite at index from texture to screen
-	SDL_Rect src_rect{ sprite_size * (index % columns), sprite_size * (index / columns), sprite_size, sprite_size };
-	SDL_Rect dst_rect{ (int)x, (int)y, sprite_size, sprite_size };
-
-	SDL_RenderCopy(renderer, spritesheet_texture, &src_rect, &dst_rect);
-}
-
 void Spritesheet::sprite(uint16_t index, float x, float y, float scale) {
 	// Render sprite at index from texture to screen
 	SDL_Rect src_rect{ sprite_size * (index % columns), sprite_size * (index / columns), sprite_size, sprite_size };
@@ -38,17 +30,8 @@ void Spritesheet::sprite(uint16_t index, float x, float y, float scale) {
 	SDL_RenderCopy(renderer, spritesheet_texture, &src_rect, &dst_rect);
 }
 
-void Spritesheet::sprite(uint16_t index, float x, float y, float angle, SDL_Point* center, SDL_RendererFlip flip) {
-	// Render sprite at index from texture to screen
-	SDL_Rect src_rect{ sprite_size * (index % columns), sprite_size * (index / columns), sprite_size, sprite_size };
-	SDL_Rect dst_rect{ (int)x, (int)y, sprite_size, sprite_size };
-
-	if (center != NULL) {
-		center->x *= scale;
-		center->y *= scale;
-	}
-
-	SDL_RenderCopyEx(renderer, spritesheet_texture, &src_rect, &dst_rect, angle, center, flip);
+void Spritesheet::sprite(uint16_t index, float x, float y, float scale, SDL_RendererFlip flip) {
+	sprite(index, x, y, scale, 0.0f, NULL, flip);
 }
 
 void Spritesheet::sprite(uint16_t index, float x, float y, float scale, float angle, SDL_Point* center, SDL_RendererFlip flip) {
@@ -68,6 +51,10 @@ void Spritesheet::sprite(uint16_t index, float x, float y, float scale, float an
 void Spritesheet::sprite_scaled(uint16_t index, float x, float y) {
 	// Render sprite at index from texture to screen
 	sprite(index, x, y, scale);
+}
+
+void Spritesheet::sprite_scaled(uint16_t index, float x, float y, SDL_RendererFlip flip) {
+	sprite_scaled(index, x, y, 0.0f, NULL, flip);
 }
 
 void Spritesheet::sprite_scaled(uint16_t index, float x, float y, float angle, SDL_Point* center, SDL_RendererFlip flip) {

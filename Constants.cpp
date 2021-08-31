@@ -15,6 +15,9 @@ namespace SPRITES {
 	const uint8_t TEXT_OFFSET_X = SIZE * 4;// 5 or 6 work too, but text looks too wide when beziering
 
 	namespace ID {
+		const uint16_t BLUE_SQUARE = 0;
+		const uin16_t PINK_SQUARE = 4;
+
 		const uint16_t SQUARE_PARTICLE = 228;
 
 		const uint16_t FINISH_PARTICLE_BLUE = 230;

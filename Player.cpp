@@ -2,8 +2,8 @@
 
 Player::Player() {
 	// TODO: remove literals ( 0 and 4 )
-	blue = Square(0, 0, 0);
-	pink = Square(4, 0, 0);
+	blue = Square(SPRITES::ID::BLUE_SQUARE, 0, 0);
+	pink = Square(SPRITES::ID::PINK_SQUARE, 0, 0);
 }
 
 Player::Player(uint16_t blue_x, uint16_t blue_y, uint16_t pink_x, uint16_t pink_y) {
