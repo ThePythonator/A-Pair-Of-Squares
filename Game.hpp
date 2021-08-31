@@ -74,9 +74,13 @@ private:
 	void setup_game_paused();
 	void setup_game_end();
 
+	void resume_game_running();
+
 	// Transition functions
 	void render_fade_in_rect(float delay);
 	void render_fade_out_rect(float delay);
+	
+	void render_fade_rect(uint8_t alpha);
 
 	std::pair<float, float> get_bezier_text_positions();
 
@@ -110,6 +114,13 @@ private:
 		GAME_END
 	};
 
+	enum class FadeState {
+		FADE,
+		UNFADE,
+
+		NONE
+	};
+
 
 	// Variables
 
@@ -126,9 +137,6 @@ private:
 	// Fonts
 	SDL_Texture* font_sheet_texture = NULL;
 	FontHandler::Font /*font_black,*/ font_white, font_selected;
-
-	// Game state
-	GameState game_state = GameState::MENU_INTRO;
 
 	// Input handler
 	InputHandler input_handler;
@@ -150,7 +158,15 @@ private:
 
 	// State/data variables
 
+	// Game state
+	GameState game_state = GameState::MENU_INTRO;
+
+	// Fade state
+	FadeState fade_state = FadeState::NONE;
+
 	bool running = false;
+
+	bool paused = false;
 
 	uint8_t option_selected = 0;
 	bool option_confirmed = false;

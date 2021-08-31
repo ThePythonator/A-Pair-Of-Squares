@@ -16,7 +16,7 @@ namespace SPRITES {
 
 	namespace ID {
 		const uint16_t BLUE_SQUARE = 0;
-		const uin16_t PINK_SQUARE = 4;
+		const uint16_t PINK_SQUARE = 4;
 
 		const uint16_t SQUARE_PARTICLE = 228;
 
@@ -175,12 +175,12 @@ namespace FILES {
 }
 
 namespace DELAY {
-	const float TRANSITION_FADE_LENGTH = 0.6f;
+	const float TRANSITION_FADE_LENGTH = 0.7f;
 
 	const float MENU_INTRO_LENGTH = 2.0f;
 	const float MENU_INTRO_FADE_LENGTH = 1.0f;
 
-	const float MENU_BEZIER_LENGTH = 1.0f;
+	const float MENU_BEZIER_LENGTH = 0.9f;
 
 	const float MENU_SHAPE_GENERATION = 3.0f;
 

@@ -24,7 +24,7 @@ namespace SPRITES {
 
 	namespace ID {
 		extern const uint16_t BLUE_SQUARE;
-		extern const uin16_t PINK_SQUARE;
+		extern const uint16_t PINK_SQUARE;
 
 		extern const uint16_t SQUARE_PARTICLE;
 
