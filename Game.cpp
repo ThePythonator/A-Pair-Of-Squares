@@ -812,7 +812,7 @@ void Game::render_game_paused() {
 	player.render(spritesheet);
 	
 	// Cause game scene to be partially faded out
-	//render_fade_rect(0x7F);
+	render_fade_rect(0x7F);
 
 	// Get x positions of text
 	std::pair<float, float> positions = get_bezier_text_positions();
