@@ -10,6 +10,8 @@
 typedef std::pair<uint16_t, float> AnimationFrame;
 typedef std::vector<AnimationFrame> AnimationFrames;
 
+//constexpr float sum_animation_frame_arr(const AnimationFrame frames[], uint8_t length);
+
 class Entity {
 public:
 	Entity();

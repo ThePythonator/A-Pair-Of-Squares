@@ -13,14 +13,53 @@ namespace SPRITES {
 	const uint8_t SPACE_WIDTH = 1;
 
 	const uint8_t TEXT_OFFSET_X = SIZE * 4;// 5 or 6 work too, but text looks too wide when beziering
+}
 
-	namespace ID {
-		const uint16_t BLUE_SQUARE = 0;
-		const uint16_t PINK_SQUARE = 4;
+namespace TILE_ID {
+	namespace PLAYER {
+		const uint16_t BLUE = 0;
+		const uint16_t PINK = 4;
+	}
 
-		const uint16_t SQUARE_PARTICLE = 228;
+	namespace SPIKE {
+		const uint16_t DOUBLE_BOTTOM = 44;
+		const uint16_t DOUBLE_LEFT = 45;
+		const uint16_t DOUBLE_TOP = 46;
+		const uint16_t DOUBLE_RIGHT = 47;
 
-		const uint16_t FINISH_PARTICLE_BLUE = 230;
+		const uint16_t SINGLE_BOTTOM_LEFT = 60;
+		const uint16_t SINGLE_BOTTOM_RIGHT = 61;
+
+		const uint16_t SINGLE_LEFT_TOP = 62;
+		const uint16_t SINGLE_LEFT_BOTTOM = 63;
+
+		const uint16_t SINGLE_TOP_LEFT = 76;
+		const uint16_t SINGLE_TOP_RIGHT = 77;
+
+		const uint16_t SINGLE_RIGHT_TOP = 78;
+		const uint16_t SINGLE_RIGHT_BOTTOM = 79;
+	}
+
+	namespace FINISH {
+		const uint16_t BLUE = 96;
+		const uint16_t PINK = 97;
+	}
+
+	namespace ORB {
+		const uint16_t BLUE = 98;
+		const uint16_t PINK = 99;
+	}
+
+	namespace PARTICLE {
+		const uint16_t SQUARE_DARK = 228;
+		const uint16_t SQUARE_LIGHT = 229;
+
+		const uint16_t FINISH_BLUE = 230;
+		const uint16_t FINISH_PINK = 231;
+	}
+
+	namespace SPRING {
+		const uint16_t BASE_FRAME = 8;
 	}
 }
 
@@ -46,6 +85,8 @@ namespace WINDOW {
 	//const float MIN_DT = 1.0f / FPS;
 
 	//const float CAMERA_MOVEMENT_RATIO = 0.95f;
+
+	const float MAX_DT = 0.05f;
 }
 
 namespace GAME {
@@ -70,6 +111,49 @@ namespace GAME {
 		}
 	}
 
+	namespace FINISH {
+		const uint8_t HEIGHT = 1;
+
+		const uint8_t BORDER = 1;
+		const uint8_t WIDTH = SPRITES::SIZE - BORDER * 2;
+
+	}
+
+	namespace SPRING {
+		const uint8_t FRAME_COUNT = 6;
+
+		const AnimationFrame ANIMATION[FRAME_COUNT] = {
+			AnimationFrame{TILE_ID::SPRING::BASE_FRAME, 2.0f},
+			AnimationFrame{TILE_ID::SPRING::BASE_FRAME + 1, 0.03f},
+			AnimationFrame{TILE_ID::SPRING::BASE_FRAME + 2, 0.03f},
+			AnimationFrame{TILE_ID::SPRING::BASE_FRAME + 3, 1.0f},
+			AnimationFrame{TILE_ID::SPRING::BASE_FRAME + 2, 0.09f},
+			AnimationFrame{TILE_ID::SPRING::BASE_FRAME + 1, 0.09f}
+		};
+
+		const uint8_t ANIMATION_HEIGHTS[FRAME_COUNT] = {
+			2,
+			5,
+			8,
+			11,
+			8,
+			5
+		};
+
+		// Note: firing player on 4th frame (when it reaches apex) doesn't look good (looks like there is a delay)
+		// Therefore fire player upwards on the 2nd frame
+		const uint8_t LAUNCH_FRAME = 1;
+
+		const uint8_t BORDER = 1;
+		const uint8_t WIDTH = SPRITES::SIZE - BORDER * 2;
+
+		const float LAUNCH_VELOCITY = 300.0f;
+
+		const float MAXIMUM_COLLISION_RESOLUTION_Y_VEL = LAUNCH_VELOCITY / 2;
+
+		//const float ANIMATION_DURATION = sum_animation_frame_arr(ANIMATION, FRAME_COUNT);
+	}
+
 	namespace SQUARE {
 		const float ACCELERATION = 500.0f;
 		const float DECELERATION = 400.0f;
@@ -78,6 +162,8 @@ namespace GAME {
 		const float IDLE_VELOCITY_MIN = 40.0f;
 
 		const float JUMP_STRENGTH = 210.0f;
+
+		const float MAXIMUM_STEP_HEIGHT = 2.0f;
 
 		namespace FADE {
 			const float MAX_SCALE_BOOST = 2.0f;
@@ -114,6 +200,8 @@ namespace MENU {
 	const uint8_t LEVELS_PER_ROW = 4;
 	const uint8_t LEVEL_ROWS = GAME::LEVEL_COUNT / LEVELS_PER_ROW;
 
+	const uint8_t PAUSED_BACKGROUND_ALPHA = 0x7F;
+
 	namespace SHAPE_PARTICLE {
 		const uint8_t COUNT = 7;
 		const uint8_t CHANNELS = 4;
@@ -123,6 +211,10 @@ namespace MENU {
 namespace COLOURS {
 	const Colour BLACK = Colour(0x04, 0x07, 0x10);
 	const Colour WHITE = Colour(0xFF, 0xFF, 0xE4);
+
+	//const Colour GREEN = Colour(0x9C, 0xB9, 0x3B);
+
+	const Colour TRUE_WHITE = Colour(0xFF, 0xFF, 0xFF);
 
 	const Colour SELECTED = Colour(0x1C, 0x92, 0xA7);
 }
@@ -137,27 +229,37 @@ namespace STRINGS {
 
 	namespace MENU {
 		namespace TITLE {
+			const std::string HEADING = "A PAIR OF SQUARES";
+
 			const std::string OPTION_PLAY = "Play";
 			const std::string OPTION_SETTINGS = "Settings";
 			const std::string OPTION_QUIT = "Quit";
 		}
 
 		namespace SETTINGS {
+			const std::string HEADING = "SETTINGS";
+
 			const std::string OPTION_MUSIC = "Music";
 			const std::string OPTION_SFX = "SFX";
 			const std::string OPTION_BACK = "Back";
 		}
 
 		namespace LEVEL_SELECT {
+			const std::string HEADING = "LEVEL SELECT";
+
 			const std::string OPTION_BACK = "Back";
 		}
 
 		namespace LEVEL_PAUSED {
+			const std::string HEADING = "GAME PAUSED";
+
 			const std::string OPTION_RESUME = "Resume";
 			const std::string OPTION_EXIT = "Exit";
 		}
 
 		namespace LEVEL_COMPLETED {
+			const std::string HEADING = "LEVEL COMPLETE";
+
 			const std::string TEXT_TIME_TAKEN = "Time taken";
 			const std::string TEXT_ORBS_COLLECTED = "Orbs collected";
 			const std::string TEXT_NUMBER_OF_DEATHS = "Number of deaths";
@@ -170,17 +272,20 @@ namespace STRINGS {
 namespace FILES {
 	const std::string SPRITESHEET = "spritesheet.png";
 
-	const std::string FONT_SHEET = "font.png";//"another-font.png"
+	const std::string FONT_SHEET = "font.png";//"another-font.png"//"another-another-font.png";
+	const std::string TITLE_BLUE_FONT_SHEET = "title_blue.png";
+	const std::string TITLE_PINK_FONT_SHEET = "title_pink.png";
+
 	// const std::string FONT_SHEET = "font.png";
 }
 
 namespace DELAY {
-	const float TRANSITION_FADE_LENGTH = 0.7f;
+	const float TRANSITION_FADE_LENGTH = 0.6f;
 
 	const float MENU_INTRO_LENGTH = 2.0f;
 	const float MENU_INTRO_FADE_LENGTH = 1.0f;
 
-	const float MENU_BEZIER_LENGTH = 0.9f;
+	const float MENU_BEZIER_LENGTH = 1.0f;
 
 	const float MENU_SHAPE_GENERATION = 3.0f;
 

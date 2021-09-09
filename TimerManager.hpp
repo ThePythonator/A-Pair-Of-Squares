@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include "Utilities.hpp"
+
 enum class TimerState : uint8_t {
 	PAUSED,
 	RUNNING,

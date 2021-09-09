@@ -2,10 +2,13 @@
 
 #include <vector>
 
+#include "Constants.hpp"
+
 #include "Spritesheet.hpp"
 //#include "Player.hpp"
 #include "Orb.hpp"
 #include "Spike.hpp"
+#include "Spring.hpp"
 
 // Struct header generated for the tmx files
 #pragma pack(push,1)
@@ -78,6 +81,7 @@ public:
 
 	std::vector<Tile> get_tiles();
 	//std::vector<Orb> get_orbs();
+	std::vector<Spring> get_springs();
 
 	uint8_t get_sprite_size();
 
@@ -85,6 +89,7 @@ private:
 	std::vector<Tile> tiles;
 	std::vector<Orb> orbs;
 	std::vector<Spike> spikes;
+	std::vector<Spring> springs;
 
 	uint8_t sprite_size;
 };
@@ -94,8 +99,11 @@ private:
 
 bool is_colliding(Tile& tile, float x, float y, uint8_t sprite_size);
 bool is_colliding(float tile_x, float tile_y, float x, float y, uint8_t sprite_size);
+bool is_colliding(float tile_x, float tile_y, float x, float y, uint8_t tile_w, uint8_t tile_h, uint8_t w, uint8_t h);
 
-bool is_on_tile(Tile& tile, float x, float y, uint8_t sprite_size);
+bool check_on_top(float tile_x, float tile_y, float x, float y, uint8_t tile_w, uint8_t tile_h, uint8_t w, uint8_t h);
+
+bool check_on_top(Tile& tile, float x, float y, uint8_t sprite_size);
 
 
 Spike::SpikeDirection parse_spike_id(uint16_t spike_id);

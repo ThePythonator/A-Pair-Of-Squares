@@ -1,41 +1,5 @@
 #include "LevelManager.hpp"
 
-namespace TILE_ID {
-	namespace PLAYER {
-		const uint16_t BLUE = 0;
-		const uint16_t PINK = 4;
-	}
-
-	namespace SPIKE {
-		const uint16_t DOUBLE_BOTTOM = 44;
-		const uint16_t DOUBLE_LEFT = 45;
-		const uint16_t DOUBLE_TOP = 46;
-		const uint16_t DOUBLE_RIGHT = 47;
-
-		const uint16_t SINGLE_BOTTOM_LEFT = 60;
-		const uint16_t SINGLE_BOTTOM_RIGHT = 61;
-
-		const uint16_t SINGLE_LEFT_TOP = 62;
-		const uint16_t SINGLE_LEFT_BOTTOM = 63;
-
-		const uint16_t SINGLE_TOP_LEFT = 76;
-		const uint16_t SINGLE_TOP_RIGHT = 77;
-
-		const uint16_t SINGLE_RIGHT_TOP = 78;
-		const uint16_t SINGLE_RIGHT_BOTTOM = 79;
-	}
-
-	namespace FINISH {
-		const uint16_t BLUE = 96;
-		const uint16_t PINK = 97;
-	}
-
-	namespace ORB {
-		const uint16_t BLUE = 98;
-		const uint16_t PINK = 99;
-	}
-}
-
 Camera::Camera() {
 
 }
@@ -134,71 +98,74 @@ void LevelHandler::load_level(const uint8_t level_data[]) {
 	tiles.clear();
 	orbs.clear();
 	spikes.clear();
+	springs.clear();
 
 	TMX* level_tmx = (TMX*)level_data;
+	uint16_t tile_id, x, y;
 
 	for (uint16_t i = 0; i < level_tmx->height * level_tmx->width; i++) {
-		if (level_tmx->data[i] != level_tmx->empty_tile) {
-			switch (level_tmx->data[i]) {
-				case TILE_ID::PLAYER::BLUE:
-					// Blue spawn
-					level_spawn_blue_x = (i % level_tmx->width) * sprite_size;
-					level_spawn_blue_y = (i / level_tmx->width) * sprite_size;
-					break;
+		tile_id = level_tmx->data[i];
+		x = (i % level_tmx->width) * sprite_size;
+		y = (i / level_tmx->width) * sprite_size;
 
-				case TILE_ID::PLAYER::PINK:
-					// Pink spawn
-					level_spawn_pink_x = (i % level_tmx->width) * sprite_size;
-					level_spawn_pink_y = (i / level_tmx->width) * sprite_size;
-					break;
+		if (tile_id != level_tmx->empty_tile) {
+			if (tile_id == TILE_ID::PLAYER::BLUE) {
+				// Blue spawn
+				level_spawn_blue_x = x;
+				level_spawn_blue_y = y;
+			}
+			else if (tile_id == TILE_ID::PLAYER::PINK) {
+				// Pink spawn
+				level_spawn_pink_x = x;
+				level_spawn_pink_y = y;
+			}
 
-				case TILE_ID::FINISH::BLUE:
-					// Finish spawn for blue
-					level_finish_blue_x = (i % level_tmx->width) * sprite_size;
-					level_finish_blue_y = (i / level_tmx->width) * sprite_size;
-					break;
+			else if (tile_id == TILE_ID::FINISH::BLUE) {
+				// Finish spawn for blue
+				level_finish_blue_x = x;
+				level_finish_blue_y = y;
+			}
+			else if (tile_id == TILE_ID::FINISH::PINK) {
+				// Finish spawn for pink
+				level_finish_pink_x = x;
+				level_finish_pink_y = y;
+			}
+			else if (tile_id == TILE_ID::ORB::BLUE) {
+				// Blue orb
+				orbs.push_back(Orb(tile_id, 0, x, y));
+			}
+			else if (tile_id == TILE_ID::ORB::PINK) {
+				// Pink Orb
+				orbs.push_back(Orb(tile_id, 1, x, y));
+			}
+			else if (
+				tile_id == TILE_ID::SPIKE::DOUBLE_RIGHT ||
+				tile_id == TILE_ID::SPIKE::DOUBLE_LEFT ||
+				tile_id == TILE_ID::SPIKE::DOUBLE_TOP ||
+				tile_id == TILE_ID::SPIKE::DOUBLE_RIGHT ||
 
-				case TILE_ID::FINISH::PINK:
-					// Finish spawn for pink
-					level_finish_pink_x = (i % level_tmx->width) * sprite_size;
-					level_finish_pink_y = (i / level_tmx->width) * sprite_size;
-					break;
+				tile_id == TILE_ID::SPIKE::SINGLE_BOTTOM_LEFT ||
+				tile_id == TILE_ID::SPIKE::SINGLE_BOTTOM_RIGHT ||
 
-				case TILE_ID::ORB::BLUE:
-					// Blue orb
-					orbs.push_back(Orb(level_tmx->data[i], 0, (i % level_tmx->width) * sprite_size, (i / level_tmx->width) * sprite_size));
-					break;
+				tile_id == TILE_ID::SPIKE::SINGLE_LEFT_TOP ||
+				tile_id == TILE_ID::SPIKE::SINGLE_LEFT_BOTTOM ||
 
-				case TILE_ID::ORB::PINK:
-					// Pink Orb
-					orbs.push_back(Orb(level_tmx->data[i], 1, (i % level_tmx->width) * sprite_size, (i / level_tmx->width) * sprite_size));
-					break;
+				tile_id == TILE_ID::SPIKE::SINGLE_TOP_LEFT ||
+				tile_id == TILE_ID::SPIKE::SINGLE_TOP_RIGHT ||
 
-				case TILE_ID::SPIKE::DOUBLE_BOTTOM:
-				case TILE_ID::SPIKE::DOUBLE_LEFT:
-				case TILE_ID::SPIKE::DOUBLE_TOP:
-				case TILE_ID::SPIKE::DOUBLE_RIGHT:
+				tile_id == TILE_ID::SPIKE::SINGLE_RIGHT_TOP ||
+				tile_id == TILE_ID::SPIKE::SINGLE_RIGHT_BOTTOM) {
 
-				case TILE_ID::SPIKE::SINGLE_BOTTOM_LEFT:
-				case TILE_ID::SPIKE::SINGLE_BOTTOM_RIGHT:
-
-				case TILE_ID::SPIKE::SINGLE_LEFT_TOP:
-				case TILE_ID::SPIKE::SINGLE_LEFT_BOTTOM:
-
-				case TILE_ID::SPIKE::SINGLE_TOP_LEFT:
-				case TILE_ID::SPIKE::SINGLE_TOP_RIGHT:
-
-				case TILE_ID::SPIKE::SINGLE_RIGHT_TOP:
-				case TILE_ID::SPIKE::SINGLE_RIGHT_BOTTOM:
-
-					// Spike
-					spikes.push_back(Spike(level_tmx->data[i], parse_spike_id(level_tmx->data[i]), (i % level_tmx->width) * sprite_size, (i / level_tmx->width) * sprite_size));
-					break;
-
-				default:
-					// Normal tile
-					tiles.push_back(Tile(level_tmx->data[i], (i % level_tmx->width) * sprite_size, (i / level_tmx->width) * sprite_size));
-					break;
+				// Spike
+				spikes.push_back(Spike(tile_id, parse_spike_id(tile_id), x, y));
+			}
+			else if (tile_id == TILE_ID::SPRING::BASE_FRAME) {
+				// Spring
+				springs.push_back(Spring(tile_id, x, y));
+			}
+			else {
+				// Normal tile
+				tiles.push_back(Tile(tile_id, x, y));
 			}
 		}
 	}
@@ -207,6 +174,10 @@ void LevelHandler::load_level(const uint8_t level_data[]) {
 void LevelHandler::update(float dt) { //Player& player,
 	for (Orb& orb : orbs) {
 		orb.update(dt);
+	}
+
+	for (Spring& spring : springs) {
+		spring.update(dt);
 	}
 }
 
@@ -221,6 +192,10 @@ void LevelHandler::render(Spritesheet& spritesheet) {
 
 	for (Spike& spike : spikes) {
 		spike.render(spritesheet);
+	}
+	
+	for (Spring& spring : springs) {
+		spring.render(spritesheet);
 	}
 
 	// Render finish
@@ -280,11 +255,20 @@ std::vector<Tile> LevelHandler::get_tiles() {
 //	return orbs;
 //}
 
+std::vector<Spring> LevelHandler::get_springs() {
+	return springs;
+}
+
 
 uint8_t LevelHandler::get_sprite_size() {
 	return sprite_size;
 }
 
+
+
+bool is_colliding(float tile_x, float tile_y, float x, float y, uint8_t tile_w, uint8_t tile_h, uint8_t w, uint8_t h) {
+	return tile_x + tile_w > x && tile_x < x + w && tile_y + tile_h > y && tile_y < y + h;
+}
 
 
 bool is_colliding(Tile& tile, float x, float y, uint8_t sprite_size) {
@@ -295,50 +279,54 @@ bool is_colliding(float tile_x, float tile_y, float x, float y, uint8_t sprite_s
 	return (tile_x + sprite_size > x && tile_x < x + sprite_size && tile_y + sprite_size > y && tile_y < y + sprite_size);
 }
 
-bool is_on_tile(Tile& tile, float x, float y, uint8_t sprite_size) {
+
+bool check_on_top(float tile_x, float tile_y, float x, float y, uint8_t tile_w, uint8_t tile_h, uint8_t w, uint8_t h) {
+	return tile_x + tile_w > x && tile_x < x + w && tile_y == y + h;
+}
+
+bool check_on_top(Tile& tile, float x, float y, uint8_t sprite_size) {
 	return (tile.get_x() + sprite_size > x && tile.get_x() < x + sprite_size && tile.get_y() == y + sprite_size);
 }
 
 
 Spike::SpikeDirection parse_spike_id(uint16_t spike_id) {
-	switch (spike_id) {
-	case TILE_ID::SPIKE::DOUBLE_BOTTOM:
+	if (spike_id == TILE_ID::SPIKE::DOUBLE_BOTTOM) {
 		return Spike::SpikeDirection::DOUBLE_BOTTOM;
-
-	case TILE_ID::SPIKE::DOUBLE_LEFT:
+	}
+	else if (spike_id == TILE_ID::SPIKE::DOUBLE_LEFT) {
 		return Spike::SpikeDirection::DOUBLE_LEFT;
-
-	case TILE_ID::SPIKE::DOUBLE_TOP:
+	}
+	else if (spike_id == TILE_ID::SPIKE::DOUBLE_TOP) {
 		return Spike::SpikeDirection::DOUBLE_TOP;
-
-	case TILE_ID::SPIKE::DOUBLE_RIGHT:
+	}
+	else if (spike_id == TILE_ID::SPIKE::DOUBLE_RIGHT) {
 		return Spike::SpikeDirection::DOUBLE_RIGHT;
-
-	case TILE_ID::SPIKE::SINGLE_BOTTOM_LEFT:
+	}
+	else if (spike_id == TILE_ID::SPIKE::SINGLE_BOTTOM_LEFT) {
 		return Spike::SpikeDirection::SINGLE_BOTTOM_LEFT;
-
-	case TILE_ID::SPIKE::SINGLE_BOTTOM_RIGHT:
+	}
+	else if (spike_id == TILE_ID::SPIKE::SINGLE_BOTTOM_RIGHT) {
 		return Spike::SpikeDirection::SINGLE_BOTTOM_RIGHT;
-
-	case TILE_ID::SPIKE::SINGLE_LEFT_TOP:
+	}
+	else if (spike_id == TILE_ID::SPIKE::SINGLE_LEFT_TOP) {
 		return Spike::SpikeDirection::SINGLE_LEFT_TOP;
-
-	case TILE_ID::SPIKE::SINGLE_LEFT_BOTTOM:
+	}
+	else if (spike_id == TILE_ID::SPIKE::SINGLE_LEFT_BOTTOM) {
 		return Spike::SpikeDirection::SINGLE_LEFT_BOTTOM;
-
-	case TILE_ID::SPIKE::SINGLE_TOP_LEFT:
+	}
+	else if (spike_id == TILE_ID::SPIKE::SINGLE_TOP_LEFT) {
 		return Spike::SpikeDirection::SINGLE_TOP_LEFT;
-
-	case TILE_ID::SPIKE::SINGLE_TOP_RIGHT:
+	}
+	else if (spike_id == TILE_ID::SPIKE::SINGLE_TOP_RIGHT) {
 		return Spike::SpikeDirection::SINGLE_TOP_RIGHT;
-
-	case TILE_ID::SPIKE::SINGLE_RIGHT_TOP:
+	}
+	else if (spike_id == TILE_ID::SPIKE::SINGLE_RIGHT_TOP) {
 		return Spike::SpikeDirection::SINGLE_RIGHT_TOP;
-
-	case TILE_ID::SPIKE::SINGLE_RIGHT_BOTTOM:
+	}
+	else if (spike_id == TILE_ID::SPIKE::SINGLE_RIGHT_BOTTOM) {
 		return Spike::SpikeDirection::SINGLE_RIGHT_BOTTOM;
-
-	default:
+	}
+	else {
 		// Pick one
 		return Spike::SpikeDirection::DOUBLE_BOTTOM;
 	}

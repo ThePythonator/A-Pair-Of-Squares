@@ -6,7 +6,8 @@ const uint8_t* asset_levels[] = {
 	asset_level_1,
 	asset_level_2,
 	asset_level_3,
-	asset_level_4
+	asset_level_4,
+	asset_level_5
 };
 
 namespace GAME {
@@ -121,12 +122,19 @@ void Game::load_data() {
 	spritesheet = Spritesheet(renderer, spritesheet_texture, SPRITES::SIZE, SPRITES::SCALE);
 
 	SDL_Surface* font_sheet_surface = load_surface(assets_path + FILES::FONT_SHEET);
+	SDL_Surface * title_font_blue_sheet_surface = load_surface(assets_path + FILES::TITLE_BLUE_FONT_SHEET);
+	SDL_Surface* title_font_pink_sheet_surface = load_surface(assets_path + FILES::TITLE_PINK_FONT_SHEET);
 
 	//font_black = FontHandler::Font(renderer, font_sheet_texture, font_sheet_surface, SPRITES::SIZE, SPRITE_SCALE, COLOURS::BLACK);
-	font_white = FontHandler::Font(renderer, font_sheet_texture, font_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::WHITE);
-	font_selected = FontHandler::Font(renderer, font_sheet_texture, font_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::SELECTED);
+	font_white = FontHandler::Font(renderer, font_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::WHITE);
+	font_selected = FontHandler::Font(renderer, font_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::SELECTED);
+
+	font_title_blue = FontHandler::Font(renderer, title_font_blue_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::TRUE_WHITE);
+	font_title_pink = FontHandler::Font(renderer, title_font_pink_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::TRUE_WHITE);
 
 	SDL_FreeSurface(font_sheet_surface);
+	SDL_FreeSurface(title_font_blue_sheet_surface);
+	SDL_FreeSurface(title_font_pink_sheet_surface);
 
 	// Load timers
 	TIMER_ID::INTRO_LENGTH = timer_handler.add_timer();
@@ -138,7 +146,15 @@ void Game::load_data() {
 	TIMER_ID::GAME_FINISH_PARTICLE_GENERATION = timer_handler.add_timer();
 	TIMER_ID::GAME_DURATION = timer_handler.add_timer();
 
+	// Load transitions
+	menu_transition = TransitionHandler(renderer);
+	pause_transition = TransitionHandler(renderer);
 
+	// Setup transitions
+	//menu_transition.set_transition();
+	//pause_transition.set_transition();
+
+	// Load level handler
 	level_handler = LevelHandler(SPRITES::SIZE);
 }
 
@@ -216,6 +232,9 @@ uint8_t Game::run()
 		time = SDL_GetTicks();
 		dt = (time - last_time) / 1000.0f;
 		last_time = time;
+
+		// Cap dt - stops game skipping time when window is dragged (which caused collisions to fail)
+		dt = std::min(dt, WINDOW::MAX_DT);
 
 		update(dt);
 
@@ -423,6 +442,9 @@ void Game::render_menu_title() {
 	float left_x = positions.first;
 	float right_x = positions.second;
 
+
+	//TextHandler::render_text(font_title_blue, STRINGS::MENU::TITLE::HEADING, right_x, SPRITES::SIZE, SPRITES::SPACE_WIDTH);
+	//TextHandler::render_text(font_title_pink, STRINGS::MENU::TITLE::HEADING, right_x, SPRITES::SIZE, SPRITES::SPACE_WIDTH);
 	
 	TextHandler::render_text(option_selected == 0 ? font_selected : font_white, STRINGS::MENU::TITLE::OPTION_PLAY, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE * 2, SPRITES::SPACE_WIDTH);
 	TextHandler::render_text(option_selected == 1 ? font_selected : font_white, STRINGS::MENU::TITLE::OPTION_SETTINGS, right_x, WINDOW::TEXT_SCALED_HEIGHT_HALF, SPRITES::SPACE_WIDTH);
@@ -812,7 +834,7 @@ void Game::render_game_paused() {
 	player.render(spritesheet);
 	
 	// Cause game scene to be partially faded out
-	render_fade_rect(0x7F);
+	render_fade_rect(MENU::PAUSED_BACKGROUND_ALPHA);
 
 	// Get x positions of text
 	std::pair<float, float> positions = get_bezier_text_positions();
@@ -828,11 +850,11 @@ void Game::render_game_paused() {
 	// Display fade-in/out black rect
 	if (fade_state == FadeState::UNFADE) {
 		render_fade_in_rect(DELAY::TRANSITION_FADE_LENGTH);
-		fade_state == FadeState::UNFADE; //hacky but fixes issue with transition flashing I think
+		//fade_state = FadeState::UNFADE; //hacky but fixes issue with transition flashing I think
 	}
 	else if (fade_state == FadeState::FADE) {
 		render_fade_out_rect(DELAY::TRANSITION_FADE_LENGTH);
-		fade_state == FadeState::FADE; //hacky but fixes issue with transition flashing I think
+		//fade_state = FadeState::FADE; //hacky but fixes issue with transition flashing I think
 	}
 }
 
@@ -1124,7 +1146,7 @@ ImageParticle Game::create_menu_shape_particle() {
 
 	uint16_t x = WINDOW::WIDTH * (menu_shape_particle_count % MENU::SHAPE_PARTICLE::CHANNELS) / (MENU::SHAPE_PARTICLE::CHANNELS * scale);
 
-	return ImageParticle(SPRITES::ID::SQUARE_PARTICLE + colour, x, -SPRITES::SIZE, (rand() % 5 - 2), y_speed, 0.0f, 0.0f, 0.0f, rand() % 90 - 45, scale);
+	return ImageParticle(TILE_ID::PARTICLE::SQUARE_DARK + colour, x, -SPRITES::SIZE, (rand() % 5 - 2), y_speed, 0.0f, 0.0f, 0.0f, rand() % 90 - 45, scale);
 }
 
 ImageParticle Game::create_game_finish_particle(float x, float y, uint8_t colour) {
@@ -1144,7 +1166,7 @@ ImageParticle Game::create_game_finish_particle(float x, float y, uint8_t colour
 
 	float fade = -40.0f;
 
-	return ImageParticle(SPRITES::ID::FINISH_PARTICLE_BLUE + colour, new_x * position_scale, y * position_scale, x_speed * position_scale, y_speed * position_scale, 0.0f, 0.0f, 0.0f, rand() % 90 - 45, scale, 255, fade);
+	return ImageParticle(TILE_ID::PARTICLE::FINISH_BLUE + colour, new_x * position_scale, y * position_scale, x_speed * position_scale, y_speed * position_scale, 0.0f, 0.0f, 0.0f, rand() % 90 - 45, scale, 255, fade);
 }
 
 void Game::fill_menu_shape_particle(uint8_t count) {
@@ -1162,7 +1184,7 @@ void Game::fill_menu_shape_particle(uint8_t count) {
 		x -= rand() % SPRITES::SIZE - SPRITES::SIZE_HALF;
 		y -= (rand() % SPRITES::SIZE - SPRITES::SIZE_HALF) * scale / 4.0f;
 
-		particle_handlers.back.add(ImageParticle(SPRITES::ID::SQUARE_PARTICLE + colour, x, y, (rand() % 5 - 2), y_speed, 0.0f, 0.0f, 0.0f, rand() % 90 - 45, scale));
+		particle_handlers.back.add(ImageParticle(TILE_ID::PARTICLE::SQUARE_DARK + colour, x, y, (rand() % 5 - 2), y_speed, 0.0f, 0.0f, 0.0f, rand() % 90 - 45, scale));
 
 		menu_shape_particle_count++;
 	}
@@ -1188,8 +1210,8 @@ bool Game::level_is_completed() {
 	//return false;
 
 	// Could be improved
-	return level_handler.level_finish_blue_x == player.get_blue_x() && level_handler.level_finish_blue_y == player.get_blue_y() &&
-		level_handler.level_finish_pink_x == player.get_pink_x() && level_handler.level_finish_pink_y == player.get_pink_y();
+	return level_handler.level_finish_blue_x == player.get_blue_x() && level_handler.level_finish_blue_y - GAME::FINISH::HEIGHT == player.get_blue_y() &&
+		level_handler.level_finish_pink_x == player.get_pink_x() && level_handler.level_finish_pink_y - GAME::FINISH::HEIGHT == player.get_pink_y();
 }
 
 
@@ -1217,8 +1239,7 @@ SDL_Texture* Game::load_texture(std::string path) {
 	return texture;
 }
 
-SDL_Surface* Game::load_surface(std::string path)
-{
+SDL_Surface* Game::load_surface(std::string path) {
 	// Load image at specified path
 	SDL_Surface* image = IMG_Load(path.c_str());
 

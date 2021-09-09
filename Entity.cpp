@@ -1,5 +1,15 @@
 #include "Entity.hpp"
 
+//constexpr float sum_animation_frame_arr(AnimationFrame frames[], uint8_t length) {
+//	float total = 0.0f;
+//
+//	for (uint8_t i = 0; i < length; i++) {
+//		total += frames[i].first;
+//	}
+//
+//	return total;
+//}
+
 Entity::Entity() {
 	sprite_index = 0;
 

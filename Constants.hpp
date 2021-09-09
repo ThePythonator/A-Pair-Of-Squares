@@ -21,14 +21,54 @@ namespace SPRITES {
 	extern const uint8_t SPACE_WIDTH;
 
 	extern const uint8_t TEXT_OFFSET_X;// 5 or 6 work too, but text looks too wide when beziering
+}
 
-	namespace ID {
-		extern const uint16_t BLUE_SQUARE;
-		extern const uint16_t PINK_SQUARE;
+namespace TILE_ID {
+	namespace PLAYER {
+		extern const uint16_t BLUE;
+		extern const uint16_t PINK;
+	}
 
-		extern const uint16_t SQUARE_PARTICLE;
+	namespace SPIKE {
+		extern const uint16_t DOUBLE_BOTTOM;
+		extern const uint16_t DOUBLE_LEFT;
+		extern const uint16_t DOUBLE_TOP;
+		extern const uint16_t DOUBLE_RIGHT;
 
-		extern const uint16_t FINISH_PARTICLE_BLUE;
+		extern const uint16_t SINGLE_BOTTOM_LEFT;
+		extern const uint16_t SINGLE_BOTTOM_RIGHT;
+
+		extern const uint16_t SINGLE_LEFT_TOP;
+		extern const uint16_t SINGLE_LEFT_BOTTOM;
+
+		extern const uint16_t SINGLE_TOP_LEFT;
+		extern const uint16_t SINGLE_TOP_RIGHT;
+
+		extern const uint16_t SINGLE_RIGHT_TOP;
+		extern const uint16_t SINGLE_RIGHT_BOTTOM;
+	}
+
+	namespace FINISH {
+		extern const uint16_t BLUE;
+		extern const uint16_t PINK;
+	}
+
+	namespace ORB {
+		extern const uint16_t BLUE;
+		extern const uint16_t PINK;
+	}
+
+	namespace PARTICLE {
+		extern const uint16_t SQUARE_DARK;
+		extern const uint16_t SQUARE_LIGHT;
+
+		extern const uint16_t FINISH_BLUE;
+		extern const uint16_t FINISH_PINK;
+	}
+
+
+	namespace SPRING {
+		extern const uint16_t BASE_FRAME;
 	}
 }
 
@@ -52,6 +92,8 @@ namespace WINDOW {
 	//extern const float MIN_DT = 1.0f / FPS;
 
 	//extern const float CAMERA_MOVEMENT_RATIO = 0.95f;
+	
+	extern const float MAX_DT;
 }
 
 namespace GAME {
@@ -78,6 +120,33 @@ namespace GAME {
 		}
 	}
 
+	namespace FINISH {
+		extern const uint8_t HEIGHT;
+
+		extern const uint8_t BORDER;
+		extern const uint8_t WIDTH;
+	}
+
+	namespace SPRING {
+		extern const uint8_t FRAME_COUNT;
+
+		extern const AnimationFrame ANIMATION[];
+
+		extern const uint8_t ANIMATION_HEIGHTS[];
+
+		extern const uint8_t LAUNCH_FRAME;
+
+		extern const uint8_t BORDER;
+		extern const uint8_t WIDTH;
+
+
+		extern const float LAUNCH_VELOCITY;
+
+		extern const float MAXIMUM_COLLISION_RESOLUTION_Y_VEL;
+
+		//extern const float ANIMATION_DURATION;
+	}
+
 	namespace SQUARE {
 		extern const float ACCELERATION;
 		extern const float DECELERATION;
@@ -86,6 +155,8 @@ namespace GAME {
 		extern const float IDLE_VELOCITY_MIN;
 
 		extern const float JUMP_STRENGTH;
+
+		extern const float MAXIMUM_STEP_HEIGHT;
 
 		namespace FADE {
 			extern const float MAX_SCALE_BOOST;
@@ -122,6 +193,8 @@ namespace MENU {
 	extern const uint8_t LEVELS_PER_ROW;
 	extern const uint8_t LEVEL_ROWS;
 
+	extern const uint8_t PAUSED_BACKGROUND_ALPHA;
+
 	namespace SHAPE_PARTICLE {
 		extern const uint8_t COUNT;
 		extern const uint8_t CHANNELS;
@@ -131,6 +204,10 @@ namespace MENU {
 namespace COLOURS {
 	extern const Colour BLACK;
 	extern const Colour WHITE;
+
+	//extern const Colour GREEN;
+
+	extern const Colour TRUE_WHITE;
 
 	extern const Colour SELECTED;
 }
@@ -145,27 +222,37 @@ namespace STRINGS {
 
 	namespace MENU {
 		namespace TITLE {
+			extern const std::string HEADING;
+
 			extern const std::string OPTION_PLAY;
 			extern const std::string OPTION_SETTINGS;
 			extern const std::string OPTION_QUIT;
 		}
 
 		namespace SETTINGS {
+			extern const std::string HEADING;
+
 			extern const std::string OPTION_MUSIC;
 			extern const std::string OPTION_SFX;
 			extern const std::string OPTION_BACK;
 		}
 
 		namespace LEVEL_SELECT {
+			extern const std::string HEADING;
+
 			extern const std::string OPTION_BACK;
 		}
 
 		namespace LEVEL_PAUSED {
+			extern const std::string HEADING;
+
 			extern const std::string OPTION_RESUME;
 			extern const std::string OPTION_EXIT;
 		}
 
 		namespace LEVEL_COMPLETED {
+			extern const std::string HEADING;
+
 			extern const std::string TEXT_TIME_TAKEN;
 			extern const std::string TEXT_ORBS_COLLECTED;
 			extern const std::string TEXT_NUMBER_OF_DEATHS;
@@ -179,6 +266,9 @@ namespace FILES {
 	extern const std::string SPRITESHEET;
 
 	extern const std::string FONT_SHEET;
+	extern const std::string TITLE_BLUE_FONT_SHEET;
+	extern const std::string TITLE_PINK_FONT_SHEET;
+
 	// extern const std::string FONT_SHEET = "font.png";
 }
 

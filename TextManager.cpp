@@ -9,11 +9,9 @@ FontHandler::Font::Font() {
 	//scale_ratio = 1.0f;
 }
 
-FontHandler::Font::Font(SDL_Renderer* renderer, SDL_Texture* font_sheet_texture, SDL_Surface* font_sheet_surface, uint8_t sprite_size, uint8_t scale, Colour colour) {
+FontHandler::Font::Font(SDL_Renderer* renderer, SDL_Surface* font_sheet_surface, uint8_t sprite_size, uint8_t scale, Colour colour, Colour replace_colour) {
 	this->colour = colour;
 	//this->scale_ratio = (float)sys_scale / (float)scale;
-
-	font_sheet = Spritesheet(renderer, font_sheet_texture, sprite_size, scale);
 
 	uint16_t base_x, base_y, x, y, left, right;
 	uint8_t r, g, b, a;
@@ -36,7 +34,8 @@ FontHandler::Font::Font(SDL_Renderer* renderer, SDL_Texture* font_sheet_texture,
 		x = y = 0;
 		while (!found) {
 			// Get pixel at (x, y)
-			SDL_GetRGBA(((uint32_t*)font_sheet_surface->pixels)[(base_y + y) * font_sheet_surface->w + (base_x + x)], font_sheet_surface->format, &r, &g, &b, &a);
+			//SDL_GetRGBA(((uint32_t*)font_sheet_surface->pixels)[(base_y + y) * font_sheet_surface->w + (base_x + x)], font_sheet_surface->format, &r, &g, &b, &a);
+			get_pixel(font_sheet_surface, base_x + x, base_y + y, &r, &g, &b, &a);
 
 			if (a) {
 				// We found the left edge of the character!
@@ -65,7 +64,7 @@ FontHandler::Font::Font(SDL_Renderer* renderer, SDL_Texture* font_sheet_texture,
 			SDL_GetRGBA(((uint32_t*)font_sheet_surface->pixels)[(base_y + y) * font_sheet_surface->w + (base_x + x)], font_sheet_surface->format, &r, &g, &b, &a);
 
 			if (a) {
-				// We found the left edge of the character!
+				// We found the right edge of the character!
 				right = x;
 				found = true;
 			}
@@ -84,13 +83,37 @@ FontHandler::Font::Font(SDL_Renderer* renderer, SDL_Texture* font_sheet_texture,
 
 		character_rects[i] = SDL_Rect{ base_x + left, base_y, right - left + 1, sprite_size };
 	}
+
+
+	// Set all pixels to colour
+	if (replace_colour.a) {
+		for (x = 0; x < 32 * sprite_size; x++) {
+			for (y = 0; y < (ALPHABET_LENGTH / 32) * sprite_size; y++) {
+				get_pixel(font_sheet_surface, x, y, &r, &g, &b, &a);
+
+				if (a) {
+					// Pixel isn't transparent!
+					set_pixel(font_sheet_surface, x, y, replace_colour.r, replace_colour.g, replace_colour.b, replace_colour.a);
+				}
+			}
+		}
+	}
+
+
+	// Set up font spritesheet
+	SDL_Texture* font_sheet_texture = convert_surface(renderer, font_sheet_surface);
+
+	font_sheet = Spritesheet(renderer, font_sheet_texture, sprite_size, scale);
 }
 
 void FontHandler::Font::render_char(uint8_t c, float x, float y) {
 	// Check character is one we have an image/rect for (don't include c == 32, since that's a space)
 	if (c >= 33 && c <= 255) {
 		// Set colour (need to do this every frame since other fonts may also be using the same texture)
-		SDL_SetTextureColorMod(font_sheet.get_texture(), colour);
+		if (colour.a) {
+			// Colour isn't transparent
+			SDL_SetTextureColorMod(font_sheet.get_texture(), colour);
+		}
 
 		// Render character
 		font_sheet.rect_scaled(&character_rects[c - 32], x, y);

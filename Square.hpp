@@ -15,7 +15,7 @@ public:
 	Square();
 	Square(uint16_t sprite_index, float x, float y);
 
-	void update(std::vector<Tile>& tiles, float dt);
+	void update(std::vector<Tile>& tiles, std::vector<Spring>& springs, float dt);
 
 	void render(Spritesheet& spritesheet);
 
@@ -34,6 +34,12 @@ public:
 	void reset_dead_fade();
 
 	bool get_fade_finished();
+
+	void reset_x_vel();
+	void reset_y_vel();
+
+	bool get_can_jump();
+	void set_can_jump();
 
 protected:
 

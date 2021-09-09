@@ -19,6 +19,7 @@
 #include "TextManager.hpp"
 //#include "Utilities.hpp"
 #include "LevelManager.hpp"
+#include "TransitionManager.hpp"
 
 #include "Assets.hpp"
 
@@ -99,7 +100,6 @@ private:
 	// Loading functions
 	SDL_Texture* load_texture(std::string path);
 	SDL_Surface* load_surface(std::string path);
-	//SDL_Surface* convert_surface(SDL_Surface* surface);
 
 
 	enum class GameState {
@@ -136,7 +136,7 @@ private:
 
 	// Fonts
 	SDL_Texture* font_sheet_texture = NULL;
-	FontHandler::Font /*font_black,*/ font_white, font_selected;
+	FontHandler::Font font_white, font_selected, font_title_blue, font_title_pink;
 
 	// Input handler
 	InputHandler input_handler;
@@ -148,6 +148,9 @@ private:
 
 	// Timer handler
 	TimerHandler timer_handler;
+
+	// Transition handlers
+	TransitionHandler menu_transition, pause_transition;
 
 	// Player
 	Player player;
