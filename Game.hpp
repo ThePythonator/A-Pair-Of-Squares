@@ -97,6 +97,7 @@ private:
 	bool level_is_completed();
 
 
+
 	// Loading functions
 	SDL_Texture* load_texture(std::string path);
 	SDL_Surface* load_surface(std::string path);
@@ -150,7 +151,7 @@ private:
 	TimerHandler timer_handler;
 
 	// Transition handlers
-	TransitionHandler menu_transition, pause_transition;
+	TransitionHandler pause_transition;//menu_transition, 
 
 	// Player
 	Player player;
@@ -181,3 +182,8 @@ private:
 		bool audio_sfx = true;
 	} settings;
 };
+
+// Transition functions
+// Not sure why can't be inside Game scope
+void pause_transition_update(TransitionState* transition_state, float* timer, float dt);
+void pause_transition_render(TransitionState* transition_state, float* timer, SDL_Renderer* renderer, Spritesheet& spritesheet);

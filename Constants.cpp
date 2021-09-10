@@ -290,6 +290,8 @@ namespace DELAY {
 	const float MENU_SHAPE_GENERATION = 3.0f;
 
 	const float GAME_FINISH_PARTICLE_GENERATION = 0.9f;
+
+	const float PAUSE_FADE_LENGTH = 0.5f;
 }
 
 // Timer IDs (are set later in program)

@@ -20,16 +20,18 @@ void TransitionHandler::render(Spritesheet& spritesheet) {
 	}
 }
 
-void TransitionHandler::set_transition(void (*transition_update) (TransitionState* transition_state, float* timer, float dt), void (*transition_render) (SDLRenderer* renderer, Spritesheet& spritesheet, float timer)) {
+void TransitionHandler::set_transition(void (*transition_update) (TransitionState* transition_state, float* timer, float dt), void (*transition_render) (TransitionState* transition_state, float* timer, SDL_Renderer* renderer, Spritesheet& spritesheet)) {
 	this->transition_update = transition_update;
 	this->transition_render = transition_render;
 }
 
 void TransitionHandler::open() {
+	timer = 0.0f;
 	transition_state = TransitionState::OPENING;
 }
 
 void TransitionHandler::close() {
+	timer = 0.0f;
 	transition_state = TransitionState::CLOSING;
 }
 

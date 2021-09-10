@@ -147,12 +147,12 @@ void Game::load_data() {
 	TIMER_ID::GAME_DURATION = timer_handler.add_timer();
 
 	// Load transitions
-	menu_transition = TransitionHandler(renderer);
+	//menu_transition = TransitionHandler(renderer);
 	pause_transition = TransitionHandler(renderer);
 
 	// Setup transitions
 	//menu_transition.set_transition();
-	//pause_transition.set_transition();
+	pause_transition.set_transition(pause_transition_update, pause_transition_render);
 
 	// Load level handler
 	level_handler = LevelHandler(SPRITES::SIZE);
@@ -298,6 +298,8 @@ void Game::update(float dt) {
 	default:
 		break;
 	}
+
+	pause_transition.update(dt);
 }
 
 void Game::render() {
@@ -332,6 +334,8 @@ void Game::render() {
 
 	// Render particles
 	particle_handlers.front.render(spritesheet);
+
+	pause_transition.render(spritesheet);
 }
 
 // Update and render functions for each state
@@ -702,22 +706,20 @@ void Game::update_game_running(float dt) {
 			timer_handler.set_timer_state(TIMER_ID::GAME_DURATION, TimerState::PAUSED);
 
 			// Start transition fade
-			timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
-			timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::RUNNING);
+			//timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
+			//timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::RUNNING);
 
-			fade_state = FadeState::FADE;
+			//fade_state = FadeState::FADE;
+			pause_transition.close();
 		}
 	}
 
-	//if (timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) > DELAY::TRANSITION_FADE_LENGTH) {
-	if (fade_state == FadeState::NONE) {
-		if (paused) {
-			setup_game_paused();
-		}
-		else {
-			// Unpause game timer
-			timer_handler.set_timer_state(TIMER_ID::GAME_DURATION, TimerState::RUNNING);
-		}
+	if (pause_transition.is_closed() && paused) {
+		setup_game_paused();
+	}
+	else if (fade_state == FadeState::NONE && !paused) {
+		// Unpause game timer
+		timer_handler.set_timer_state(TIMER_ID::GAME_DURATION, TimerState::RUNNING);
 	}
 }
 
@@ -778,6 +780,20 @@ void Game::update_game_paused(float dt) {
 			switch ((MENU::LEVEL_PAUSED)option_selected)
 			{
 			case MENU::LEVEL_PAUSED::RESUME:
+				// We need bezier curves
+
+				// Reset timer and set it to running
+				timer_handler.set_timer_state(TIMER_ID::MENU_BEZIER_TEXT, TimerState::RUNNING);
+				timer_handler.reset_timer(TIMER_ID::MENU_BEZIER_TEXT);
+
+				//timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::RUNNING);
+				//timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
+
+				//fade_state = FadeState::FADE;
+
+				option_confirmed = true;
+				break;
+
 			case MENU::LEVEL_PAUSED::EXIT:
 				// We need bezier curves
 
@@ -802,22 +818,49 @@ void Game::update_game_paused(float dt) {
 		// User has selected an option, or initial intro is still happening
 
 		// Check if transition is finished
-		//if (option_confirmed && timer_handler.get_timer_state(TIMER_ID::MENU_BEZIER_TEXT) == TimerState::PAUSED && fade_state == FadeState::NONE) {
-		if (option_confirmed && timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) > DELAY::TRANSITION_FADE_LENGTH) {
-			// User has selected an option and animation is finished
+		//if (option_confirmed && timer_handler.get_timer_state(TIMER_ID::MENU_BEZIER_TEXT) == TimerState::PAUSED) {
+		////if (option_confirmed && timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) > DELAY::TRANSITION_FADE_LENGTH) {
+		//	// User has selected an option and animation is finished
 
-			if ((MENU::LEVEL_PAUSED)option_selected == MENU::LEVEL_PAUSED::RESUME) {
-				// Return to game
-				resume_game_running();
-			}
-			else if ((MENU::LEVEL_PAUSED)option_selected == MENU::LEVEL_PAUSED::EXIT) {
-				// Exit to title
-				timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::RUNNING);
-				timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
+		//	if ((MENU::LEVEL_PAUSED)option_selected == MENU::LEVEL_PAUSED::RESUME) {
+		//		// Return to game
+		//		resume_game_running();
+		//	}
+		//	else if ((MENU::LEVEL_PAUSED)option_selected == MENU::LEVEL_PAUSED::EXIT) {
+		//		// Exit to title
+		//		timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::RUNNING);
+		//		timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
 
-				fade_state = FadeState::UNFADE;
+		//		fade_state = FadeState::UNFADE;
 
-				setup_menu_title();
+		//		setup_menu_title();
+		//	}
+		//}
+
+		// Check if transition is finished and handle option selected
+		if (option_confirmed) {
+			switch ((MENU::LEVEL_PAUSED)option_selected) {
+			case MENU::LEVEL_PAUSED::RESUME:
+				if (timer_handler.get_timer_state(TIMER_ID::MENU_BEZIER_TEXT) == TimerState::PAUSED) {
+					// Return to game
+					resume_game_running();
+				}
+				break;
+
+			case MENU::LEVEL_PAUSED::EXIT:
+				if (timer_handler.get_timer_state(TIMER_ID::MENU_BEZIER_TEXT) == TimerState::PAUSED && timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) > DELAY::TRANSITION_FADE_LENGTH) {
+					// Exit to title
+					timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::RUNNING);
+					timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
+
+					fade_state = FadeState::UNFADE;
+
+					setup_menu_title();
+				}
+				break;
+
+			default:
+				break;
 			}
 		}
 	}
@@ -855,6 +898,10 @@ void Game::render_game_paused() {
 	else if (fade_state == FadeState::FADE) {
 		render_fade_out_rect(DELAY::TRANSITION_FADE_LENGTH);
 		//fade_state = FadeState::FADE; //hacky but fixes issue with transition flashing I think
+	}
+	else if (option_confirmed && (MENU::LEVEL_PAUSED)option_selected == MENU::LEVEL_PAUSED::EXIT && timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) > DELAY::TRANSITION_FADE_LENGTH) {
+		// Bit hacky but stops flashing when moving to menu when exit is pressed.
+		render_fade_rect(0xFF);
 	}
 }
 
@@ -1015,10 +1062,12 @@ void Game::setup_game_paused() {
 	timer_handler.set_timer_state(TIMER_ID::MENU_BEZIER_TEXT, TimerState::RUNNING);
 	timer_handler.reset_timer(TIMER_ID::MENU_BEZIER_TEXT);
 
-	timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::RUNNING);
-	timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
+	//timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::RUNNING);
+	//timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
 
-	fade_state = FadeState::UNFADE;
+	//fade_state = FadeState::UNFADE;
+	
+	//pause_transition.open();
 }
 
 void Game::setup_game_end() {
@@ -1043,10 +1092,12 @@ void Game::setup_game_end() {
 void Game::resume_game_running() {
 	game_state = GameState::GAME_RUNNING;
 
-	timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::RUNNING);
-	timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
+	//timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::RUNNING);
+	//timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
 
-	fade_state = FadeState::UNFADE;
+	//fade_state = FadeState::UNFADE;
+
+	pause_transition.open();
 
 	paused = false;
 }
@@ -1249,4 +1300,57 @@ SDL_Surface* Game::load_surface(std::string path) {
 	}
 
 	return image;
+}
+
+
+
+void pause_transition_update(TransitionState* transition_state, float* timer, float dt) {
+	*timer += dt;
+}
+
+void pause_transition_render(TransitionState* transition_state, float* timer, SDL_Renderer* renderer, Spritesheet& spritesheet) {
+	SDL_Rect screen_rect{ 0, 0, WINDOW::WIDTH, WINDOW::HEIGHT };
+
+	switch (*transition_state) {
+	case TransitionState::OPENING:
+		if (*timer <= DELAY::PAUSE_FADE_LENGTH) {
+			// Calculate alpha
+			uint8_t alpha = MENU::PAUSED_BACKGROUND_ALPHA * (1.0f - *timer / DELAY::PAUSE_FADE_LENGTH);
+
+			// Fill with semi-transparent black
+			SDL_SetRenderDrawColor(renderer, Colour(COLOURS::BLACK, alpha));
+			SDL_RenderFillRect(renderer, &screen_rect);
+
+			//printf("fade %u, time %f, delay %f\n", alpha, timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE), delay);
+		}
+		else {
+			*transition_state = TransitionState::OPEN;
+		}
+		break;
+
+	case TransitionState::CLOSING:
+		if (*timer <= DELAY::PAUSE_FADE_LENGTH) {
+			// Calculate alpha
+			uint8_t alpha = MENU::PAUSED_BACKGROUND_ALPHA * (*timer / DELAY::PAUSE_FADE_LENGTH);
+
+			// Fill with semi-transparent black
+			SDL_SetRenderDrawColor(renderer, Colour(COLOURS::BLACK, alpha));
+			SDL_RenderFillRect(renderer, &screen_rect);
+		}
+		else {
+			*transition_state = TransitionState::CLOSED;
+		}
+		break;
+
+	case TransitionState::CLOSED:
+		// In this case, don't fill
+		// Normally you'd want to fill with black when closed, but pause menu is 'closed' the whole time.
+		/*SDL_SetRenderDrawColor(renderer, Colour(COLOURS::BLACK, 0xFF));
+		SDL_RenderFillRect(renderer, &screen_rect);*/
+
+		break;
+
+	default:
+		break;
+	}
 }

@@ -283,6 +283,8 @@ namespace DELAY {
 	extern const float MENU_SHAPE_GENERATION;
 
 	extern const float GAME_FINISH_PARTICLE_GENERATION;
+
+	extern const float PAUSE_FADE_LENGTH;
 }
 
 // Timer IDs (are set later in program)
