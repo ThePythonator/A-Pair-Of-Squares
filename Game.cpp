@@ -663,7 +663,7 @@ void Game::update_game_running(float dt) {
 	particle_handlers.spare.remove_if([](ImageParticle& particle) { return particle.get_alpha() == 0.0f; });
 
 	// Only move the player and entities when there aren't transitions in the way
-	if (fade_state == FadeState::NONE) {
+	if (!paused && fade_state == FadeState::NONE) {
 		player.update(input_handler, level_handler, dt);
 
 		level_handler.update(dt);
@@ -696,7 +696,7 @@ void Game::update_game_running(float dt) {
 			}
 		}
 	}
-	else {
+	else if (!paused) {
 		// Level in progress
 		if (KeyHandler::just_down(input_handler.get_key_union().keys.ESCAPE)) {
 			// User has paused game
@@ -1096,6 +1096,9 @@ void Game::resume_game_running() {
 	//timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
 
 	//fade_state = FadeState::UNFADE;
+
+	// Reset space to stop players jumping as soon as fade ends
+	input_handler.set_key(KeyHandler::Key::SPACE, KeyHandler::KeyState::STILL_UP);
 
 	pause_transition.open();
 

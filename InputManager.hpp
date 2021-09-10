@@ -12,6 +12,14 @@ namespace KeyHandler {
 		JUST_PRESSED // Key has been pressed that frame
 	};
 
+	// enum Key and struct Keys must all have the same fields in the same order!
+	enum class Key {
+		UP, DOWN, LEFT, RIGHT,
+		A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
+		NUM_0, NUM_1, NUM_2, NUM_3, NUM_4, NUM_5, NUM_6, NUM_7, NUM_8, NUM_9,
+		SPACE, RETURN, ESCAPE
+	};
+
 	struct Keys {
 		KeyState UP, DOWN, LEFT, RIGHT,
 			A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
@@ -26,14 +34,16 @@ namespace KeyHandler {
 		KeyState key_array[KEY_COUNT];
 	};
 
-	bool is_up(const KeyState& key_state); // Returns true if STILL_UP or JUST_RELEASED
-	bool is_down(const KeyState& key_state); // Returns true if STILL_DOWN or JUST_PRESSED
-	bool just_up(const KeyState& key_state); // Returns true if JUST_RELEASED
-	bool just_down(const KeyState& key_state); // Returns true if JUST_PRESSED
+	bool is_up(KeyState key_state); // Returns true if STILL_UP or JUST_RELEASED
+	bool is_down(KeyState key_state); // Returns true if STILL_DOWN or JUST_PRESSED
+	bool just_up(KeyState key_state); // Returns true if JUST_RELEASED
+	bool just_down(KeyState key_state); // Returns true if JUST_PRESSED
 
 	void update(KeyUnion& key_handler);
 
 	void update_key(KeyUnion& key_handler, const SDL_Event& sdl_event);
+
+	void set_key(KeyUnion& key_handler, Key key, KeyState key_state);
 }
 
 namespace MouseHandler {
@@ -47,6 +57,8 @@ public:
 	void update();
 
 	void handle_sdl_event(const SDL_Event& sdl_event);
+
+	void set_key(KeyHandler::Key key, KeyHandler::KeyState key_state);
 
 	KeyHandler::KeyUnion get_key_union();
 
