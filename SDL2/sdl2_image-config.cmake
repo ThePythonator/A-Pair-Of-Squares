@@ -3,7 +3,6 @@ find_path(SDL2_IMAGE_INCLUDE_DIR SDL_image.h
 	PATH_SUFFIXES SDL2 include/SDL2 include
 )
 
-# vs
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 	set(VC_LIB_PATH_SUFFIX lib/x64)
 else()
