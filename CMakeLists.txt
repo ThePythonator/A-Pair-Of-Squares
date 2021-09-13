@@ -22,10 +22,21 @@ else()
 endif()
 
 find_package(PythonInterp 3.6 REQUIRED)
-find_package(SDL2 REQUIRED)
-find_package(SDL2_image REQUIRED)
 
-include_directories(${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+if(EMSCRIPTEN)
+	target_compile_options(APairOfSquares
+		PRIVATE
+			"-s;USE_SDL=2;-s ;USE_SDL_IMAGE=2"
+	)
+
+	set(SDL2_LIBRARIES "-s USE_SDL=2")
+	set(SDL2_IMAGE_LIBRARY "-s USE_SDL_IMAGE=2")
+else()
+	find_package(SDL2 REQUIRED)
+	find_package(SDL2_image REQUIRED)
+
+	include_directories(${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+endif()
 
 # Build assets.hpp/cpp files
 add_custom_command(
