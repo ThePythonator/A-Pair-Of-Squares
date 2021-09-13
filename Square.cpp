@@ -24,6 +24,9 @@ void Square::update(std::vector<Tile>& tiles, std::vector<Spring>& springs, floa
 		x_vel = y_vel = 0;
 	}
 	else {
+		// Hacky
+		float old_y = y;
+
 		// Move y
 		y += y_vel * dt;
 
@@ -44,21 +47,6 @@ void Square::update(std::vector<Tile>& tiles, std::vector<Spring>& springs, floa
 				y_vel = 0.0f;
 			}
 		}
-
-		// Handle springs
-		//for (Spring& spring : springs) {
-		//	if (spring.check_collision(x, y)) {
-		//		//if (y_vel > 0.0f) {
-		//		//	// Collided from top
-		//		//	y = spring.get_top() - SPRITES::SIZE;
-		//		//}
-		//		//if (y_vel >= 0.0f)
-		//		if (y - (spring.get_top() - SPRITES::SIZE) <= GAME::SQUARE::MAXIMUM_STEP_HEIGHT)
-		//		y = spring.get_top() - SPRITES::SIZE;
-		//		printf("%f\n", y - (spring.get_top() - SPRITES::SIZE));
-		//		//y_vel = 0.0f;
-		//	}
-		//}
 
 		// Move x
 		x += x_vel * dt;
@@ -83,15 +71,16 @@ void Square::update(std::vector<Tile>& tiles, std::vector<Spring>& springs, floa
 		// Handle springs
 		for (Spring& spring : springs) {
 			if (spring.check_collision(x, y)) {
-				if (y_vel >= 0.0f && y + SPRITES::SIZE - spring.get_top() <= GAME::SQUARE::MAXIMUM_STEP_HEIGHT) {
+				if (y_vel >= 0.0f && ((spring.get_just_changed_frame() && old_y + SPRITES::SIZE - spring.get_top() <= GAME::SPRING::FRAME_HEIGHT_DIFFERENCE) || (y + SPRITES::SIZE - spring.get_top() <= GAME::SQUARE::MAXIMUM_STEP_HEIGHT))) {
 					y = spring.get_top() - SPRITES::SIZE;
 					y_vel = 0.0f;
 				}
 				else {
 					// A bit hacky but should stop weird glitchy collision resolution.
 					// Without the below if statement, moving left/right as a spring launches causes you to be moved to the other side of the spring.
+					// May no longer be necessary.
 					if (y_vel > -GAME::SPRING::MAXIMUM_COLLISION_RESOLUTION_Y_VEL) {
-						printf("colliding, %f, %f\n", x_vel, y_vel);
+						//printf("colliding, %f, %f\n", x_vel, y_vel);
 						if (x_vel > 0.0f) {
 							// Collided from left
 							x = spring.get_x() + GAME::SPRING::BORDER - SPRITES::SIZE;
@@ -105,19 +94,6 @@ void Square::update(std::vector<Tile>& tiles, std::vector<Spring>& springs, floa
 				}
 			}
 		}
-		//for (Spring& spring : springs) {
-		//	if (spring.check_collision(x, y)) {
-		//		if (x_vel > 0) {
-		//			// Collided from left
-		//			x = spring.get_x() - SPRITES::SIZE;
-		//		}
-		//		else if (x_vel < 0) {
-		//			// Collided from right
-		//			x = spring.get_x() + SPRITES::SIZE;
-		//		}
-		//		x_vel = 0;
-		//	}
-		//}
 	}
 	
 	can_jump = false;
@@ -161,31 +137,33 @@ void Square::render(Spritesheet& spritesheet) {
 		}
 	}
 
-	if (index_base == sprite_index) {
-		// Check if we need to blink
-		if (can_blink) {
-			if (blink_timer <= GAME::SQUARE::BLINK::DURATION) {
-				if (blink_timer <= GAME::SQUARE::BLINK::FRAME_DURATIONS[1]) {
-					// 2nd frame of blink
-					index_base += 2;
+	if (!finished) {
+		if (index_base == sprite_index) {
+			// Check if we need to blink
+			if (can_blink) {
+				if (blink_timer <= GAME::SQUARE::BLINK::DURATION) {
+					if (blink_timer <= GAME::SQUARE::BLINK::FRAME_DURATIONS[1]) {
+						// 2nd frame of blink
+						index_base += 2;
+					}
+					else {
+						// 1st frame of blink
+						index_base += 1;
+					}
 				}
 				else {
-					// 1st frame of blink
-					index_base += 1;
+					// Not blinking
 				}
 			}
 			else {
-				// Not blinking
+				can_blink = true;
 			}
 		}
 		else {
-			can_blink = true;
+			// Reset blink timer so that when player is next on stationary image it gets updated
+			blink_timer = 0.0f;
+			can_blink = false;
 		}
-	}
-	else {
-		// Reset blink timer so that when player is next on stationary image it gets updated
-		blink_timer = 0.0f;
-		can_blink = false;
 	}
 
 	if (dead && fade_age < GAME::SQUARE::FADE::MAX_AGE) {

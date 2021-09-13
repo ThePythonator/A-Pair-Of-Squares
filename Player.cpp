@@ -87,10 +87,13 @@ void Player::update(InputHandler& input_handler, LevelHandler& level_handler, fl
 	for (Spring& spring : level_handler.get_springs()) {
 		if (spring.should_launch()) {
 			if (spring.check_collision(blue.get_x(), blue.get_y())) {
+				// Reset velocity first to hopefully fix 'super-jump' bug
+				blue.reset_y_vel();
 				blue.add_velocity(0.0f, -GAME::SPRING::LAUNCH_VELOCITY);
 			}
 
 			if (spring.check_collision(pink.get_x(), pink.get_y())) {
+				pink.reset_y_vel();
 				pink.add_velocity(0.0f, -GAME::SPRING::LAUNCH_VELOCITY);
 			}
 		}

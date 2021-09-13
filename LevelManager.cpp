@@ -139,7 +139,7 @@ void LevelHandler::load_level(const uint8_t level_data[]) {
 				orbs.push_back(Orb(tile_id, 1, x, y));
 			}
 			else if (
-				tile_id == TILE_ID::SPIKE::DOUBLE_RIGHT ||
+				tile_id == TILE_ID::SPIKE::DOUBLE_BOTTOM ||
 				tile_id == TILE_ID::SPIKE::DOUBLE_LEFT ||
 				tile_id == TILE_ID::SPIKE::DOUBLE_TOP ||
 				tile_id == TILE_ID::SPIKE::DOUBLE_RIGHT ||
@@ -162,6 +162,14 @@ void LevelHandler::load_level(const uint8_t level_data[]) {
 			else if (tile_id == TILE_ID::SPRING::BASE_FRAME) {
 				// Spring
 				springs.push_back(Spring(tile_id, x, y));
+			}
+			else if (tile_id == TILE_ID::BUTTON::BLUE_RELEASED) {
+				// Spring
+				//springs.push_back(Button(tile_id, x, y));
+			}
+			else if (tile_id == TILE_ID::BUTTON::PINK_RELEASED) {
+				// Spring
+				//springs.push_back(Button(tile_id, x, y));
 			}
 			else {
 				// Normal tile
@@ -221,7 +229,7 @@ uint8_t LevelHandler::handle_orb_collisions(float x, float y, uint8_t type) {
 		// Orb hasn't been collected and is same colour as player
 		if (!orb.get_collected() && type == orb.get_type()) {
 			// Orb is colliding
-			if (is_colliding(orb.get_x(), orb.get_y(), x, y, sprite_size)) {
+			if (is_colliding(orb.get_x() + GAME::ORB::BORDER, orb.get_y() + GAME::ORB::BORDER, x, y, GAME::ORB::WIDTH, GAME::ORB::WIDTH, sprite_size, sprite_size)) {
 				orb.set_collected();
 				count++; // Note: sometimes (rarely) player gets awarded many orbs when there aren't that many in the level
 				//printf("orb %u, %u, collected: %u\n", type, orb.get_type(), orb.get_collected());

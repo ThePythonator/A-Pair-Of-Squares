@@ -21,10 +21,13 @@ public:
 
 	float get_top();
 
+	bool get_just_changed_frame();
+
 protected:
 	float animation_timer = 0.0f;
 
 	uint8_t current_frame_offset = 0;
 
 	bool launch_player = false;
+	bool just_changed_frame = false;
 };

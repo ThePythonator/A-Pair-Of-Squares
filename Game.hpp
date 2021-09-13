@@ -30,7 +30,7 @@ class Game {
 public:
 	Game();
 
-	uint8_t run();
+	void run();
 
 private:
 	bool init();

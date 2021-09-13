@@ -70,6 +70,13 @@ namespace TILE_ID {
 	namespace SPRING {
 		extern const uint16_t BASE_FRAME;
 	}
+
+	namespace BUTTON {
+		extern const uint16_t BLUE_RELEASED;
+		extern const uint16_t BLUE_PRESSED;
+		extern const uint16_t PINK_RELEASED;
+		extern const uint16_t PINK_PRESSED;
+	}
 }
 
 namespace WINDOW {
@@ -88,7 +95,7 @@ namespace WINDOW {
 	extern const uint16_t TEXT_SCALED_WIDTH_HALF;
 	extern const uint16_t TEXT_SCALED_HEIGHT_HALF;
 
-	extern const uint8_t FPS;
+	extern const uint8_t MAX_FPS;
 	//extern const float MIN_DT = 1.0f / FPS;
 
 	//extern const float CAMERA_MOVEMENT_RATIO = 0.95f;
@@ -118,6 +125,9 @@ namespace GAME {
 			extern const float MAX_SCALE_BOOST;
 			extern const float MAX_AGE;
 		}
+
+		extern const uint8_t BORDER;
+		extern const uint8_t WIDTH;
 	}
 
 	namespace FINISH {
@@ -144,7 +154,17 @@ namespace GAME {
 
 		extern const float MAXIMUM_COLLISION_RESOLUTION_Y_VEL;
 
+		extern const uint8_t FRAME_HEIGHT_DIFFERENCE;
+
 		//extern const float ANIMATION_DURATION;
+	}
+
+	namespace BUTTON {
+		extern const uint8_t HEIGHT_RELEASED;
+		extern const uint8_t HEIGHT_PRESSED;
+
+		extern const uint8_t BORDER;
+		extern const uint8_t WIDTH;
 	}
 
 	namespace SQUARE {

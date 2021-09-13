@@ -46,8 +46,8 @@ namespace TILE_ID {
 	}
 
 	namespace ORB {
-		const uint16_t BLUE = 98;
-		const uint16_t PINK = 99;
+		const uint16_t BLUE = 112;
+		const uint16_t PINK = 113;
 	}
 
 	namespace PARTICLE {
@@ -60,6 +60,13 @@ namespace TILE_ID {
 
 	namespace SPRING {
 		const uint16_t BASE_FRAME = 8;
+	}
+
+	namespace BUTTON {
+		const uint16_t BLUE_RELEASED = 12;
+		const uint16_t BLUE_PRESSED = 13;
+		const uint16_t PINK_RELEASED = 14;
+		const uint16_t PINK_PRESSED = 15;
 	}
 }
 
@@ -81,7 +88,7 @@ namespace WINDOW {
 	const uint16_t TEXT_SCALED_WIDTH_HALF = TEXT_SCALED_WIDTH / 2;
 	const uint16_t TEXT_SCALED_HEIGHT_HALF = TEXT_SCALED_HEIGHT / 2;
 
-	const uint8_t FPS = 120;
+	const uint8_t MAX_FPS = 120;
 	//const float MIN_DT = 1.0f / FPS;
 
 	//const float CAMERA_MOVEMENT_RATIO = 0.95f;
@@ -92,8 +99,8 @@ namespace WINDOW {
 namespace GAME {
 	namespace SCORE {
 		const uint16_t INITIAL = 1000;
-		const uint8_t DEATH = 30;
-		const uint8_t ORB = 10;
+		const uint8_t DEATH = 40;
+		const uint8_t ORB = 15;
 		const uint8_t TIME = 1;
 	}
 
@@ -109,12 +116,15 @@ namespace GAME {
 			const float MAX_SCALE_BOOST = 4.0f;
 			const float MAX_AGE = 0.3f;
 		}
+
+		const uint8_t BORDER = 4;
+		const uint8_t WIDTH = SPRITES::SIZE - BORDER * 2;
 	}
 
 	namespace FINISH {
 		const uint8_t HEIGHT = 1;
 
-		const uint8_t BORDER = 1;
+		const uint8_t BORDER = 2;// 1;
 		const uint8_t WIDTH = SPRITES::SIZE - BORDER * 2;
 
 	}
@@ -129,6 +139,12 @@ namespace GAME {
 			AnimationFrame{TILE_ID::SPRING::BASE_FRAME + 3, 1.0f},
 			AnimationFrame{TILE_ID::SPRING::BASE_FRAME + 2, 0.09f},
 			AnimationFrame{TILE_ID::SPRING::BASE_FRAME + 1, 0.09f}
+			/*AnimationFrame{TILE_ID::SPRING::BASE_FRAME, 2.0f},
+			AnimationFrame{TILE_ID::SPRING::BASE_FRAME + 1, 2.0f},
+			AnimationFrame{TILE_ID::SPRING::BASE_FRAME + 2, 2.0f},
+			AnimationFrame{TILE_ID::SPRING::BASE_FRAME + 3, 2.0f},
+			AnimationFrame{TILE_ID::SPRING::BASE_FRAME + 2, 2.0f},
+			AnimationFrame{TILE_ID::SPRING::BASE_FRAME + 1, 2.0f}*/
 		};
 
 		const uint8_t ANIMATION_HEIGHTS[FRAME_COUNT] = {
@@ -144,14 +160,24 @@ namespace GAME {
 		// Therefore fire player upwards on the 2nd frame
 		const uint8_t LAUNCH_FRAME = 1;
 
-		const uint8_t BORDER = 1;
+		const uint8_t BORDER = 2;//1;
 		const uint8_t WIDTH = SPRITES::SIZE - BORDER * 2;
 
-		const float LAUNCH_VELOCITY = 300.0f;
+		const float LAUNCH_VELOCITY = 330.0f;//300.0f;
 
-		const float MAXIMUM_COLLISION_RESOLUTION_Y_VEL = LAUNCH_VELOCITY / 2;
+		const float MAXIMUM_COLLISION_RESOLUTION_Y_VEL = LAUNCH_VELOCITY / 3;
+
+		const uint8_t FRAME_HEIGHT_DIFFERENCE = 3; // Number of pixels spring increases in height by each frame
 
 		//const float ANIMATION_DURATION = sum_animation_frame_arr(ANIMATION, FRAME_COUNT);
+	}
+
+	namespace BUTTON {
+		const uint8_t HEIGHT_RELEASED = 4;
+		const uint8_t HEIGHT_PRESSED = 2;
+
+		const uint8_t BORDER = 1;
+		const uint8_t WIDTH = SPRITES::SIZE - BORDER * 2;
 	}
 
 	namespace SQUARE {

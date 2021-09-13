@@ -195,7 +195,7 @@ std::string Game::find_assets_path(std::string test_file, uint8_t depth) {
 	return base_path + "assets/";
 }
 
-uint8_t Game::run()
+void Game::run()
 {
 	// Initialise SDL and globals - if it fails, don't run program
 	running = init();
@@ -236,6 +236,26 @@ uint8_t Game::run()
 		// Cap dt - stops game skipping time when window is dragged (which caused collisions to fail)
 		dt = std::min(dt, WINDOW::MAX_DT);
 
+
+		//printf("FPS: %f\n", 1.0f / dt);
+
+		//// Limit framerate - to fix
+		//if (dt < 1.0f / WINDOW::MAX_FPS) {
+		//	printf("(too high)");
+		//	// Wait remaining time
+		//	SDL_Delay(1000 * (1.0f / WINDOW::MAX_FPS - dt));
+		//	printf(" %f", (1.0f / WINDOW::MAX_FPS - dt));
+		//	//SDL_Delay(1000 * (1.0f/120 - dt));
+
+		//	// Calculate dt
+		//	time = SDL_GetTicks();
+		//	dt = (time - last_time) / 1000.0f;
+		//	last_time = time;
+		//	printf(" corrected FPS: %f\n", 1.0f / dt);
+		//}
+
+
+
 		update(dt);
 
 		// Clear the screen
@@ -247,21 +267,10 @@ uint8_t Game::run()
 
 		// Update screen
 		SDL_RenderPresent(renderer);
-
-		// Limit framerate - to fix
-		//if (dt < MIN_DT) {
-		//	// Wait remaining time
-		//	SDL_Delay(1000 * (MIN_DT - dt));
-		//}
-
-
-		//printf("FPS: %f\n", 1.0f / dt);
 	}
 
 	// Quit everything
 	quit();
-
-	return 0;
 }
 
 void Game::update(float dt) {

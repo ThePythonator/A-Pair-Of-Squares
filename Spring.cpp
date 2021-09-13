@@ -11,6 +11,7 @@ Spring::Spring(uint16_t sprite_index, float x, float y) : Entity(sprite_index, x
 void Spring::update(float dt) {
 	// launch_player is only set for 1 frame
 	launch_player = false;
+	just_changed_frame = false;
 
 	animation_timer += dt;
 
@@ -18,6 +19,8 @@ void Spring::update(float dt) {
 		animation_timer -= GAME::SPRING::ANIMATION[current_frame_offset].second;
 
 		current_frame_offset++;
+
+		just_changed_frame = true;
 
 		if (current_frame_offset == GAME::SPRING::FRAME_COUNT) {
 			current_frame_offset = 0;
@@ -47,4 +50,8 @@ bool Spring::check_on_top(float player_x, float player_y){
 
 float Spring::get_top() {
 	return y + SPRITES::SIZE - GAME::SPRING::ANIMATION_HEIGHTS[current_frame_offset];
+}
+
+bool Spring::get_just_changed_frame() {
+	return just_changed_frame;
 }
