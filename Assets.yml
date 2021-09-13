@@ -1,4 +1,4 @@
-assets.cpp:
+Assets.cpp:
     
   assets/level0.tmx:
     name: asset_level_0
