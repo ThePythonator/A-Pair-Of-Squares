@@ -7,6 +7,7 @@
 #include "Spritesheet.hpp"
 
 #include <vector>
+#include <algorithm>
 
 // No direct support for Filled polygons
 //namespace ShapeParticle {
