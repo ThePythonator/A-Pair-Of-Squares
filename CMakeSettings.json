@@ -25,12 +25,12 @@
       "variables": [
         {
           "name": "SDL2_DIR",
-          "value": "F:/SDL2/vs/sdl",
+          "value": "C:/Users/capta_fjj2zz9/OneDrive/Development/Projects/A-Pair-Of-Squares/SDL2",
           "type": "PATH"
         },
         {
           "name": "SDL2_image_DIR",
-          "value": "F:/SDL2/vs/sdl",
+          "value": "C:/Users/capta_fjj2zz9/OneDrive/Development/Projects/A-Pair-Of-Squares/SDL2",
           "type": "PATH"
         }
       ]
