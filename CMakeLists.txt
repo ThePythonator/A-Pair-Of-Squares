@@ -9,8 +9,8 @@ set(PROJECT_SOURCE "APairOfSquares.cpp" "Square.cpp" "Entity.cpp" "Spritesheet.c
 # ... and any other files you want in the release here
 set(PROJECT_DISTRIBS LICENSE README.md)
 
-set(ASSET_OUTPUTS "assets.hpp" "assets.cpp")
-set(ASSET_DEPENDS "assets.yml")
+set(ASSET_OUTPUTS "Assets.hpp" "Assets.cpp")
+set(ASSET_DEPENDS "Assets.yml")
 
 # Build configuration; approach this with caution!
 if(MSVC)
