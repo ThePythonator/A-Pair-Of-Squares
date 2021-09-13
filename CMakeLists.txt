@@ -37,7 +37,7 @@ add_custom_command(
 
 add_executable(APairOfSquares ${PROJECT_SOURCE})
 
-target_link_libraries(APairOfSquares ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY})
+target_link_libraries(APairOfSquares ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARY})
 
 # setup release packages
 #install (FILES ${PROJECT_DISTRIBS} DESTINATION .)
