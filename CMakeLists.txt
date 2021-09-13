@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.9)
 
 project(APairOfSquares)
 
+set(CMAKE_CXX_STANDARD 17)
+
 # Add your sources here (adding headers is optional, but helps some CMake generators)
 set(PROJECT_SOURCE "APairOfSquares.cpp" "Square.cpp" "Entity.cpp" "Spritesheet.cpp" "InputManager.cpp" "Assets.cpp" "LevelManager.cpp" "Player.cpp" "ParticleManager.cpp" "TimerManager.cpp" "Bezier.cpp" "TextManager.cpp" "Game.cpp" "Utilities.cpp" "AudioManager.cpp" "Orb.cpp" "Spike.cpp" "Colour.cpp" "Constants.cpp" "Spring.cpp" "TransitionManager.cpp" "Button.cpp")
 
