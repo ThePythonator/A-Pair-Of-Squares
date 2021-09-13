@@ -255,7 +255,7 @@ bool LevelHandler::handle_spike_collisions(float x, float y) {
 	return false;
 }
 
-std::vector<Tile> LevelHandler::get_tiles() {
+std::vector<Tile>& LevelHandler::get_tiles() {
 	return tiles;
 }
 
@@ -263,7 +263,7 @@ std::vector<Tile> LevelHandler::get_tiles() {
 //	return orbs;
 //}
 
-std::vector<Spring> LevelHandler::get_springs() {
+std::vector<Spring>& LevelHandler::get_springs() {
 	return springs;
 }
 

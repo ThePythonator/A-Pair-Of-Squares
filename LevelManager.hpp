@@ -79,9 +79,9 @@ public:
 	uint8_t handle_orb_collisions(float x, float y, uint8_t type);
 	bool handle_spike_collisions(float x, float y);
 
-	std::vector<Tile> get_tiles();
+	std::vector<Tile>& get_tiles();
 	//std::vector<Orb> get_orbs();
-	std::vector<Spring> get_springs();
+	std::vector<Spring>& get_springs();
 
 	uint8_t get_sprite_size();
 
