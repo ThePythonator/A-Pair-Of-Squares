@@ -9,7 +9,7 @@ set(PROJECT_SOURCE "APairOfSquares.cpp" "Square.cpp" "Entity.cpp" "Spritesheet.c
 # ... and any other files you want in the release here
 set(PROJECT_DISTRIBS LICENSE README.md)
 
-set(ASSET_OUTPUTS "Assets.hpp" "Assets.cpp")
+set(ASSET_OUTPUTS "assets.hpp" "assets.cpp")
 set(ASSET_DEPENDS "assets.yml")
 
 # Build configuration; approach this with caution!
@@ -22,9 +22,6 @@ endif()
 find_package(PythonInterp 3.6 REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
-
-
-#############
 
 include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR})
 

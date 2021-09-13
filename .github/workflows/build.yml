@@ -29,6 +29,7 @@ jobs:
             release-suffix: LIN64
             cmake-args: -DSDL2_image_DIR=$GITHUB_WORKSPACE/main/SDL2
             apt-packages: libsdl2-dev libsdl2-image-dev python3-setuptools
+            can-fail: true
 
           - os: ubuntu-20.04
             name: Emscripten
@@ -36,19 +37,24 @@ jobs:
             cmake-args: -DSDL2_image_DIR=$GITHUB_WORKSPACE/main/SDL2
             cmake-prefix: emcmake
             apt-packages: python3-setuptools
+            can-fail: true
 
           - os: macos-latest
             name: macOS
             release-suffix: MACOS
             cmake-args: -DSDL2_image_DIR=$GITHUB_WORKSPACE/main/SDL2
             brew-packages: sdl2 sdl2_image
+            can-fail: true
 
           - os: windows-latest
             name: Visual Studio
             release-suffix: WIN64
             cmake-args: -DSDL2_image_DIR=$GITHUB_WORKSPACE/main/SDL2
+            can-fail: true
+
 
     runs-on: ${{matrix.os}}
+    continue-on-error: ${{ matrix.can-fail }}
 
     env:
       RELEASE_FILE: ${{github.event.repository.name}}-${{github.event.release.tag_name}}-${{matrix.release-suffix}}
