@@ -289,6 +289,7 @@ bool is_colliding(float tile_x, float tile_y, float x, float y, uint8_t sprite_s
 
 
 bool check_on_top(float tile_x, float tile_y, float x, float y, uint8_t tile_w, uint8_t tile_h, uint8_t w, uint8_t h) {
+	// Checks if on top of tile
 	return tile_x + tile_w > x && tile_x < x + w && tile_y == y + h;
 }
 

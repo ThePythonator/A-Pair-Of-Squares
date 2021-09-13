@@ -10,6 +10,8 @@
 #include "LevelManager.hpp"
 #include "Utilities.hpp"
 
+#include <vector>
+
 class Square : public Entity {
 public:
 	Square();
