@@ -21,6 +21,9 @@ else()
   add_compile_options("-Wall" "-Wextra" "-Wdouble-promotion")
 endif()
 
+
+add_executable(APairOfSquares ${PROJECT_SOURCE})
+
 find_package(PythonInterp 3.6 REQUIRED)
 
 if(EMSCRIPTEN)
@@ -35,8 +38,13 @@ else()
 	find_package(SDL2 REQUIRED)
 	find_package(SDL2_image REQUIRED)
 
-	include_directories(${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+	target_include_directories(APairOfSquares PRIVATE ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 endif()
+
+#find_package(SDL2 REQUIRED)
+#find_package(SDL2_image REQUIRED)
+
+#include_directories(${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 # Build assets.hpp/cpp files
 add_custom_command(
@@ -46,12 +54,11 @@ add_custom_command(
 )
 
 
-add_executable(APairOfSquares ${PROJECT_SOURCE})
 
 target_link_libraries(APairOfSquares ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARY})
 
-# setup release packages
-#install (FILES ${PROJECT_DISTRIBS} DESTINATION .)
-#set (CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
-#set (CPACK_GENERATOR "ZIP" "TGZ")
-#include (CPack)
+# Setup release packages
+install(FILES ${PROJECT_DISTRIBS} DESTINATION .)
+set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
+set(CPACK_GENERATOR "ZIP" "TGZ")
+include(CPack)
