@@ -1318,51 +1318,45 @@ SDL_Surface* Game::load_surface(std::string path) {
 
 void pause_transition_update(TransitionState* transition_state, float* timer, float dt) {
 	*timer += dt;
+
+	if (*transition_state == TransitionState::OPENING) {
+		if (*timer > DELAY::PAUSE_FADE_LENGTH) {
+			*transition_state = TransitionState::OPEN;
+		}
+	}
+	else if (*transition_state == TransitionState::CLOSING) {
+		if (*timer > DELAY::PAUSE_FADE_LENGTH) {
+			*transition_state = TransitionState::CLOSED;
+		}
+	}
 }
 
 void pause_transition_render(TransitionState* transition_state, float* timer, SDL_Renderer* renderer, Spritesheet& spritesheet) {
 	SDL_Rect screen_rect{ 0, 0, WINDOW::WIDTH, WINDOW::HEIGHT };
 
-	switch (*transition_state) {
-	case TransitionState::OPENING:
-		if (*timer <= DELAY::PAUSE_FADE_LENGTH) {
-			// Calculate alpha
-			uint8_t alpha = MENU::PAUSED_BACKGROUND_ALPHA * (1.0f - *timer / DELAY::PAUSE_FADE_LENGTH);
+	if (*transition_state == TransitionState::OPENING) {
+		// Calculate alpha
+		uint8_t alpha = MENU::PAUSED_BACKGROUND_ALPHA * (1.0f - *timer / DELAY::PAUSE_FADE_LENGTH);
 
-			// Fill with semi-transparent black
-			SDL_SetRenderDrawColor(renderer, Colour(COLOURS::BLACK, alpha));
-			SDL_RenderFillRect(renderer, &screen_rect);
+		// Fill with semi-transparent black
+		SDL_SetRenderDrawColor(renderer, Colour(COLOURS::BLACK, alpha));
+		SDL_RenderFillRect(renderer, &screen_rect);
 
-			//printf("fade %u, time %f, delay %f\n", alpha, timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE), delay);
-		}
-		else {
-			*transition_state = TransitionState::OPEN;
-		}
-		break;
+		//printf("fade %u, time %f, delay %f\n", alpha, timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE), delay);
+	}
+	else if (*transition_state == TransitionState::CLOSING) {
+		// Calculate alpha
+		uint8_t alpha = MENU::PAUSED_BACKGROUND_ALPHA * (*timer / DELAY::PAUSE_FADE_LENGTH);
 
-	case TransitionState::CLOSING:
-		if (*timer <= DELAY::PAUSE_FADE_LENGTH) {
-			// Calculate alpha
-			uint8_t alpha = MENU::PAUSED_BACKGROUND_ALPHA * (*timer / DELAY::PAUSE_FADE_LENGTH);
-
-			// Fill with semi-transparent black
-			SDL_SetRenderDrawColor(renderer, Colour(COLOURS::BLACK, alpha));
-			SDL_RenderFillRect(renderer, &screen_rect);
-		}
-		else {
-			*transition_state = TransitionState::CLOSED;
-		}
-		break;
-
-	case TransitionState::CLOSED:
+		// Fill with semi-transparent black
+		SDL_SetRenderDrawColor(renderer, Colour(COLOURS::BLACK, alpha));
+		SDL_RenderFillRect(renderer, &screen_rect);
+	}
+	else if (*transition_state == TransitionState::CLOSED) {
 		// In this case, don't fill
 		// Normally you'd want to fill with black when closed, but pause menu is 'closed' the whole time.
+
 		/*SDL_SetRenderDrawColor(renderer, Colour(COLOURS::BLACK, 0xFF));
 		SDL_RenderFillRect(renderer, &screen_rect);*/
-
-		break;
-
-	default:
-		break;
 	}
 }

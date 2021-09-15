@@ -3,7 +3,7 @@
 FontHandler::Font::Font() {
 	// Generate empty character_rects
 	for (uint8_t i = 0; i < ALPHABET_LENGTH; i++) {
-		character_rects[i] = SDL_Rect{ 0 };
+		character_rects[i] = SDL_Rect{ 0, 0, 0, 0 };
 	}
 
 	//scale_ratio = 1.0f;

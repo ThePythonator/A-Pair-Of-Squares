@@ -179,7 +179,7 @@ void KeyHandler::set_key(KeyUnion& key_handler, Key key, KeyState key_state) {
 
 
 InputHandler::InputHandler() {
-	key_data = { KeyHandler::KeyState::STILL_UP };
+	key_data.keys = { KeyHandler::KeyState::STILL_UP };
 }
 
 void InputHandler::update() {

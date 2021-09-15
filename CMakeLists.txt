@@ -60,6 +60,11 @@ add_custom_command(
 target_link_libraries(APairOfSquares ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARY})
 
 # Setup release packages
+install(TARGETS APairOfSquares
+	RUNTIME DESTINATION bin
+	BUNDLE DESTINATION bin
+)
+
 install(FILES ${PROJECT_DISTRIBS} DESTINATION .)
 set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
 set(CPACK_GENERATOR "ZIP" "TGZ")
