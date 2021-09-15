@@ -1,7 +1,9 @@
 # Basic parameters; check that these match your project / environment
 cmake_minimum_required(VERSION 3.9)
 
-project(APairOfSquares)
+set(PROJECT_NAME APairOfSquares)
+
+project(${PROJECT_NAME})
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -23,31 +25,33 @@ else()
 endif()
 
 
-add_executable(APairOfSquares ${PROJECT_SOURCE})
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCE})
 
 find_package(PythonInterp 3.6 REQUIRED)
 
 if(EMSCRIPTEN)
-	target_compile_options(APairOfSquares
-		PRIVATE
-			"-s;USE_SDL=2;-s ;USE_SDL_IMAGE=2"
-	)
+	target_compile_options(${PROJECT_NAME} PRIVATE "-s;USE_SDL=2;-s ;USE_SDL_IMAGE=2")
 
 	set(SDL2_LIBRARIES "-s USE_SDL=2")
 	set(SDL2_IMAGE_LIBRARY "-s USE_SDL_IMAGE=2")
 
-	target_include_directories(APairOfSquares PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+	target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+
+	set_target_properties(${PROJECT_NAME} PROPERTIES
+		SUFFIX ".html"
+		LINK_FLAGS "-s ENVIRONMENT=web -s SDL2_IMAGE_FORMATS=['png'] --shell-file ${EMSCRIPTEN_SHELL} -s 'EXTRA_EXPORTED_RUNTIME_METHODS=[\"addRunDependency\", \"removeRunDependency\"]'"
+		LINK_DEPENDS ${EMSCRIPTEN_SHELL}
+	)
+
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.js ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.wasm
+		DESTINATION bin
+	)
 else()
 	find_package(SDL2 REQUIRED)
 	find_package(SDL2_image REQUIRED)
 
-	target_include_directories(APairOfSquares PRIVATE ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+	target_include_directories(${PROJECT_NAME} PRIVATE ${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 endif()
-
-#find_package(SDL2 REQUIRED)
-#find_package(SDL2_image REQUIRED)
-
-#include_directories(${SDL2_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 # Build assets.hpp/cpp files
 add_custom_command(
@@ -58,10 +62,10 @@ add_custom_command(
 
 
 
-target_link_libraries(APairOfSquares ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARY})
+target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARY})
 
 # Setup release packages
-install(TARGETS APairOfSquares
+install(TARGETS ${PROJECT_NAME}
 	RUNTIME DESTINATION bin
 	BUNDLE DESTINATION bin
 )
