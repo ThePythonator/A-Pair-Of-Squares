@@ -29,7 +29,7 @@ find_package(PythonInterp 3.6 REQUIRED)
 if(EMSCRIPTEN)
 	target_compile_options(APairOfSquares
 		PRIVATE
-			"-s;USE_SDL=2;-s;USE_SDL_IMAGE=2"
+			"-s;USE_SDL=2;-s ;USE_SDL_IMAGE=2"
 	)
 
 	set(SDL2_LIBRARIES "-s USE_SDL=2")
