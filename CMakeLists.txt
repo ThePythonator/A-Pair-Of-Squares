@@ -29,11 +29,13 @@ find_package(PythonInterp 3.6 REQUIRED)
 if(EMSCRIPTEN)
 	target_compile_options(APairOfSquares
 		PRIVATE
-			"-s;USE_SDL=2;-s ;USE_SDL_IMAGE=2"
+			"-s;USE_SDL=2;-s;USE_SDL_IMAGE=2"
 	)
 
 	set(SDL2_LIBRARIES "-s USE_SDL=2")
 	set(SDL2_IMAGE_LIBRARY "-s USE_SDL_IMAGE=2")
+
+	target_include_directories(APairOfSquares PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 else()
 	find_package(SDL2 REQUIRED)
 	find_package(SDL2_image REQUIRED)
