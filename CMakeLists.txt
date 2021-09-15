@@ -10,6 +10,7 @@ set(PROJECT_SOURCE "APairOfSquares.cpp" "Square.cpp" "Entity.cpp" "Spritesheet.c
 
 # ... and any other files you want in the release here
 set(PROJECT_DISTRIBS LICENSE README.md)
+set(PROJECT_ASSETS assets)
 
 set(ASSET_OUTPUTS "Assets.hpp" "Assets.cpp")
 set(ASSET_DEPENDS "Assets.yml")
@@ -66,6 +67,13 @@ install(TARGETS APairOfSquares
 )
 
 install(FILES ${PROJECT_DISTRIBS} DESTINATION .)
+install(DIRECTORY ${PROJECT_ASSETS}
+    DESTINATION .
+    FILES_MATCHING
+    PATTERN "*.png"
+)
+# install(DIRECTORY ${PROJECT_ASSETS} DESTINATION .)
+
 set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
 set(CPACK_GENERATOR "ZIP" "TGZ")
 include(CPack)
