@@ -68,6 +68,28 @@ namespace TILE_ID {
 		const uint16_t PINK_RELEASED = 14;
 		const uint16_t PINK_PRESSED = 15;
 	}
+
+	namespace DOOR {
+		namespace VERTICAL {
+			const uint16_t BLUE_TOP = 128;
+			const uint16_t BLUE_MIDDLE = 160;
+			const uint16_t BLUE_BOTTOM = 144;
+
+			const uint16_t PINK_TOP = 129;
+			const uint16_t PINK_MIDDLE = 161;
+			const uint16_t PINK_BOTTOM = 145;
+		}
+
+		namespace HORIZONTAL {
+			const uint16_t BLUE_LEFT = 130;
+			const uint16_t BLUE_MIDDLE = 162;
+			const uint16_t BLUE_RIGHT = 131;
+
+			const uint16_t PINK_LEFT = 146;
+			const uint16_t PINK_MIDDLE = 163;
+			const uint16_t PINK_RIGHT = 147;
+		}
+	}
 }
 
 namespace WINDOW {
@@ -173,11 +195,13 @@ namespace GAME {
 	}
 
 	namespace BUTTON {
-		const uint8_t HEIGHT_RELEASED = 4;
-		const uint8_t HEIGHT_PRESSED = 2;
+		const uint8_t HEIGHT_RELEASED = 3; // Fixes double-pressing issue by making same as HEIGHT_PRESSED. Actual height is 4.
+		const uint8_t HEIGHT_PRESSED = 3;
 
 		const uint8_t BORDER = 1;
 		const uint8_t WIDTH = SPRITES::SIZE - BORDER * 2;
+
+		const float RELEASE_DELAY = 0.4f;
 	}
 
 	namespace SQUARE {
@@ -190,6 +214,9 @@ namespace GAME {
 		const float JUMP_STRENGTH = 210.0f;
 
 		const float MAXIMUM_STEP_HEIGHT = 2.0f;
+
+		const uint8_t WIDTH = SPRITES::SIZE;
+		const uint8_t HEIGHT = SPRITES::SIZE - 1; // Only used for a few collisions because I added this pretty late in development
 
 		namespace FADE {
 			const float MAX_SCALE_BOOST = 2.0f;

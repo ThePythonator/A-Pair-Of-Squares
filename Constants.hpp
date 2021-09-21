@@ -77,6 +77,28 @@ namespace TILE_ID {
 		extern const uint16_t PINK_RELEASED;
 		extern const uint16_t PINK_PRESSED;
 	}
+
+	namespace DOOR {
+		namespace VERTICAL {
+			extern const uint16_t BLUE_TOP;
+			extern const uint16_t BLUE_MIDDLE;
+			extern const uint16_t BLUE_BOTTOM;
+
+			extern const uint16_t PINK_TOP;
+			extern const uint16_t PINK_MIDDLE;
+			extern const uint16_t PINK_BOTTOM;
+		}
+
+		namespace HORIZONTAL {
+			extern const uint16_t BLUE_LEFT;
+			extern const uint16_t BLUE_MIDDLE;
+			extern const uint16_t BLUE_RIGHT;
+
+			extern const uint16_t PINK_LEFT;
+			extern const uint16_t PINK_MIDDLE;
+			extern const uint16_t PINK_RIGHT;
+		}
+	}
 }
 
 namespace WINDOW {
@@ -165,6 +187,8 @@ namespace GAME {
 
 		extern const uint8_t BORDER;
 		extern const uint8_t WIDTH;
+
+		extern const float RELEASE_DELAY;
 	}
 
 	namespace SQUARE {
@@ -177,6 +201,9 @@ namespace GAME {
 		extern const float JUMP_STRENGTH;
 
 		extern const float MAXIMUM_STEP_HEIGHT;
+
+		extern const uint8_t WIDTH;
+		extern const uint8_t HEIGHT; // Only used for a few collisions because I added this pretty late in development
 
 		namespace FADE {
 			extern const float MAX_SCALE_BOOST;

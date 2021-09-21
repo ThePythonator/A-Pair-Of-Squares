@@ -7,7 +7,9 @@ const uint8_t* asset_levels[] = {
 	asset_level_2,
 	asset_level_3,
 	asset_level_4,
-	asset_level_5
+	asset_level_5,
+	asset_level_6,
+	asset_level_7
 };
 
 namespace GAME {

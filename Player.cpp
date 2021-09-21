@@ -99,8 +99,8 @@ void Player::update(InputHandler& input_handler, LevelHandler& level_handler, fl
 		}
 	}
 
-	blue.update(tiles, level_handler.get_springs(), dt);
-	pink.update(tiles, level_handler.get_springs(), dt);
+	blue.update(tiles, level_handler.get_springs(), level_handler.get_buttons(), level_handler.get_doors(), dt);
+	pink.update(tiles, level_handler.get_springs(), level_handler.get_buttons(), level_handler.get_doors(), dt);
 
 	// Update player position to allow walking over finish
 	if (is_colliding(level_handler.level_finish_blue_x + GAME::FINISH::BORDER, level_handler.level_finish_blue_y + SPRITES::SIZE - GAME::FINISH::HEIGHT,
@@ -222,6 +222,12 @@ void Player::reset_players(LevelHandler& level_handler) {
 	// Reset pink position
 	pink.set_x(level_handler.level_spawn_pink_x);
 	pink.set_y(level_handler.level_spawn_pink_y);
+
+	// Reset velocities
+	blue.reset_x_vel();
+	blue.reset_y_vel();
+	pink.reset_x_vel();
+	pink.reset_y_vel();
 
 	// Reset fade variables
 	blue.reset_dead_fade();

@@ -8,7 +8,7 @@ Square::Square(uint16_t sprite_index, float x, float y) : Entity(sprite_index, x
 
 }
 
-void Square::update(std::vector<Tile>& tiles, std::vector<Spring>& springs, float dt) {
+void Square::update(std::vector<Tile>& tiles, std::vector<Spring>& springs, std::vector<Button>& buttons, std::vector<Door>& doors, float dt) {
 	if (can_blink) {
 		blink_timer -= dt;
 		if (blink_timer <= 0.0f) {
@@ -34,14 +34,14 @@ void Square::update(std::vector<Tile>& tiles, std::vector<Spring>& springs, floa
 
 		// Handle tiles
 		for (Tile& tile : tiles) {
-			if (is_colliding(tile, x, y, SPRITES::SIZE)) {
+			if (is_colliding(tile.get_x(), tile.get_y(), x, y + SPRITES::SIZE - GAME::SQUARE::HEIGHT, SPRITES::SIZE, SPRITES::SIZE, GAME::SQUARE::WIDTH, GAME::SQUARE::HEIGHT)) {
 				if (y_vel > 0.0f) {
 					// Collided from top
 					y = tile.get_y() - SPRITES::SIZE;
 				}
 				else if (y_vel < 0.0f) {
 					// Collided from bottom
-					y = tile.get_y() + SPRITES::SIZE;
+					y = tile.get_y() + SPRITES::SIZE * 2 - GAME::SQUARE::HEIGHT;
 				}
 
 				y_vel = 0.0f;
@@ -55,7 +55,7 @@ void Square::update(std::vector<Tile>& tiles, std::vector<Spring>& springs, floa
 
 		// Handle tiles
 		for (Tile& tile : tiles) {
-			if (is_colliding(tile, x, y, SPRITES::SIZE)) {
+			if (is_colliding(tile.get_x(), tile.get_y(), x, y + SPRITES::SIZE - GAME::SQUARE::HEIGHT, SPRITES::SIZE, SPRITES::SIZE, GAME::SQUARE::WIDTH, GAME::SQUARE::HEIGHT)) {
 				if (x_vel > 0) {
 					// Collided from left
 					x = tile.get_x() - SPRITES::SIZE;
@@ -94,6 +94,18 @@ void Square::update(std::vector<Tile>& tiles, std::vector<Spring>& springs, floa
 				}
 			}
 		}
+
+		// Handle buttons
+		for (Button& button : buttons) {
+			if (button.check_collision(x, y)) {
+				if (y_vel >= 0.0f) {
+					y = button.get_top() - SPRITES::SIZE;
+					y_vel = 0.0f;
+					button.set_pressed(sprite_index == TILE_ID::PLAYER::BLUE ? 0 : 1);
+					break;
+				}
+			}
+		}
 	}
 	
 	can_jump = false;
@@ -113,6 +125,16 @@ void Square::update(std::vector<Tile>& tiles, std::vector<Spring>& springs, floa
 				// Don't allow can_jump to be set to false after it's been set to true
 				break;
 			}
+		}
+	}
+
+	// Update can_jump for buttons, but also check if button has been released
+	for (Button& button : buttons) {
+		if (button.check_on_top(x, y)) {
+			can_jump = true;
+		}
+		else if (button.get_pressed()) {
+			button.set_released(sprite_index == TILE_ID::PLAYER::BLUE ? 0 : 1);
 		}
 	}
 }

@@ -9,6 +9,8 @@
 #include "Orb.hpp"
 #include "Spike.hpp"
 #include "Spring.hpp"
+#include "Button.hpp"
+#include "Door.hpp"
 
 // Struct header generated for the tmx files
 #pragma pack(push,1)
@@ -82,6 +84,8 @@ public:
 	std::vector<Tile>& get_tiles();
 	//std::vector<Orb> get_orbs();
 	std::vector<Spring>& get_springs();
+	std::vector<Button>& get_buttons();
+	std::vector<Door>& get_doors();
 
 	uint8_t get_sprite_size();
 
@@ -90,6 +94,8 @@ private:
 	std::vector<Orb> orbs;
 	std::vector<Spike> spikes;
 	std::vector<Spring> springs;
+	std::vector<Button> buttons;
+	std::vector<Door> doors;
 
 	uint8_t sprite_size;
 };

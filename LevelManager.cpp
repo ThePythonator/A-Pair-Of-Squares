@@ -99,6 +99,8 @@ void LevelHandler::load_level(const uint8_t level_data[]) {
 	orbs.clear();
 	spikes.clear();
 	springs.clear();
+	buttons.clear();
+	doors.clear();
 
 	TMX* level_tmx = (TMX*)level_data;
 	uint16_t tile_id, x, y;
@@ -164,12 +166,30 @@ void LevelHandler::load_level(const uint8_t level_data[]) {
 				springs.push_back(Spring(tile_id, x, y));
 			}
 			else if (tile_id == TILE_ID::BUTTON::BLUE_RELEASED) {
-				// Spring
-				//springs.push_back(Button(tile_id, x, y));
+				// Button
+				buttons.push_back(Button(tile_id, x, y, 0));
 			}
 			else if (tile_id == TILE_ID::BUTTON::PINK_RELEASED) {
-				// Spring
-				//springs.push_back(Button(tile_id, x, y));
+				// Button
+				buttons.push_back(Button(tile_id, x, y, 1));
+			}
+			else if (tile_id == TILE_ID::DOOR::VERTICAL::BLUE_MIDDLE) {
+				// Door
+				doors.push_back(Door(tile_id, x, y, 0));
+			}
+			else if (tile_id == TILE_ID::DOOR::VERTICAL::PINK_MIDDLE) {
+				// Door
+				doors.push_back(Door(tile_id, x, y, 1));
+			}
+			else if (
+				tile_id == TILE_ID::DOOR::VERTICAL::BLUE_TOP ||
+				tile_id == TILE_ID::DOOR::VERTICAL::BLUE_BOTTOM ||
+
+				tile_id == TILE_ID::DOOR::VERTICAL::PINK_TOP ||
+				tile_id == TILE_ID::DOOR::VERTICAL::PINK_BOTTOM) {
+
+				// Blank tile (don't render and don't collide)
+				// Don't do anything
 			}
 			else {
 				// Normal tile
@@ -186,6 +206,14 @@ void LevelHandler::update(float dt) { //Player& player,
 
 	for (Spring& spring : springs) {
 		spring.update(dt);
+	}
+
+	for (Button& button : buttons) {
+		button.update(dt);
+	}
+
+	for (Door& door : doors) {
+		door.update(dt);
 	}
 }
 
@@ -204,6 +232,14 @@ void LevelHandler::render(Spritesheet& spritesheet) {
 	
 	for (Spring& spring : springs) {
 		spring.render(spritesheet);
+	}
+
+	for (Button& button : buttons) {
+		button.render(spritesheet);
+	}
+
+	for (Door& door : doors) {
+		door.render(spritesheet);
 	}
 
 	// Render finish
@@ -266,6 +302,15 @@ std::vector<Tile>& LevelHandler::get_tiles() {
 std::vector<Spring>& LevelHandler::get_springs() {
 	return springs;
 }
+
+std::vector<Button>& LevelHandler::get_buttons() {
+	return buttons;
+}
+
+std::vector<Door>& LevelHandler::get_doors() {
+	return doors;
+}
+
 
 
 uint8_t LevelHandler::get_sprite_size() {

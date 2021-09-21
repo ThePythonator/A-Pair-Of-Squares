@@ -9,6 +9,7 @@
 #include "InputManager.hpp"
 #include "LevelManager.hpp"
 #include "Utilities.hpp"
+#include "Door.hpp"
 
 #include <vector>
 
@@ -17,7 +18,7 @@ public:
 	Square();
 	Square(uint16_t sprite_index, float x, float y);
 
-	void update(std::vector<Tile>& tiles, std::vector<Spring>& springs, float dt);
+	void update(std::vector<Tile>& tiles, std::vector<Spring>& springs, std::vector<Button>& buttons, std::vector<Door>& doors, float dt);
 
 	void render(Spritesheet& spritesheet);
 
