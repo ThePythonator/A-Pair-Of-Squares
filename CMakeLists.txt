@@ -7,6 +7,18 @@ project(${PROJECT_NAME})
 
 set(CMAKE_CXX_STANDARD 17)
 
+if (EXISTS SDL2_DIR)
+	message("Using existing SDL2_DIR: ${SDL2_DIR}")
+else()
+	set(SDL2_DIR ${CMAKE_CURRENT_SOURCE_DIR}/SDL2)
+endif()
+
+if (EXISTS SDL2_IMAGE_DIR)
+	message("Using existing SDL2_IMAGE_DIR: ${SDL2_IMAGE_DIR}")
+else()
+	set(SDL2_IMAGE_DIR ${SDL2_DIR})
+endif()
+
 # Add your sources here (adding headers is optional, but helps some CMake generators)
 set(PROJECT_SOURCE "APairOfSquares.cpp" "Square.cpp" "Entity.cpp" "Spritesheet.cpp" "InputManager.cpp" "Assets.cpp" "LevelManager.cpp" "Player.cpp" "ParticleManager.cpp" "TimerManager.cpp" "Bezier.cpp" "TextManager.cpp" "Game.cpp" "Utilities.cpp" "AudioManager.cpp" "Orb.cpp" "Spike.cpp" "Colour.cpp" "Constants.cpp" "Spring.cpp" "TransitionManager.cpp" "Button.cpp" "Door.cpp")
 
@@ -63,6 +75,15 @@ add_custom_command(
 
 target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARY})
 
+# Windows DLLs
+#if(SDL2_DLL)
+#    configure_file(${SDL2_DLL} ${CMAKE_CURRENT_BINARY_DIR}/SDL2.dll COPYONLY)
+#endif()
+
+#if(SDL2_IMAGE_DLL)
+#    configure_file(${SDL2_IMAGE_DLL} ${CMAKE_CURRENT_BINARY_DIR}/SDL2_image.dll COPYONLY)
+#endif()
+
 # Setup release packages
 install(TARGETS ${PROJECT_NAME}
 	RUNTIME DESTINATION bin
@@ -72,11 +93,51 @@ install(TARGETS ${PROJECT_NAME}
 install(FILES ${PROJECT_DISTRIBS}
 	DESTINATION .
 )
+
 install(DIRECTORY ${PROJECT_ASSETS}
     DESTINATION .
     FILES_MATCHING
     PATTERN "*.png"
 )
+
+if(APPLE)
+	install(FILES "sdl_setup_mac.sh"
+		DESTINATION .
+	)
+endif()
+
+# Copy SDL2 dlls for Windows users
+if(SDL2_DLL)
+	install(FILES ${SDL2_DLL}
+		DESTINATION bin
+	)
+	#set(SDL2_DLL ${SDL2_DLL} PARENT_SCOPE)
+endif()
+
+if(SDL2_IMAGE_DLL)
+	install(FILES ${SDL2_IMAGE_DLL}
+		DESTINATION bin
+	)
+endif()
+
+if(LIBJPEG_DLL)
+	install(FILES ${LIBJPEG_DLL}
+		DESTINATION bin
+	)
+endif()
+
+if(ZLIB_DLL)
+	install(FILES ${ZLIB_DLL}
+		DESTINATION bin
+	)
+endif()
+
+if(LIBPNG_DLL)
+	install(FILES ${LIBPNG_DLL}
+		DESTINATION bin
+	)
+endif()
+
 # install(DIRECTORY ${PROJECT_ASSETS} DESTINATION .)
 
 set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
