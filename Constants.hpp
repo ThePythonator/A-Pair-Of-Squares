@@ -287,7 +287,8 @@ namespace STRINGS {
 
 	namespace MENU {
 		namespace TITLE {
-			extern const std::string HEADING;
+			extern const std::string HEADING_BLUE;
+			extern const std::string HEADING_PINK;
 
 			extern const std::string OPTION_PLAY;
 			extern const std::string OPTION_SETTINGS;

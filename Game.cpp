@@ -464,8 +464,8 @@ void Game::render_menu_title() {
 	float right_x = positions.second;
 
 
-	//TextHandler::render_text(font_title_blue, STRINGS::MENU::TITLE::HEADING, right_x, SPRITES::SIZE, SPRITES::SPACE_WIDTH);
-	//TextHandler::render_text(font_title_pink, STRINGS::MENU::TITLE::HEADING, right_x, SPRITES::SIZE, SPRITES::SPACE_WIDTH);
+	//TextHandler::render_text(font_title_blue, STRINGS::MENU::TITLE::HEADING_BLUE, right_x, SPRITES::SIZE, SPRITES::SPACE_WIDTH, TextHandler::CENTER_RIGHT);
+	//TextHandler::render_text(font_title_pink, STRINGS::MENU::TITLE::HEADING_PINK, right_x + SPRITES::SIZE_HALF, SPRITES::SIZE, SPRITES::SPACE_WIDTH, TextHandler::CENTER_LEFT);
 	
 	TextHandler::render_text(option_selected == 0 ? font_selected : font_white, STRINGS::MENU::TITLE::OPTION_PLAY, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE * 2, SPRITES::SPACE_WIDTH);
 	TextHandler::render_text(option_selected == 1 ? font_selected : font_white, STRINGS::MENU::TITLE::OPTION_SETTINGS, right_x, WINDOW::TEXT_SCALED_HEIGHT_HALF, SPRITES::SPACE_WIDTH);

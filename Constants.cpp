@@ -301,7 +301,8 @@ namespace STRINGS {
 
 	namespace MENU {
 		namespace TITLE {
-			const std::string HEADING = "A PAIR OF SQUARES";
+			const std::string HEADING_BLUE = "A PAIR OF";
+			const std::string HEADING_PINK = "SQUARES";
 
 			const std::string OPTION_PLAY = "Play";
 			const std::string OPTION_SETTINGS = "Settings";

@@ -1,3 +1,7 @@
 # Folders
 .vs/
 out/
+
+# Don't upload local SDL folder if it exists
+SDL/
+SDL2/
