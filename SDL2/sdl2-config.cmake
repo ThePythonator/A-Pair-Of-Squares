@@ -1,10 +1,11 @@
-#set(SDL2_INCLUDE_DIR ${SDL2_DIR}/include)
+set(SDL2_INCLUDE_DIR ${SDL2_DIR}/include)
 
+#[[
 find_path(SDL2_INCLUDE_DIR SDL.h
 	HINTS ${SDL2_DIR}
 	PATH_SUFFIXES SDL2 include/SDL2 include
 )
-
+#]]
 #[[
 #]]
 # Support both 32 and 64 bit builds
@@ -40,13 +41,13 @@ set(SDL2_LIBRARIES ${SDL2_LIB} ${SDL2MAIN_LIB})
 #]]
 
 
-#[[
+
 find_library(SDL2_LIBRARIES
 	NAMES SDL2
 	HINTS ${SDL2_DIR}
 	PATH_SUFFIXES lib ${VC_LIB_PATH_SUFFIX}
 )
-#]]
+
 
 
 # Find dlls

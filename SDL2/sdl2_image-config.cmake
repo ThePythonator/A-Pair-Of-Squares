@@ -10,7 +10,7 @@ else()
 endif()
 
 find_library(SDL2_IMAGE_LIBRARY
-	NAMES SDL2_image
+	NAMES SDL2_IMAGE
 	HINTS ${SDL2_IMAGE_DIR}
 	PATH_SUFFIXES lib ${VC_LIB_PATH_SUFFIX}
 )
