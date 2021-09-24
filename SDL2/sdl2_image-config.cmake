@@ -1,9 +1,6 @@
-# Note: seems to not use SDL2_DIR, causing lots of issues
-# SDL_DIR is never set
-
 find_path(SDL2_IMAGE_INCLUDE_DIR SDL_image.h
 	HINTS ${SDL2_IMAGE_DIR}
-	PATH_SUFFIXES include/SDL2 include
+	PATH_SUFFIXES SDL2 include/SDL2 include
 )
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -18,7 +15,7 @@ find_library(SDL2_IMAGE_LIBRARY
 	PATH_SUFFIXES lib ${VC_LIB_PATH_SUFFIX}
 )
 
-#[[
+
 # Find dlls
 find_file(SDL2_IMAGE_DLL SDL2_image.dll
 	HINTS ${SDL2_IMAGE_DIR}
@@ -39,4 +36,3 @@ find_file(LIBPNG_DLL libpng16-16.dll
 	HINTS ${SDL2_IMAGE_DIR}
 	PATH_SUFFIXES bin ${VC_LIB_PATH_SUFFIX}
 )
-#]]
