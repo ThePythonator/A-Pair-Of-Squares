@@ -30,6 +30,8 @@ add_custom_command(
 
 include(get_sdl2.cmake)
 
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+
 # Link
 target_link_libraries(${PROJECT_NAME} SDL2::SDL2main SDL2::SDL2 SDL2::image)
 
