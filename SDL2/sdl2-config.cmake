@@ -1,11 +1,11 @@
-set(SDL2_INCLUDE_DIR ${SDL2_DIR}/include)
+#set(SDL2_INCLUDE_DIR ${SDL2_DIR}/include)
 
-#[[
+
 find_path(SDL2_INCLUDE_DIR SDL.h
 	HINTS ${SDL2_DIR}
 	PATH_SUFFIXES SDL2 include/SDL2 include
 )
-#]]
+
 #[[
 #]]
 # Support both 32 and 64 bit builds
