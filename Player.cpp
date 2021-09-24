@@ -99,8 +99,10 @@ void Player::update(InputHandler& input_handler, LevelHandler& level_handler, fl
 		}
 	}
 
-	blue.update(tiles, level_handler.get_springs(), level_handler.get_buttons(), level_handler.get_doors(), dt);
-	pink.update(tiles, level_handler.get_springs(), level_handler.get_buttons(), level_handler.get_doors(), dt);
+	bool should_die = false;
+
+	should_die |= blue.update(tiles, level_handler.get_springs(), level_handler.get_buttons(), level_handler.get_doors(), dt);
+	should_die |= pink.update(tiles, level_handler.get_springs(), level_handler.get_buttons(), level_handler.get_doors(), dt);
 
 	// Update player position to allow walking over finish
 	if (is_colliding(level_handler.level_finish_blue_x + GAME::FINISH::BORDER, level_handler.level_finish_blue_y + SPRITES::SIZE - GAME::FINISH::HEIGHT,
@@ -180,8 +182,9 @@ void Player::update(InputHandler& input_handler, LevelHandler& level_handler, fl
 	orb_count += level_handler.handle_orb_collisions(pink.get_x(), pink.get_y(), 1);
 
 	// Handle spike collisions
-	if (level_handler.handle_spike_collisions(blue.get_x(), blue.get_y()) ||
-		level_handler.handle_spike_collisions(pink.get_x(), pink.get_y())) {
+	if (level_handler.handle_spike_collisions(blue.get_x(), blue.get_y() + SPRITES::SIZE - GAME::SQUARE::HEIGHT) ||
+		level_handler.handle_spike_collisions(pink.get_x(), pink.get_y() + SPRITES::SIZE - GAME::SQUARE::HEIGHT) ||
+		should_die) {
 		// Blue or pink hit spikes
 
 		// Start square death animation

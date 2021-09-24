@@ -208,16 +208,42 @@ void LevelHandler::update(float dt) { //Player& player,
 		spring.update(dt);
 	}
 
+	bool blue_pressed = false;
+	bool pink_pressed = false;
+
 	for (Button& button : buttons) {
 		button.update(dt);
+		if (button.get_pressed()) {
+			if (button.get_type() == 0) {
+				blue_pressed = true;
+			}
+			else {
+				pink_pressed = true;
+			}
+		}
 	}
 
 	for (Door& door : doors) {
+		if ((blue_pressed && door.get_type() == 0) ||
+			(pink_pressed && door.get_type() == 1)) {
+
+			if (!door.is_open() && !door.is_opening()) {
+				door.open();
+			}
+		}
+		else {
+			door.close();
+		}
+
 		door.update(dt);
 	}
 }
 
 void LevelHandler::render(Spritesheet& spritesheet) {
+	for (Door& door : doors) {
+		door.render(spritesheet);
+	}
+
 	for (Tile& tile : tiles) {
 		tile.render(spritesheet);
 	}
@@ -236,10 +262,6 @@ void LevelHandler::render(Spritesheet& spritesheet) {
 
 	for (Button& button : buttons) {
 		button.render(spritesheet);
-	}
-
-	for (Door& door : doors) {
-		door.render(spritesheet);
 	}
 
 	// Render finish
@@ -281,7 +303,7 @@ uint8_t LevelHandler::handle_orb_collisions(float x, float y, uint8_t type) {
 bool LevelHandler::handle_spike_collisions(float x, float y) {
 	for (Spike& spike : spikes) {
 		// Spike is colliding
-		if (spike.check_collision(x, y, sprite_size)) {
+		if (spike.check_collision(x, y)) {
 			return true;
 
 			//TODO: create something to show player was killed

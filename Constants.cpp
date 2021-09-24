@@ -245,6 +245,25 @@ namespace GAME {
 		const float PULL_MIN_VELOCITY = 0.2f;
 		const float MIN_DISTANCE = 1.0f;
 	}
+
+	namespace DOOR {
+		const uint8_t OPEN_SIZE = SPRITES::SIZE * 2;
+		const uint8_t CLOSE_SIZE = SPRITES::SIZE_HALF;
+
+		const uint8_t BORDER = 3;
+
+		const uint8_t WIDTH = SPRITES::SIZE - BORDER * 2;
+
+		const float OPEN_SPEED = 120.0f;
+		const float CLOSE_SPEED = 80.0f;
+
+		// Allow player a tolerance so it's harder to die by being clipped by a door.
+		const uint8_t PLAYER_ALLOWANCE = 2;
+	}
+
+	namespace SPIKE {
+		const uint8_t TOLERANCE = 1;
+	}
 }
 
 namespace MENU {

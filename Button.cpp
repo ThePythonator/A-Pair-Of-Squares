@@ -50,3 +50,7 @@ bool Button::check_on_top(float player_x, float player_y) {
 float Button::get_top() {
 	return y + SPRITES::SIZE - (pressed ? GAME::BUTTON::HEIGHT_PRESSED : GAME::BUTTON::HEIGHT_RELEASED);
 }
+
+uint8_t Button::get_type() {
+	return type;
+}

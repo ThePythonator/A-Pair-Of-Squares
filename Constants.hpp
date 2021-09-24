@@ -232,6 +232,24 @@ namespace GAME {
 		extern const float PULL_MIN_VELOCITY;
 		extern const float MIN_DISTANCE;
 	}
+
+	namespace DOOR {
+		extern const uint8_t OPEN_SIZE;
+		extern const uint8_t CLOSE_SIZE;
+
+		extern const uint8_t BORDER;
+
+		extern const uint8_t WIDTH;
+
+		extern const float OPEN_SPEED;
+		extern const float CLOSE_SPEED;
+
+		extern const uint8_t PLAYER_ALLOWANCE;
+	}
+
+	namespace SPIKE {
+		extern const uint8_t TOLERANCE;
+	}
 }
 
 namespace MENU {

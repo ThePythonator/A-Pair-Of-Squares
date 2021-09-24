@@ -14,15 +14,25 @@ public:
 
 	void render(Spritesheet& spritesheet);
 
-	bool check_collision(float player_x, float player_y);
-	bool check_on_top(float  player_x, float player_y);
+	bool check_collision(float player_x, float player_y, float player_w, float player_h);
 
-	float get_top();
+	float get_bottom();
+
+	bool is_open();
+	bool is_opening();
+
+	void open();
+	void close();
 
 	uint8_t get_type();
 
 protected:
-	bool collected = false;
-
 	uint8_t type = 0;
+
+	float height = GAME::DOOR::CLOSE_SIZE;
+
+	bool opening = false;
+	bool closing = false;
+
+	float open_timer = 0.0f;
 };

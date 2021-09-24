@@ -32,8 +32,10 @@ find_library(SDL2MAIN_LIB
 
 set(SDL2_LIBRARIES ${SDL2_LIB} ${SDL2MAIN_LIB})
 
+#[[
 # Find dlls
 find_file(SDL2_DLL SDL2.dll
 	HINTS ${SDL2_DIR}
 	PATH_SUFFIXES bin ${VC_LIB_PATH_SUFFIX}
 )
+#]]

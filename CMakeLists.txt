@@ -107,35 +107,37 @@ if(APPLE)
 endif()
 
 # Copy SDL2 dlls for Windows users
-if(SDL2_DLL)
-	install(FILES ${SDL2_DLL}
-		DESTINATION bin
-	)
-	#set(SDL2_DLL ${SDL2_DLL} PARENT_SCOPE)
-endif()
+if(WIN32)
+	if(SDL2_DLL)
+		install(FILES ${SDL2_DLL}
+			DESTINATION bin
+		)
+		#set(SDL2_DLL ${SDL2_DLL} PARENT_SCOPE)
+	endif()
 
-if(SDL2_IMAGE_DLL)
-	install(FILES ${SDL2_IMAGE_DLL}
-		DESTINATION bin
-	)
-endif()
+	if(SDL2_IMAGE_DLL)
+		install(FILES ${SDL2_IMAGE_DLL}
+			DESTINATION bin
+		)
+	endif()
 
-if(LIBJPEG_DLL)
-	install(FILES ${LIBJPEG_DLL}
-		DESTINATION bin
-	)
-endif()
+	if(LIBJPEG_DLL)
+		install(FILES ${LIBJPEG_DLL}
+			DESTINATION bin
+		)
+	endif()
 
-if(ZLIB_DLL)
-	install(FILES ${ZLIB_DLL}
-		DESTINATION bin
-	)
-endif()
+	if(ZLIB_DLL)
+		install(FILES ${ZLIB_DLL}
+			DESTINATION bin
+		)
+	endif()
 
-if(LIBPNG_DLL)
-	install(FILES ${LIBPNG_DLL}
-		DESTINATION bin
-	)
+	if(LIBPNG_DLL)
+		install(FILES ${LIBPNG_DLL}
+			DESTINATION bin
+		)
+	endif()
 endif()
 
 # install(DIRECTORY ${PROJECT_ASSETS} DESTINATION .)

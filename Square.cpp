@@ -8,7 +8,9 @@ Square::Square(uint16_t sprite_index, float x, float y) : Entity(sprite_index, x
 
 }
 
-void Square::update(std::vector<Tile>& tiles, std::vector<Spring>& springs, std::vector<Button>& buttons, std::vector<Door>& doors, float dt) {
+bool Square::update(std::vector<Tile>& tiles, std::vector<Spring>& springs, std::vector<Button>& buttons, std::vector<Door>& doors, float dt) {
+	bool should_die = false;
+
 	if (can_blink) {
 		blink_timer -= dt;
 		if (blink_timer <= 0.0f) {
@@ -23,7 +25,7 @@ void Square::update(std::vector<Tile>& tiles, std::vector<Spring>& springs, std:
 	if (finished) {
 		x_vel = y_vel = 0;
 	}
-	else {
+	else if (!dead) {
 		// Hacky
 		float old_y = y;
 
@@ -56,11 +58,11 @@ void Square::update(std::vector<Tile>& tiles, std::vector<Spring>& springs, std:
 		// Handle tiles
 		for (Tile& tile : tiles) {
 			if (is_colliding(tile.get_x(), tile.get_y(), x, y + SPRITES::SIZE - GAME::SQUARE::HEIGHT, SPRITES::SIZE, SPRITES::SIZE, GAME::SQUARE::WIDTH, GAME::SQUARE::HEIGHT)) {
-				if (x_vel > 0) {
+				if (x_vel > 0.0f) {
 					// Collided from left
 					x = tile.get_x() - SPRITES::SIZE;
 				}
-				else if (x_vel < 0) {
+				else if (x_vel < 0.0f) {
 					// Collided from right
 					x = tile.get_x() + SPRITES::SIZE;
 				}
@@ -106,37 +108,90 @@ void Square::update(std::vector<Tile>& tiles, std::vector<Spring>& springs, std:
 				}
 			}
 		}
-	}
-	
-	can_jump = false;
-	for (Tile& tile : tiles) {
-		can_jump = check_on_top(tile, x, y, SPRITES::SIZE);
 
-		if (can_jump) {
-			// Don't allow can_jump to be set to false after it's been set to true
-			break;
+		// Handle doors
+		for (Door& door : doors) {
+			if (door.check_collision(x, y + SPRITES::SIZE - GAME::SQUARE::HEIGHT, GAME::SQUARE::WIDTH, GAME::SQUARE::HEIGHT)) {
+				
+				if (door.check_collision(x + GAME::DOOR::PLAYER_ALLOWANCE, y + SPRITES::SIZE - GAME::SQUARE::HEIGHT, GAME::SQUARE::WIDTH - GAME::DOOR::PLAYER_ALLOWANCE * 2, GAME::SQUARE::HEIGHT)) {
+					for (Tile& tile : tiles) {
+						if (check_on_top(tile, x, y, SPRITES::SIZE)) {
+							// Player has been squashed by door.
+							should_die = true;
+							break;
+						}
+					}
+				}
+				else {
+					//if (x_vel > 0.0f) {
+					//	// Collided from left
+					//	x = door.get_x() - SPRITES::SIZE + GAME::DOOR::BORDER;
+					//}
+					//else if (x_vel < 0.0f) {
+					//	// Collided from right
+					//	x = door.get_x() + SPRITES::SIZE - GAME::DOOR::BORDER;
+					//}
+					//else {
+					//	// Find closest side
+					//	if (door.get_x() - x >= 0) {
+					//		// On left side of middle of door
+					//		x = door.get_x() - SPRITES::SIZE + GAME::DOOR::BORDER;
+					//	}
+					//	else {
+					//		// On right side of middle of door
+					//		x = door.get_x() + SPRITES::SIZE - GAME::DOOR::BORDER;
+					//	}
+					//}
+
+					// Find closest side
+					if (door.get_x() - x >= 0) {
+						// On left side of middle of door
+						x = door.get_x() - SPRITES::SIZE + GAME::DOOR::BORDER;
+					}
+					else {
+						// On right side of middle of door
+						x = door.get_x() + SPRITES::SIZE - GAME::DOOR::BORDER;
+					}
+					x_vel = 0.0f;
+				}
+			}
 		}
-	}
-	if (!can_jump) {
-		for (Spring& spring : springs) {
-			can_jump = spring.check_on_top(x, y);
+
+
+		can_jump = false;
+		for (Tile& tile : tiles) {
+			can_jump = check_on_top(tile, x, y, SPRITES::SIZE);
 
 			if (can_jump) {
 				// Don't allow can_jump to be set to false after it's been set to true
 				break;
 			}
 		}
+		if (!can_jump) {
+			for (Spring& spring : springs) {
+				can_jump = spring.check_on_top(x, y);
+
+				if (can_jump) {
+					// Don't allow can_jump to be set to false after it's been set to true
+					break;
+				}
+			}
+		}
+
+		// Update can_jump for buttons, but also check if button has been released
+		for (Button& button : buttons) {
+			if (button.check_on_top(x, y)) {
+				can_jump = true;
+			}
+			else if (button.get_pressed()) {
+				button.set_released(sprite_index == TILE_ID::PLAYER::BLUE ? 0 : 1);
+			}
+		}
+
+		can_jump &= !dead; // If dead, can't jump
 	}
 
-	// Update can_jump for buttons, but also check if button has been released
-	for (Button& button : buttons) {
-		if (button.check_on_top(x, y)) {
-			can_jump = true;
-		}
-		else if (button.get_pressed()) {
-			button.set_released(sprite_index == TILE_ID::PLAYER::BLUE ? 0 : 1);
-		}
-	}
+	return should_die;
 }
 
 void Square::render(Spritesheet& spritesheet) {

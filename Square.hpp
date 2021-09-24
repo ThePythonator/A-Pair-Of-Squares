@@ -18,7 +18,8 @@ public:
 	Square();
 	Square(uint16_t sprite_index, float x, float y);
 
-	void update(std::vector<Tile>& tiles, std::vector<Spring>& springs, std::vector<Button>& buttons, std::vector<Door>& doors, float dt);
+	// Returns bool whether player should be dead (if so, level_handler needs to kill both players and reset stuff.
+	bool update(std::vector<Tile>& tiles, std::vector<Spring>& springs, std::vector<Button>& buttons, std::vector<Door>& doors, float dt);
 
 	void render(Spritesheet& spritesheet);
 

@@ -23,6 +23,8 @@ public:
 
 	float get_top();
 
+	uint8_t get_type();
+
 protected:
 	bool pressed = false;
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Constants.hpp"
+
 #include "Entity.hpp"
 #include "Spritesheet.hpp"
 
@@ -60,7 +62,7 @@ public:
 	void render(Spritesheet& spritesheet);
 	//void render(Spritesheet& spritesheet, Camera& camera);
 
-	bool check_collision(float player_x, float player_y, uint8_t sprite_size);
+	bool check_collision(float player_x, float player_y);
 
 protected:
 };
