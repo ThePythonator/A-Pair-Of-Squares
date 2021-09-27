@@ -18,8 +18,8 @@ if(EMSCRIPTEN)
 else()
     # Check for system SDL2
     # Currently breaks for me
-    #find_package(SDL2 QUIET)
-    #find_package(SDL2_image QUIET) # will probably fail
+    find_package(SDL2 QUIET NO_SYSTEM_ENVIRONMENT_PATH)
+    find_package(SDL2_image QUIET) # will probably fail
 endif()
 
 # Didn't find it, build from source

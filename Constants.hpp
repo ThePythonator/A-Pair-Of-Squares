@@ -313,6 +313,7 @@ namespace STRINGS {
 			extern const std::string HEADING;
 
 			extern const std::string OPTION_RESUME;
+			extern const std::string OPTION_RESTART;
 			extern const std::string OPTION_EXIT;
 		}
 

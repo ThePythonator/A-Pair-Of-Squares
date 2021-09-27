@@ -327,6 +327,7 @@ namespace STRINGS {
 			const std::string HEADING = "GAME PAUSED";
 
 			const std::string OPTION_RESUME = "Resume";
+			const std::string OPTION_RESTART = "Restart";
 			const std::string OPTION_EXIT = "Exit";
 		}
 

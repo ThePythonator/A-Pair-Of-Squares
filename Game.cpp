@@ -41,6 +41,7 @@ namespace MENU {
 
 	enum class LEVEL_PAUSED : uint8_t {
 		RESUME,
+		RESTART,
 		EXIT,
 
 		OPTION_COUNT
@@ -636,7 +637,7 @@ void Game::update_menu_level_select(float dt) {
 		if (timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) > DELAY::TRANSITION_FADE_LENGTH) {
 			timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::PAUSED);
 
-			setup_game_running();
+			setup_game_running(option_selected);
 		}
 	}
 }
@@ -798,7 +799,6 @@ void Game::update_game_paused(float dt) {
 			{
 			case MENU::LEVEL_PAUSED::RESUME:
 				// We need bezier curves
-
 				// Reset timer and set it to running
 				timer_handler.set_timer_state(TIMER_ID::MENU_BEZIER_TEXT, TimerState::RUNNING);
 				timer_handler.reset_timer(TIMER_ID::MENU_BEZIER_TEXT);
@@ -807,6 +807,20 @@ void Game::update_game_paused(float dt) {
 				//timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
 
 				//fade_state = FadeState::FADE;
+
+				option_confirmed = true;
+				break;
+
+
+			case MENU::LEVEL_PAUSED::RESTART:
+				// We need bezier curves
+				// Reset timer and set it to running
+				timer_handler.set_timer_state(TIMER_ID::MENU_BEZIER_TEXT, TimerState::RUNNING);
+				timer_handler.reset_timer(TIMER_ID::MENU_BEZIER_TEXT);
+
+				//restart_game();
+
+				fade_state = FadeState::FADE;
 
 				option_confirmed = true;
 				break;
@@ -864,6 +878,27 @@ void Game::update_game_paused(float dt) {
 				}
 				break;
 
+			case MENU::LEVEL_PAUSED::RESTART:
+				//if (timer_handler.get_timer_state(TIMER_ID::MENU_BEZIER_TEXT) == TimerState::PAUSED) {
+				//	// Restart and return to game
+				//	resume_game_running();
+				//}
+
+				if (timer_handler.get_timer_state(TIMER_ID::MENU_BEZIER_TEXT) == TimerState::PAUSED) {
+					if (timer_handler.get_timer_state(TIMER_ID::MENU_TRANSITION_FADE) == TimerState::PAUSED) {
+						timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
+						timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::RUNNING);
+
+						fade_state = FadeState::FADE;
+					}
+					else if (timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) > DELAY::TRANSITION_FADE_LENGTH) {
+						// Restart game
+						setup_game_running(current_level);
+					}
+				}
+
+				break;
+
 			case MENU::LEVEL_PAUSED::EXIT:
 				if (timer_handler.get_timer_state(TIMER_ID::MENU_BEZIER_TEXT) == TimerState::PAUSED && timer_handler.get_timer(TIMER_ID::MENU_TRANSITION_FADE) > DELAY::TRANSITION_FADE_LENGTH) {
 					// Exit to title
@@ -903,10 +938,11 @@ void Game::render_game_paused() {
 	float right_x = positions.second;
 
 
-	TextHandler::render_text(option_selected == 0 ? font_selected : font_white, STRINGS::MENU::LEVEL_PAUSED::OPTION_RESUME, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE, SPRITES::SPACE_WIDTH);
+	TextHandler::render_text(option_selected == 0 ? font_selected : font_white, STRINGS::MENU::LEVEL_PAUSED::OPTION_RESUME, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE * 2, SPRITES::SPACE_WIDTH);
 	//TextHandler::render_text(option_selected == 1 ? font_selected : font_white, STRINGS::MENU::LEVEL_PAUSED::OPTION_SFX + STRINGS::COLON_SPACE + (settings.audio_sfx ? STRINGS::ON : STRINGS::OFF), right_x, WINDOW::TEXT_SCALED_HEIGHT_HALF, SPRITES::SPACE_WIDTH);
-	TextHandler::render_text(option_selected == 1 ? font_selected : font_white, STRINGS::MENU::LEVEL_PAUSED::OPTION_EXIT, right_x, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE, SPRITES::SPACE_WIDTH);//left_x
-
+	TextHandler::render_text(option_selected == 1 ? font_selected : font_white, STRINGS::MENU::LEVEL_PAUSED::OPTION_RESTART, right_x, WINDOW::TEXT_SCALED_HEIGHT_HALF, SPRITES::SPACE_WIDTH);//left_x
+	TextHandler::render_text(option_selected == 2 ? font_selected : font_white, STRINGS::MENU::LEVEL_PAUSED::OPTION_EXIT, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE * 2, SPRITES::SPACE_WIDTH);//left_x
+	
 	// Display fade-in/out black rect
 	if (fade_state == FadeState::UNFADE) {
 		render_fade_in_rect(DELAY::TRANSITION_FADE_LENGTH);
@@ -1047,12 +1083,13 @@ void Game::setup_menu_level_select() {
 	//setup_menu_shape_particles();
 }
 
-void Game::setup_game_running() {
+void Game::setup_game_running(uint8_t level_number) {
 	game_state = GameState::GAME_RUNNING;
 
 	paused = false;
 
-	level_handler.load_level(asset_levels[option_selected]);
+	level_handler.load_level(asset_levels[level_number]);
+	current_level = level_number;
 
 	player = Player(level_handler.level_spawn_blue_x, level_handler.level_spawn_blue_y, level_handler.level_spawn_pink_x, level_handler.level_spawn_pink_y);
 
@@ -1122,6 +1159,25 @@ void Game::resume_game_running() {
 	paused = false;
 }
 
+void Game::restart_game() {
+	level_handler.load_level(asset_levels[current_level]);
+
+	player = Player(level_handler.level_spawn_blue_x, level_handler.level_spawn_blue_y, level_handler.level_spawn_pink_x, level_handler.level_spawn_pink_y);
+
+	timer_handler.set_timer_state(TIMER_ID::GAME_DURATION, TimerState::PAUSED);
+	timer_handler.reset_timer(TIMER_ID::GAME_DURATION);
+
+	// reset finish particle timer??
+
+	// Clear spare particle handler
+	//particle_handlers.spare.clear();
+
+
+	//timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::RUNNING);
+	//timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
+
+	//fade_state = FadeState::UNFADE;
+}
 
 
 void Game::render_fade_in_rect(float delay) {

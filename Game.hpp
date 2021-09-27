@@ -71,11 +71,12 @@ private:
 	void setup_menu_title();
 	void setup_menu_settings();
 	void setup_menu_level_select();
-	void setup_game_running();
+	void setup_game_running(uint8_t level_number);
 	void setup_game_paused();
 	void setup_game_end();
 
 	void resume_game_running();
+	void restart_game();
 
 	// Transition functions
 	void render_fade_in_rect(float delay);
@@ -174,6 +175,8 @@ private:
 
 	uint8_t option_selected = 0;
 	bool option_confirmed = false;
+
+	uint8_t current_level = 0;
 
 	uint8_t menu_shape_particle_count = 0;
 
