@@ -16,12 +16,13 @@ if(EMSCRIPTEN)
         INTERFACE_LINK_LIBRARIES "-s USE_SDL_IMAGE=2"
     )
 else()
-    # check for system SDL2
-    find_package(SDL2 QUIET)
-    find_package(SDL2_image QUIET) # will probably fail
+    # Check for system SDL2
+    # Currently breaks for me
+    #find_package(SDL2 QUIET)
+    #find_package(SDL2_image QUIET) # will probably fail
 endif()
 
-# didn't find it, build from source
+# Didn't find it, build from source
 include(FetchContent)
 
 if(NOT TARGET SDL2::SDL2)
@@ -31,7 +32,7 @@ if(NOT TARGET SDL2::SDL2)
         GIT_REPOSITORY https://github.com/libsdl-org/SDL
         GIT_TAG        release-2.0.16
     )
-    add_subdirectory(${sdl2_SOURCE_DIR} SDL2)
+    add_subdirectory(${sdl2_SOURCE_DIR} SDL2 EXCLUDE_FROM_ALL)
 endif()
 
 if(NOT TARGET SDL2::image)
@@ -40,6 +41,6 @@ if(NOT TARGET SDL2::image)
         GIT_REPOSITORY https://github.com/libsdl-org/SDL_image
         GIT_TAG        main
     )
-    add_subdirectory(${sdl2_image_SOURCE_DIR} SDL2_image)
+    add_subdirectory(${sdl2_image_SOURCE_DIR} SDL2_image EXCLUDE_FROM_ALL)
     set_property(TARGET jpeg PROPERTY POSITION_INDEPENDENT_CODE ON) # build fix
 endif()
