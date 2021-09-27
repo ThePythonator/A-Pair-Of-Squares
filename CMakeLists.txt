@@ -83,21 +83,23 @@ file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/fixup.cmake
 install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/fixup.cmake)
 ]]
 
-# Install dependencies
-set(DEP_SEARCH_DIRS)
-# We built these, so we're installing them
-if(TARGET SDL2)
-    list(APPEND DEP_SEARCH_DIRS $<TARGET_FILE_DIR:SDL2>)
-endif()
+if (NOT EMSCRIPTEN)
+    # Install dependencies
+    set(DEP_SEARCH_DIRS)
+    # We built these, so we're installing them
+    if(TARGET SDL2)
+        list(APPEND DEP_SEARCH_DIRS $<TARGET_FILE_DIR:SDL2>)
+    endif()
 
-if(TARGET SDL2_image)
-    list(APPEND DEP_SEARCH_DIRS $<TARGET_FILE_DIR:SDL2_image> $<TARGET_FILE_DIR:png> $<TARGET_FILE_DIR:zlib>)
-endif()
+    if(TARGET SDL2_image)
+        list(APPEND DEP_SEARCH_DIRS $<TARGET_FILE_DIR:SDL2_image> $<TARGET_FILE_DIR:png> $<TARGET_FILE_DIR:zlib>)
+    endif()
 
-install(CODE "
-    include(BundleUtilities)
-    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:${PROJECT_NAME}>\" \"\" \"${DEP_SEARCH_DIRS}\")
-")
+    install(CODE "
+        include(BundleUtilities)
+        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:${PROJECT_NAME}>\" \"\" \"${DEP_SEARCH_DIRS}\")
+    ")
+endif()
 
 set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
 set(CPACK_GENERATOR "ZIP" "TGZ")
