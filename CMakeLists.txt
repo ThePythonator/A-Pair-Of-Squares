@@ -18,14 +18,14 @@ set(PROJECT_ASSETS assets)
 
 set(ASSET_OUTPUTS "Assets.hpp" "Assets.cpp")
 set(ASSET_DEPENDS "Assets.yml")
-#[[
-set(DEP_SEARCH_DIRS
-    ${CMAKE_CURRENT_BINARY_DIR}/SDL2
-    ${CMAKE_CURRENT_BINARY_DIR}/SDL2/Release
-    ${CMAKE_CURRENT_BINARY_DIR}/SDL2_image
-    ${CMAKE_CURRENT_BINARY_DIR}/SDL2_image/Release
-)]]
 
+
+if(APPLE)
+    # Need to put the asssets inside the bundle (this is where SDL_GetBasePath points to)
+    set(ASSETS_DEST bin/$<TARGET_FILE_NAME:${PROJECT_NAME}>.app/Contents/Resources)
+else()
+    set(ASSETS_DEST .)
+endif()
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCE})
 
@@ -56,32 +56,16 @@ install(FILES ${PROJECT_DISTRIBS}
 )
 
 install(DIRECTORY ${PROJECT_ASSETS}
-    DESTINATION .
+    DESTINATION ${ASSETS_DEST}
     FILES_MATCHING
     PATTERN "*.png"
 )
 
-if (UNIX)
+if (UNIX AND NOT APPLE)
     install(FILES APoS_Launcher_Linux.sh
 	    DESTINATION .
     )
 endif()
-
-# Install dependencies
-#[[
-set(DEP_SEARCH_DIRS ${CMAKE_CURRENT_BINARY_DIR}/SDL2 ${CMAKE_CURRENT_BINARY_DIR}/SDL2_image)
-file(GLOB SDL2_IMAGE_DEPS_DIRS ${CMAKE_CURRENT_BINARY_DIR}/SDL2_image/external/*)
-list(APPEND DEP_SEARCH_DIRS ${SDL2_IMAGE_DEPS_DIRS})
-
-file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/fixup.cmake
-    CONTENT "
-        include(BundleUtilities)
-        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:${PROJECT_NAME}>\" \"\" \"${DEP_SEARCH_DIRS}\")
-    "
-)
-
-install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/fixup.cmake)
-]]
 
 if (NOT EMSCRIPTEN)
     # Install dependencies
@@ -95,9 +79,15 @@ if (NOT EMSCRIPTEN)
         list(APPEND DEP_SEARCH_DIRS $<TARGET_FILE_DIR:SDL2_image> $<TARGET_FILE_DIR:png> $<TARGET_FILE_DIR:zlib>)
     endif()
 
+    set(EXE_SUFFIX)
+    if(APPLE)
+        set(EXE_SUFFIX ".app")
+    endif()
+
+
     install(CODE "
         include(BundleUtilities)
-        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:${PROJECT_NAME}>\" \"\" \"${DEP_SEARCH_DIRS}\")
+        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/bin/$<TARGET_FILE_NAME:${PROJECT_NAME}>${EXE_SUFFIX}\" \"\" \"${DEP_SEARCH_DIRS}\")
     ")
 endif()
 
