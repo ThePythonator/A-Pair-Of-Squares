@@ -382,6 +382,12 @@ namespace TIMER_ID {
 	uint8_t GAME_DURATION = UNINITIALISED;
 }
 
+namespace AUDIO {
+	const int DEFAULT_FREQUENCY = 44100;
+	const uint8_t DEFAULT_CHANNELS = 2;
+	const int DEFAULT_CHUNKSIZE = 2048;
+}
+
 // Nodes for bezier transitions
 namespace BEZIER {
 	const uint8_t MENU_BEZIER_NODE_COUNT = 3;

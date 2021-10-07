@@ -368,6 +368,12 @@ namespace TIMER_ID {
 	extern uint8_t GAME_DURATION;
 }
 
+namespace AUDIO {
+	extern const int DEFAULT_FREQUENCY;
+	extern const uint8_t DEFAULT_CHANNELS;
+	extern const int DEFAULT_CHUNKSIZE;
+}
+
 // Nodes for bezier transitions
 namespace BEZIER {
 	extern const uint8_t MENU_BEZIER_NODE_COUNT;

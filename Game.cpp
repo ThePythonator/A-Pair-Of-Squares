@@ -56,17 +56,15 @@ Game::Game() {
 
 bool Game::init() {
 	// Initialise SDL
-	int sdl_init_result = SDL_Init(SDL_INIT_VIDEO);
-	if (sdl_init_result < 0)
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
 	{
 		printf("SDL could not initialize!\nSDL Error: %s\n", SDL_GetError());
 		return false;
 	}
 
 	// Initialise SDL_image
-	int img_init_flags = IMG_INIT_JPG | IMG_INIT_PNG;
-	int img_init_result = IMG_Init(img_init_flags);
-	if ((img_init_result & img_init_flags) != img_init_flags) {
+	int img_init_flags = IMG_INIT_PNG; // | IMG_INIT_JPG
+	if ((IMG_Init(img_init_flags) & img_init_flags) != img_init_flags) {
 		printf("SDL_IMG could not initialize!\nSDL_IMG Error: %s\n", IMG_GetError());
 		return false;
 	}
