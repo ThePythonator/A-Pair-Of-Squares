@@ -58,6 +58,7 @@ jobs:
 
     env:
       RELEASE_FILE: ${{github.event.repository.name}}-${{github.event.release.tag_name}}-${{matrix.release-suffix}}
+      ARTIFACT_FILE: ${{github.event.repository.name}}-artifact-${{matrix.release-suffix}}
 
     steps:
     # Check out the main repo
@@ -124,9 +125,9 @@ jobs:
       run: |
         cmake --build . --config $BUILD_TYPE -j 2
 
-    # When it's a release, generate tar/zip files of the build
+    # Generate tar/zip files of the build
     - name: Package Release
-      if: github.event_name == 'release' && matrix.release-suffix != ''
+      if: matrix.release-suffix != ''
       shell: bash
       working-directory: ${{runner.workspace}}/main/build
       run: |
@@ -155,3 +156,11 @@ jobs:
         upload_url: ${{github.event.release.upload_url}}
         asset_name: ${{env.RELEASE_FILE}}.zip
         asset_content_type: application/zip
+        
+       # When not a release, create an artifact
+    - name: Upload zip to artifacts
+      if: github.event_name != 'release'
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{env.ARTIFACT_FILE}}
+        path: ${{runner.workspace}}/main/build/${{env.RELEASE_FILE}}.zip

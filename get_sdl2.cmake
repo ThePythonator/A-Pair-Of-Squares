@@ -18,8 +18,8 @@ if(EMSCRIPTEN)
 
     add_library(SDL2::mixer INTERFACE IMPORTED)
     set_target_properties(SDL2::mixer PROPERTIES
-        INTERFACE_COMPILE_OPTIONS "SHELL:-s USE_SDL_IMAGE=2"
-        INTERFACE_LINK_LIBRARIES "-s USE_SDL_IMAGE=2" # need to add use_sdl_mixer?
+        INTERFACE_COMPILE_OPTIONS "SHELL:-s USE_SDL_MIXER=2"
+        INTERFACE_LINK_LIBRARIES "-s USE_SDL_MIXER=2"
     )
 else()
     # Check for system SDL2
@@ -66,7 +66,7 @@ if(NOT TARGET SDL2::mixer)
 
     add_subdirectory(${SDL2_mixer_SOURCE_DIR} SDL2_mixer EXCLUDE_FROM_ALL)
 endif()
-    ]]
+]]
 
 if(NOT TARGET SDL2::mixer)
     FetchContent_Populate(SDL2_mixer
