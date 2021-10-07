@@ -15,11 +15,17 @@ if(EMSCRIPTEN)
         INTERFACE_COMPILE_OPTIONS "SHELL:-s USE_SDL_IMAGE=2"
         INTERFACE_LINK_LIBRARIES "-s USE_SDL_IMAGE=2"
     )
+
+    add_library(SDL2::mixer INTERFACE IMPORTED)
+    set_target_properties(SDL2::mixer PROPERTIES
+        INTERFACE_COMPILE_OPTIONS "SHELL:-s USE_SDL_IMAGE=2"
+        INTERFACE_LINK_LIBRARIES "-s USE_SDL_IMAGE=2" # need to add use_sdl_mixer?
+    )
 else()
     # Check for system SDL2
-    # Currently breaks for me
     find_package(SDL2 QUIET NO_SYSTEM_ENVIRONMENT_PATH)
     find_package(SDL2_image QUIET) # will probably fail
+    find_package(SDL2_mixer QUIET)
 endif()
 
 # Didn't find it, build from source
@@ -36,11 +42,37 @@ if(NOT TARGET SDL2::SDL2)
 endif()
 
 if(NOT TARGET SDL2::image)
-    # get SDL2_image (no released version has CMake support)
+    # Get SDL2_image (no released version has CMake support)
     FetchContent_Populate(SDL2_image
         GIT_REPOSITORY https://github.com/libsdl-org/SDL_image
         GIT_TAG        main
     )
     add_subdirectory(${sdl2_image_SOURCE_DIR} SDL2_image EXCLUDE_FROM_ALL)
     set_property(TARGET jpeg PROPERTY POSITION_INDEPENDENT_CODE ON) # build fix
+endif()
+
+
+#[[
+if(NOT TARGET SDL2::mixer)
+    # Get SDL2_mixer
+    FetchContent_Populate(SDL2_mixer
+        GIT_REPOSITORY https://github.com/libsdl-org/SDL_mixer
+        GIT_TAG        master
+    )
+    FetchContent_Populate(SDL2_mixer
+        GIT_REPOSITORY https://github.com/Daft-Freak/SDL_mixer
+        GIT_TAG        patch-1
+    )
+
+    add_subdirectory(${SDL2_mixer_SOURCE_DIR} SDL2_mixer EXCLUDE_FROM_ALL)
+endif()
+    ]]
+
+if(NOT TARGET SDL2::mixer)
+    FetchContent_Populate(SDL2_mixer
+        GIT_REPOSITORY https://github.com/Daft-Freak/SDL_mixer
+        GIT_TAG        patch-1
+    )
+    add_definitions(-DMUSIC_WAV) # VS compile errors if no music formats
+    add_subdirectory(${sdl2_mixer_SOURCE_DIR} SDL2_mixer EXCLUDE_FROM_ALL)
 endif()
