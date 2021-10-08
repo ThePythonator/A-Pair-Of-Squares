@@ -20,6 +20,7 @@
 //#include "Utilities.hpp"
 #include "LevelManager.hpp"
 #include "TransitionManager.hpp"
+#include "AudioManager.hpp"
 
 #include "Assets.hpp"
 
@@ -131,6 +132,9 @@ private:
 
 	// Renderer for window
 	SDL_Renderer* renderer = NULL;
+
+	// Audio
+	AudioHandler audio_handler;
 
 	// Spritesheet
 	SDL_Texture* spritesheet_texture = NULL;

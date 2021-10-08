@@ -69,6 +69,9 @@ bool Game::init() {
 		return false;
 	}
 
+	// Initialise audio
+	audio_handler.init(8);
+
 	// Set texture filtering to linear
 	if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0"))
 	{
@@ -107,6 +110,9 @@ void Game::quit() {
 	SDL_DestroyWindow(window);
 	window = NULL;
 
+	// Quit audio
+	audio_handler.quit();
+
 	// Quit SDL
 	IMG_Quit();
 	SDL_Quit();
@@ -137,6 +143,9 @@ void Game::load_data() {
 	SDL_FreeSurface(title_font_blue_sheet_surface);
 	SDL_FreeSurface(title_font_pink_sheet_surface);
 
+	// Load audio and music
+	//...
+
 	// Load timers
 	TIMER_ID::INTRO_LENGTH = timer_handler.add_timer();
 
@@ -166,6 +175,9 @@ void Game::clear_data() {
 
 	SDL_DestroyTexture(font_sheet_texture);
 	font_sheet_texture = NULL;
+
+	// Free audio
+	// ...
 }
 
 std::string Game::find_assets_path(std::string test_file, uint8_t depth) {

@@ -15,7 +15,7 @@ class AudioHandler {
 public:
 	AudioHandler();
 
-	bool init(int frequency = AUDIO::DEFAULT_FREQUENCY, uint16_t format = MIX_DEFAULT_FORMAT, uint8_t channels = AUDIO::DEFAULT_CHANNELS, int chunksize = AUDIO::DEFAULT_CHUNKSIZE);
+	bool init(uint8_t channels = AUDIO::DEFAULT_CHANNELS, int frequency = AUDIO::DEFAULT_FREQUENCY, int chunksize = AUDIO::DEFAULT_CHUNKSIZE, uint16_t format = MIX_DEFAULT_FORMAT);
 
 	void quit();
 

@@ -4,7 +4,7 @@ AudioHandler::AudioHandler() {
 
 }
 
-bool AudioHandler::init(int frequency, uint16_t format, uint8_t channels, int chunksize) {
+bool AudioHandler::init(uint8_t channels, int frequency, int chunksize, uint16_t format) {
 	if (channels > MIX_CHANNELS) {
 		printf("Too many channels for SDL_mixer (%u), defaulting to maximum (%u).\n", channels, MIX_CHANNELS);
 		channels = MIX_CHANNELS;
@@ -70,7 +70,7 @@ void AudioHandler::free_sound(Sound* sample) {
 
 
 
-void AudioHandler::play_music(Music music, int loops = -1) {
+void AudioHandler::play_music(Music music, int loops) {
 	Mix_PlayMusic(music, loops);
 }
 
@@ -90,11 +90,11 @@ bool AudioHandler::is_music_fading_out() {
 	return Mix_FadingMusic() == MIX_FADING_OUT;
 }
 
-void AudioHandler::fade_music_in(Music music, int ms, int loops = -1) {
+void AudioHandler::fade_music_in(Music music, int ms, int loops) {
 	Mix_FadeInMusic(music, loops, ms);
 }
 
-void AudioHandler::fade_music_out(Music music, int ms, int loops = -1) {
+void AudioHandler::fade_music_out(Music music, int ms, int loops) {
 	Mix_FadeOutMusic(ms);
 }
 
