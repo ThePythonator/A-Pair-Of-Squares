@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <string>
+#include <vector>
 
 #include "Constants.hpp"
 
@@ -27,6 +28,7 @@ public:
 	void set_sound_volume(uint8_t channel, float volume);
 	float get_sound_volume(uint8_t channel);
 
+	// Can be wav or ogg
 	static Sound load_sound(std::string path);
 	static void free_sound(Sound* sample);
 
@@ -37,18 +39,24 @@ public:
 	bool is_music_fading_in();
 	bool is_music_fading_out();
 
-	void fade_music_in(Music music, int ms, int loops = -1);
-	void fade_music_out(Music music, int ms, int loops = -1);
+	void fade_music_in(Music music, float fade_time, int loops = -1);
+	void fade_music_out(Music music, float fade_time, int loops = -1);
 
 	void set_music_volume(float volume);
 	float get_music_volume();
 
+	// Can be wav, midi, ogg or flac
 	static Music load_music(std::string path);
 	static void free_music(Music* sample);
+
+	std::vector<Sound> sound_samples;
+	std::vector<Music> music_samples; // maybe move to private and in load sound/music, auto append to these and return index of item added, then play sound by index?
 
 private:
 	static int convert_volume_float_to_int(float volume);
 	static float convert_volume_int_to_float(int volume);
+
+	static int convert_s_to_ms_float_to_int(float s);
 
 	int frequency = AUDIO::DEFAULT_FREQUENCY;
 	uint16_t format = MIX_DEFAULT_FORMAT;

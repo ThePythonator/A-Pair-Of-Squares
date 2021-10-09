@@ -90,12 +90,12 @@ bool AudioHandler::is_music_fading_out() {
 	return Mix_FadingMusic() == MIX_FADING_OUT;
 }
 
-void AudioHandler::fade_music_in(Music music, int ms, int loops) {
-	Mix_FadeInMusic(music, loops, ms);
+void AudioHandler::fade_music_in(Music music, float fade_time, int loops) {
+	Mix_FadeInMusic(music, loops, convert_s_to_ms_float_to_int(fade_time));
 }
 
-void AudioHandler::fade_music_out(Music music, int ms, int loops) {
-	Mix_FadeOutMusic(ms);
+void AudioHandler::fade_music_out(Music music, float fade_time, int loops) {
+	Mix_FadeOutMusic(convert_s_to_ms_float_to_int(fade_time));
 }
 
 void AudioHandler::set_music_volume(float volume) {
@@ -132,4 +132,8 @@ int AudioHandler::convert_volume_float_to_int(float volume) {
 
 float AudioHandler::convert_volume_int_to_float(int volume) {
 	return static_cast<float>(volume) / MIX_MAX_VOLUME;
+}
+
+int AudioHandler::convert_s_to_ms_float_to_int(float s) {
+	return static_cast<int>(s * 1000);
 }

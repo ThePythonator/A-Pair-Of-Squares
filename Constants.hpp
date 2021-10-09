@@ -337,6 +337,10 @@ namespace FILES {
 	extern const std::string TITLE_PINK_FONT_SHEET;
 
 	// extern const std::string FONT_SHEET = "font.png";
+
+	namespace MUSIC {
+		extern const std::string INTRO;
+	}
 }
 
 namespace DELAY {

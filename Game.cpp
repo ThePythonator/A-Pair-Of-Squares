@@ -144,7 +144,7 @@ void Game::load_data() {
 	SDL_FreeSurface(title_font_pink_sheet_surface);
 
 	// Load audio and music
-	//...
+	audio_handler.music_samples.push_back(audio_handler.load_music(assets_path + FILES::MUSIC::INTRO));
 
 	// Load timers
 	TIMER_ID::INTRO_LENGTH = timer_handler.add_timer();
@@ -177,7 +177,7 @@ void Game::clear_data() {
 	font_sheet_texture = NULL;
 
 	// Free audio
-	// ...
+	audio_handler.free_music(&audio_handler.music_samples.at(0));
 }
 
 std::string Game::find_assets_path(std::string test_file, uint8_t depth) {
@@ -381,7 +381,8 @@ void Game::update_menu_intro(float dt) {
 		fade_state = FadeState::UNFADE;
 	}
 	else if (timer_handler.get_timer_state(TIMER_ID::INTRO_LENGTH) == TimerState::RUNNING &&
-		timer_handler.get_timer(TIMER_ID::INTRO_LENGTH) >= DELAY::MENU_INTRO_LENGTH) {
+		timer_handler.get_timer(TIMER_ID::INTRO_LENGTH) >= DELAY::MENU_INTRO_LENGTH &&
+		!audio_handler.is_music_playing()) {
 
 		// Start fade
 		timer_handler.reset_timer(TIMER_ID::INTRO_LENGTH);
@@ -1052,6 +1053,8 @@ void Game::setup_menu_intro() {
 
 	timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
 	timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::PAUSED);
+
+	audio_handler.play_music(audio_handler.music_samples.at(0), 0);
 }
 
 void Game::setup_menu_title() {

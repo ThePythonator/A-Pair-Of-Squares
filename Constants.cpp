@@ -351,6 +351,10 @@ namespace FILES {
 	const std::string TITLE_PINK_FONT_SHEET = "title_pink.png";
 
 	// const std::string FONT_SHEET = "font.png";
+
+	namespace MUSIC {
+		const std::string INTRO = "music_intro.mp3";
+	}
 }
 
 namespace DELAY {
