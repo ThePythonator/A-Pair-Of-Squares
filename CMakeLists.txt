@@ -88,6 +88,10 @@ if (NOT EMSCRIPTEN)
         list(APPEND DEP_SEARCH_DIRS $<TARGET_FILE_DIR:SDL2_image> $<TARGET_FILE_DIR:png> $<TARGET_FILE_DIR:zlib>)
     endif()
 
+    if(TARGET SDL2_mixer)
+        list(APPEND DEP_SEARCH_DIRS $<TARGET_FILE_DIR:SDL2_mixer>)
+    endif()
+
     set(EXE_SUFFIX)
     if(APPLE)
         set(EXE_SUFFIX ".app")

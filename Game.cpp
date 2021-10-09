@@ -209,7 +209,7 @@ std::string Game::find_assets_path(std::string test_file, uint8_t depth) {
 
 	std::string message = "Found assets folder: " + base_path + "assets/\n";
 
-	printf(message.c_str());
+	printf("%s", message.c_str());
 
 	return base_path + "assets/";
 }
