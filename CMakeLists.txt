@@ -68,6 +68,8 @@ install(DIRECTORY ${PROJECT_ASSETS}
     DESTINATION ${ASSETS_DEST}
     FILES_MATCHING
     PATTERN "*.png"
+    PATTERN "*.mp3"
+    PATTERN "*.ogg"
 )
 
 if (UNIX AND NOT APPLE)
