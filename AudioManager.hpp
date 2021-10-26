@@ -40,7 +40,7 @@ public:
 	bool is_music_fading_out();
 
 	void fade_music_in(Music music, float fade_time, int loops = -1);
-	void fade_music_out(Music music, float fade_time, int loops = -1);
+	void fade_music_out(float fade_time);
 
 	void set_music_volume(float volume);
 	float get_music_volume();
@@ -48,6 +48,11 @@ public:
 	// Can be wav, midi, ogg or flac
 	static Music load_music(std::string path);
 	static void free_music(Music* sample);
+
+	void free_all_sounds();
+	void free_all_music();
+
+	void free_all();
 
 	std::vector<Sound> sound_samples;
 	std::vector<Music> music_samples; // maybe move to private and in load sound/music, auto append to these and return index of item added, then play sound by index?

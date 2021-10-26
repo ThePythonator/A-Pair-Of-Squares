@@ -98,6 +98,8 @@ private:
 
 	bool level_is_completed();
 
+	void handle_music();
+
 
 
 	// Loading functions

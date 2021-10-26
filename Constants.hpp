@@ -340,6 +340,10 @@ namespace FILES {
 
 	namespace MUSIC {
 		extern const std::string INTRO;
+
+		extern const std::vector<std::string> GAME_TRACKS;
+
+		extern const float FADE_TIME;
 	}
 }
 

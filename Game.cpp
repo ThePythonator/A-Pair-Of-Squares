@@ -146,6 +146,10 @@ void Game::load_data() {
 	// Load audio and music
 	audio_handler.music_samples.push_back(audio_handler.load_music(assets_path + FILES::MUSIC::INTRO));
 
+	for (uint8_t i = 0; i < FILES::MUSIC::GAME_TRACKS.size(); i++) {
+		audio_handler.music_samples.push_back(audio_handler.load_music(assets_path + FILES::MUSIC::GAME_TRACKS[i]));
+	}
+
 	// Load timers
 	TIMER_ID::INTRO_LENGTH = timer_handler.add_timer();
 
@@ -177,7 +181,7 @@ void Game::clear_data() {
 	font_sheet_texture = NULL;
 
 	// Free audio
-	audio_handler.free_music(&audio_handler.music_samples.at(0));
+	audio_handler.free_all();
 }
 
 std::string Game::find_assets_path(std::string test_file, uint8_t depth) {
@@ -407,6 +411,10 @@ void Game::render_menu_intro() {
 }
 
 void Game::update_menu_title(float dt) {
+	// Update music (auto-play random piece)
+	// TODO: fade in somehow?
+	handle_music();
+
 	// Handle creation and removal of shape particles in background
 	handle_menu_shape_particles();
 
@@ -490,6 +498,9 @@ void Game::render_menu_title() {
 }
 
 void Game::update_menu_settings(float dt) {
+	// Update music (auto-play random piece)
+	handle_music();
+
 	// Handle creation and removal of shape particles in background
 	handle_menu_shape_particles();
 
@@ -569,6 +580,9 @@ void Game::render_menu_settings() {
 }
 
 void Game::update_menu_level_select(float dt) {
+	// Update music (auto-play random piece)
+	handle_music();
+
 	// Handle creation and removal of shape particles in background
 	handle_menu_shape_particles();
 
@@ -678,6 +692,9 @@ void Game::render_menu_level_select() {
 }
 
 void Game::update_game_running(float dt) {
+	// Update music (auto-play random piece)
+	handle_music();
+
 	// Handle creation and removal of shape particles in background
 	handle_menu_shape_particles();
 
@@ -770,6 +787,9 @@ void Game::render_game_running() {
 }
 
 void Game::update_game_paused(float dt) {
+	// Update music (auto-play random piece)
+	handle_music();
+
 	// Handle creation and removal of shape particles in background
 	handle_menu_shape_particles();
 
@@ -970,6 +990,9 @@ void Game::render_game_paused() {
 }
 
 void Game::update_game_end(float dt) {
+	// Update music (auto-play random piece)
+	handle_music();
+
 	// Handle creation and removal of shape particles in background
 	handle_menu_shape_particles();
 
@@ -1354,6 +1377,23 @@ bool Game::level_is_completed() {
 		level_handler.level_finish_pink_x == player.get_pink_x() && level_handler.level_finish_pink_y - GAME::FINISH::HEIGHT == player.get_pink_y();
 }
 
+
+void Game::handle_music() {
+	// TODO: possibly change settings stuff to fade out/in
+	// TODO:	...OR... change settings stuff to set volume, so it still plays in background (also, fade in/out if possible)
+
+	if (settings.audio_music) {
+		// NOTE: toggling settings often gets weird cutin/outs at start
+		if (!audio_handler.is_music_playing()) {
+			// Assumes at least 2 pieces of music in music_samples
+			audio_handler.play_music(audio_handler.music_samples.at(1 + rand() % (audio_handler.music_samples.size() - 1)), 0);
+		}
+	}
+	else if (audio_handler.is_music_playing()) {
+		// Don't play music - stop it if it's running!
+		audio_handler.fade_music_out(FILES::MUSIC::FADE_TIME);
+	}
+}
 
 
 SDL_Texture* Game::load_texture(std::string path) {

@@ -354,6 +354,10 @@ namespace FILES {
 
 	namespace MUSIC {
 		const std::string INTRO = "music_intro.mp3";
+
+		const std::vector<std::string> GAME_TRACKS = { "Solitude.mp3", "Lost-In-The-Void.mp3" };
+
+		const float FADE_TIME = 0.5f;
 	}
 }
 

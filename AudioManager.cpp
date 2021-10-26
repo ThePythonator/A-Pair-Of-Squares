@@ -69,7 +69,6 @@ void AudioHandler::free_sound(Sound* sample) {
 }
 
 
-
 void AudioHandler::play_music(Music music, int loops) {
 	Mix_PlayMusic(music, loops);
 }
@@ -94,7 +93,7 @@ void AudioHandler::fade_music_in(Music music, float fade_time, int loops) {
 	Mix_FadeInMusic(music, loops, convert_s_to_ms_float_to_int(fade_time));
 }
 
-void AudioHandler::fade_music_out(Music music, float fade_time, int loops) {
+void AudioHandler::fade_music_out(float fade_time) {
 	Mix_FadeOutMusic(convert_s_to_ms_float_to_int(fade_time));
 }
 
@@ -122,6 +121,26 @@ void AudioHandler::free_music(Music* sample) {
 	// Free sample
 	Mix_FreeMusic(*sample);
 	*sample = NULL;
+}
+
+void AudioHandler::free_all_sounds() {
+	for (uint8_t i = 0; i < sound_samples.size(); i++) {
+		free_sound(&sound_samples.at(i));
+	}
+	sound_samples.clear();
+	
+}
+
+void AudioHandler::free_all_music() {
+	for (uint8_t i = 0; i < music_samples.size(); i++) {
+		free_music(&music_samples.at(i));
+	}
+	music_samples.clear();
+}
+
+void AudioHandler::free_all() {
+	free_all_sounds();
+	free_all_music();
 }
 
 
