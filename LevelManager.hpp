@@ -11,6 +11,7 @@
 #include "Spring.hpp"
 #include "Button.hpp"
 #include "Door.hpp"
+#include "AudioManager.hpp"
 
 // Struct header generated for the tmx files
 #pragma pack(push,1)
@@ -72,7 +73,7 @@ public:
 
 	void load_level(const uint8_t level_data[]);
 
-	void update(float dt); //Player& player,
+	void update(AudioHandler audio_handler, float dt); //Player& player,
 
 
 	void render(Spritesheet& spritesheet);

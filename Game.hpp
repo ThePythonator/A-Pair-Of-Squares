@@ -103,8 +103,8 @@ private:
 
 
 	// Loading functions
-	SDL_Texture* load_texture(std::string path);
-	SDL_Surface* load_surface(std::string path);
+	SDL_Texture* load_texture(std::string path, bool display_errors = true);
+	SDL_Surface* load_surface(std::string path, bool display_errors = true);
 
 
 	enum class GameState {

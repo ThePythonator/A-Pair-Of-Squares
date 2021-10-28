@@ -338,12 +338,12 @@ namespace FILES {
 
 	// extern const std::string FONT_SHEET = "font.png";
 
-	namespace MUSIC {
+	namespace AUDIO {
 		extern const std::string INTRO;
 
 		extern const std::vector<std::string> GAME_TRACKS;
 
-		extern const float FADE_TIME;
+		extern const std::vector<std::string> SFX_SAMPLES;
 	}
 }
 
@@ -380,6 +380,21 @@ namespace AUDIO {
 	extern const int DEFAULT_FREQUENCY;
 	extern const uint8_t DEFAULT_CHANNELS;
 	extern const int DEFAULT_CHUNKSIZE;
+
+	extern const float SOUND_VOLUME;
+	extern const float MUSIC_VOLUME;
+
+	extern const float MUSIC_FADE_TIME;
+
+	enum SFX { // Should it be enum class???
+		JUMP,
+		SPRING,
+		ORB,
+		DEATH,
+		SELECT,
+		DOOR,
+		BUTTON
+	};
 }
 
 // Nodes for bezier transitions

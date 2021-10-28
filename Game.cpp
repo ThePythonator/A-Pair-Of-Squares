@@ -143,12 +143,22 @@ void Game::load_data() {
 	SDL_FreeSurface(title_font_blue_sheet_surface);
 	SDL_FreeSurface(title_font_pink_sheet_surface);
 
-	// Load audio and music
-	audio_handler.music_samples.push_back(audio_handler.load_music(assets_path + FILES::MUSIC::INTRO));
+	// Load audio:
+	// Music
+	audio_handler.music_samples.push_back(audio_handler.load_music(assets_path + FILES::AUDIO::INTRO));
 
-	for (uint8_t i = 0; i < FILES::MUSIC::GAME_TRACKS.size(); i++) {
-		audio_handler.music_samples.push_back(audio_handler.load_music(assets_path + FILES::MUSIC::GAME_TRACKS[i]));
+	for (uint8_t i = 0; i < FILES::AUDIO::GAME_TRACKS.size(); i++) {
+		audio_handler.music_samples.push_back(audio_handler.load_music(assets_path + FILES::AUDIO::GAME_TRACKS[i]));
 	}
+
+	// SFX
+	for (uint8_t i = 0; i < FILES::AUDIO::SFX_SAMPLES.size(); i++) {
+		audio_handler.sound_samples.push_back(audio_handler.load_sound(assets_path + FILES::AUDIO::SFX_SAMPLES[i]));
+	}
+
+	// Set volumes:
+	audio_handler.set_music_volume(AUDIO::MUSIC_VOLUME);
+	audio_handler.set_sound_volume(AUDIO::SOUND_VOLUME);
 
 	// Load timers
 	TIMER_ID::INTRO_LENGTH = timer_handler.add_timer();
@@ -188,7 +198,7 @@ std::string Game::find_assets_path(std::string test_file, uint8_t depth) {
 	printf("Attempting to find assets folder...\n");
 
 	std::string base_path = SDL_GetBasePath();
-	SDL_Surface* test_surface = load_surface("assets/" + test_file);
+	SDL_Surface* test_surface = load_surface("assets/" + test_file, false);
 
 	if (test_surface != NULL) {
 		base_path = "";
@@ -196,7 +206,7 @@ std::string Game::find_assets_path(std::string test_file, uint8_t depth) {
 
 	uint8_t count = 0;
 	while (test_surface == NULL && count < depth) {
-		test_surface = load_surface(base_path + "assets/" + test_file);
+		test_surface = load_surface(base_path + "assets/" + test_file, false);
 
 		if (test_surface == NULL) {
 			base_path += "../";
@@ -211,7 +221,7 @@ std::string Game::find_assets_path(std::string test_file, uint8_t depth) {
 
 	SDL_FreeSurface(test_surface);
 
-	std::string message = "Found assets folder: " + base_path + "assets/\n";
+	std::string message = "Found assets folder: " + base_path + "assets/\n\n";
 
 	printf("%s", message.c_str());
 
@@ -430,11 +440,15 @@ void Game::update_menu_title(float dt) {
 		if (KeyHandler::just_down(input_handler.get_key_union().keys.UP)) {
 			if (option_selected > 0) {
 				option_selected--;
+
+				// Should we play select sfx?
 			}
 		}
 		if (KeyHandler::just_down(input_handler.get_key_union().keys.DOWN)) {
 			if (option_selected < (uint8_t)MENU::TITLE::OPTION_COUNT - 1) {
 				option_selected++;
+
+				// Should we play select sfx?
 			}
 		}
 
@@ -445,6 +459,9 @@ void Game::update_menu_title(float dt) {
 			timer_handler.reset_timer(TIMER_ID::MENU_BEZIER_TEXT);
 
 			option_confirmed = true;
+
+			// Play 'select' sfx
+			audio_handler.play_sound(audio_handler.sound_samples.at(AUDIO::SFX::SELECT));
 		}
 	}
 	else {
@@ -516,16 +533,21 @@ void Game::update_menu_settings(float dt) {
 		if (KeyHandler::just_down(input_handler.get_key_union().keys.UP)) {
 			if (option_selected > 0) {
 				option_selected--;
+				// Should we play select sfx?
 			}
 		}
 		if (KeyHandler::just_down(input_handler.get_key_union().keys.DOWN)) {
 			if (option_selected < (uint8_t)MENU::SETTINGS::OPTION_COUNT - 1) {
 				option_selected++;
+				// Should we play select sfx?
 			}
 		}
 
 		// Check if user has just selected an option
 		if (KeyHandler::just_down(input_handler.get_key_union().keys.SPACE)) {
+			// Play 'select' sfx
+			audio_handler.play_sound(audio_handler.sound_samples.at(AUDIO::SFX::SELECT));
+
 			// Handle settings/back
 			switch ((MENU::SETTINGS)option_selected)
 			{
@@ -535,6 +557,9 @@ void Game::update_menu_settings(float dt) {
 
 			case MENU::SETTINGS::SFX:
 				settings.audio_sfx = !settings.audio_sfx;
+
+				// Turn sfx volume on/off
+				audio_handler.set_sound_volume(settings.audio_sfx ? AUDIO::SOUND_VOLUME : 0.0f);
 				break;
 
 			case MENU::SETTINGS::BACK:
@@ -607,19 +632,23 @@ void Game::update_menu_level_select(float dt) {
 		if (KeyHandler::just_down(input_handler.get_key_union().keys.DOWN)) {
 			if (option_selected < (uint8_t)MENU::LEVEL_SELECT::OPTION_COUNT - 5) {
 				option_selected += 4;
+				// Should we play select sfx?
 			}
 			else if (option_selected < (uint8_t)MENU::LEVEL_SELECT::OPTION_COUNT - 1) {
 				option_selected = (uint8_t)MENU::LEVEL_SELECT::BACK;
+				// Should we play select sfx?
 			}
 		}
 		if (KeyHandler::just_down(input_handler.get_key_union().keys.LEFT)) {
 			if (option_selected % 4 > 0) {
 				option_selected--;
+				// Should we play select sfx?
 			}
 		}
 		if (KeyHandler::just_down(input_handler.get_key_union().keys.RIGHT)) {
 			if (option_selected % 4 < 3 && option_selected != (uint8_t)MENU::LEVEL_SELECT::OPTION_COUNT - 1) {
 				option_selected++;
+				// Should we play select sfx?
 			}
 		}
 
@@ -630,6 +659,9 @@ void Game::update_menu_level_select(float dt) {
 			timer_handler.reset_timer(TIMER_ID::MENU_BEZIER_TEXT);
 
 			option_confirmed = true;
+
+			// Play 'select' sfx
+			audio_handler.play_sound(audio_handler.sound_samples.at(AUDIO::SFX::SELECT));
 		}
 	}
 	else if (timer_handler.get_timer_state(TIMER_ID::MENU_TRANSITION_FADE) == TimerState::PAUSED) {
@@ -710,9 +742,9 @@ void Game::update_game_running(float dt) {
 
 	// Only move the player and entities when there aren't transitions in the way
 	if (!paused && fade_state == FadeState::NONE) {
-		player.update(input_handler, level_handler, dt);
+		player.update(input_handler, audio_handler, level_handler, dt);
 
-		level_handler.update(dt);
+		level_handler.update(audio_handler, dt);
 	}
 
 	if (timer_handler.get_timer(TIMER_ID::GAME_DURATION) == 0.0f && timer_handler.get_timer_state(TIMER_ID::GAME_DURATION) == TimerState::PAUSED) {
@@ -757,6 +789,8 @@ void Game::update_game_running(float dt) {
 
 			//fade_state = FadeState::FADE;
 			pause_transition.close();
+
+			// Should we play select sfx?
 		}
 	}
 
@@ -815,17 +849,23 @@ void Game::update_game_paused(float dt) {
 		if (KeyHandler::just_down(input_handler.get_key_union().keys.UP)) {
 			if (option_selected > 0) {
 				option_selected--;
+				// Should we play select sfx?
 			}
 		}
 		if (KeyHandler::just_down(input_handler.get_key_union().keys.DOWN)) {
 			if (option_selected < (uint8_t)MENU::LEVEL_PAUSED::OPTION_COUNT - 1) {
 				option_selected++;
+				// Should we play select sfx?
 			}
 		}
 
 		// Check if user has just selected an option
 		if (KeyHandler::just_down(input_handler.get_key_union().keys.SPACE)) {
 			// Handle paused options
+
+			// Play 'select' sfx
+			audio_handler.play_sound(audio_handler.sound_samples.at(AUDIO::SFX::SELECT));
+
 			switch ((MENU::LEVEL_PAUSED)option_selected)
 			{
 			case MENU::LEVEL_PAUSED::RESUME:
@@ -1011,6 +1051,9 @@ void Game::update_game_end(float dt) {
 			timer_handler.reset_timer(TIMER_ID::MENU_BEZIER_TEXT);
 
 			option_confirmed = true;
+
+			// Play 'select' sfx
+			audio_handler.play_sound(audio_handler.sound_samples.at(AUDIO::SFX::SELECT));
 		}
 	}
 	else {
@@ -1391,16 +1434,16 @@ void Game::handle_music() {
 	}
 	else if (audio_handler.is_music_playing()) {
 		// Don't play music - stop it if it's running!
-		audio_handler.fade_music_out(FILES::MUSIC::FADE_TIME);
+		audio_handler.fade_music_out(AUDIO::MUSIC_FADE_TIME);
 	}
 }
 
 
-SDL_Texture* Game::load_texture(std::string path) {
+SDL_Texture* Game::load_texture(std::string path, bool display_errors) {
 	// Load image at specified path
 	SDL_Surface* image = IMG_Load(path.c_str());
 
-	if (image == NULL)
+	if (image == NULL && display_errors)
 	{
 		printf("Unable to create texture from %s!\nSDL Error: %s\n", path.c_str(), SDL_GetError());
 	}
@@ -1408,7 +1451,7 @@ SDL_Texture* Game::load_texture(std::string path) {
 	// Create texture from image
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, image);
 
-	if (texture == NULL)
+	if (texture == NULL && display_errors)
 	{
 		printf("Unable to create texture from %s!\nSDL Error: %s\n", path.c_str(), SDL_GetError());
 	}
@@ -1419,11 +1462,11 @@ SDL_Texture* Game::load_texture(std::string path) {
 	return texture;
 }
 
-SDL_Surface* Game::load_surface(std::string path) {
+SDL_Surface* Game::load_surface(std::string path, bool display_errors) {
 	// Load image at specified path
 	SDL_Surface* image = IMG_Load(path.c_str());
 
-	if (image == NULL)
+	if (image == NULL && display_errors)
 	{
 		printf("Unable to load image %s!\nSDL_image Error: %s\n", path.c_str(), IMG_GetError());
 	}

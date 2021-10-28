@@ -12,7 +12,7 @@ Player::Player(uint16_t blue_x, uint16_t blue_y, uint16_t pink_x, uint16_t pink_
 	pink = Square(4, pink_x, pink_y);
 }
 
-void Player::update(InputHandler& input_handler, LevelHandler& level_handler, float dt) {
+void Player::update(InputHandler& input_handler, AudioHandler& audio_handler, LevelHandler& level_handler, float dt) {
 	std::vector<Tile> tiles = level_handler.get_tiles();
 
 	// Handle inputs
@@ -33,6 +33,11 @@ void Player::update(InputHandler& input_handler, LevelHandler& level_handler, fl
 	if (KeyHandler::is_down(input_handler.get_key_union().keys.SPACE)) {
 		blue.jump(GAME::SQUARE::JUMP_STRENGTH);
 		pink.jump(GAME::SQUARE::JUMP_STRENGTH);
+
+		// Play jump sfx
+		if (blue.get_can_jump() || pink.get_can_jump()) {
+			audio_handler.play_sound(audio_handler.sound_samples.at(AUDIO::SFX::JUMP));
+		}
 	}
 
 	// Update player physics
@@ -90,19 +95,31 @@ void Player::update(InputHandler& input_handler, LevelHandler& level_handler, fl
 				// Reset velocity first to hopefully fix 'super-jump' bug
 				blue.reset_y_vel();
 				blue.add_velocity(0.0f, -GAME::SPRING::LAUNCH_VELOCITY);
+
+				// Play spring sound
+				audio_handler.play_sound(audio_handler.sound_samples.at(AUDIO::SFX::SPRING));
 			}
 
 			if (spring.check_collision(pink.get_x(), pink.get_y())) {
 				pink.reset_y_vel();
 				pink.add_velocity(0.0f, -GAME::SPRING::LAUNCH_VELOCITY);
+
+				// Play spring sound
+				audio_handler.play_sound(audio_handler.sound_samples.at(AUDIO::SFX::SPRING));
 			}
 		}
 	}
+
+	// todo: get buttons currently pressed, compare it to after player.updates. If different (OR if buttons have been pressed???) play sfx
 
 	bool should_die = false;
 
 	should_die |= blue.update(tiles, level_handler.get_springs(), level_handler.get_buttons(), level_handler.get_doors(), dt);
 	should_die |= pink.update(tiles, level_handler.get_springs(), level_handler.get_buttons(), level_handler.get_doors(), dt);
+
+	// Play button click sfx
+	// if (false)
+	//audio_handler.play_sound(audio_handler.sound_samples.at(AUDIO::SFX::BUTTON));
 
 	// Update player position to allow walking over finish
 	if (is_colliding(level_handler.level_finish_blue_x + GAME::FINISH::BORDER, level_handler.level_finish_blue_y + SPRITES::SIZE - GAME::FINISH::HEIGHT,
@@ -178,8 +195,15 @@ void Player::update(InputHandler& input_handler, LevelHandler& level_handler, fl
 	}
 
 	// Handle orb collisions
+	uint8_t old_orb_count = orb_count;
 	orb_count += level_handler.handle_orb_collisions(blue.get_x(), blue.get_y(), 0);
 	orb_count += level_handler.handle_orb_collisions(pink.get_x(), pink.get_y(), 1);
+	
+	// If orb_count has changed, play sfx:
+	if (orb_count != old_orb_count) {
+		// Play orb collect sfx
+		audio_handler.play_sound(audio_handler.sound_samples.at(AUDIO::SFX::ORB));
+	}
 
 	// Handle spike collisions
 	if (level_handler.handle_spike_collisions(blue.get_x(), blue.get_y() + SPRITES::SIZE - GAME::SQUARE::HEIGHT) ||

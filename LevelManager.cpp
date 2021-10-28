@@ -199,7 +199,7 @@ void LevelHandler::load_level(const uint8_t level_data[]) {
 	}
 }
 
-void LevelHandler::update(float dt) { //Player& player,
+void LevelHandler::update(AudioHandler audio_handler, float dt) { //Player& player,
 	for (Orb& orb : orbs) {
 		orb.update(dt);
 	}
@@ -229,9 +229,17 @@ void LevelHandler::update(float dt) { //Player& player,
 
 			if (!door.is_open() && !door.is_opening()) {
 				door.open();
+
+				// Play door sfx
+				audio_handler.play_sound(audio_handler.sound_samples.at(AUDIO::SFX::DOOR));
 			}
 		}
 		else {
+			if (door.is_open()) {
+				// Play door sfx
+				audio_handler.play_sound(audio_handler.sound_samples.at(AUDIO::SFX::DOOR));
+			}
+
 			door.close();
 		}
 

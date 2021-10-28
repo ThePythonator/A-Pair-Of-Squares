@@ -56,7 +56,7 @@ Sound AudioHandler::load_sound(std::string path) {
 
 	if (sample == NULL) {
 		// Failed to load
-		printf("Failed to load sound sample! SDL_mixer Error: %s\n", Mix_GetError());
+		printf("Failed to load sound sample, path %s\nSDL_mixer Error: %s\n", path.c_str(), Mix_GetError());
 	}
 
 	return sample;
@@ -111,7 +111,7 @@ Music AudioHandler::load_music(std::string path) {
 
 	if (music == NULL) {
 		// Failed to load
-		printf("Failed to load music! SDL_mixer Error: %s\n", Mix_GetError());
+		printf("Failed to load music, path %s\nSDL_mixer Error: %s\n", path.c_str(), Mix_GetError());
 	}
 
 	return music;

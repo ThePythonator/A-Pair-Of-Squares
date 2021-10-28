@@ -6,13 +6,14 @@
 #include "InputManager.hpp"
 #include "LevelManager.hpp"
 #include "Spritesheet.hpp"
+#include "AudioManager.hpp"
 
 class Player {
 public:
 	Player();
 	Player(uint16_t blue_x, uint16_t blue_y, uint16_t pink_x, uint16_t pink_y);
 
-	void update(InputHandler& input_handler, LevelHandler& level_handler, float dt);
+	void update(InputHandler& input_handler, AudioHandler& audio_handler, LevelHandler& level_handler, float dt);
 
 	void render(Spritesheet& spritesheet);
 

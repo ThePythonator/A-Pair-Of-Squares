@@ -352,12 +352,12 @@ namespace FILES {
 
 	// const std::string FONT_SHEET = "font.png";
 
-	namespace MUSIC {
+	namespace AUDIO {
 		const std::string INTRO = "music_intro.mp3";
 
 		const std::vector<std::string> GAME_TRACKS = { "Solitude.mp3", "Lost-In-The-Void.mp3" };
 
-		const float FADE_TIME = 0.5f;
+		const std::vector<std::string> SFX_SAMPLES = { "Jump.ogg", "Boing.ogg", "Pickup.ogg", "Death.ogg", "Select.ogg", "Steam.ogg", "Click.ogg"};
 	}
 }
 
@@ -394,6 +394,11 @@ namespace AUDIO {
 	const int DEFAULT_FREQUENCY = 44100;
 	const uint8_t DEFAULT_CHANNELS = 2;
 	const int DEFAULT_CHUNKSIZE = 2048;
+
+	const float SOUND_VOLUME = 0.4f;
+	const float MUSIC_VOLUME = 0.9f;
+
+	const float MUSIC_FADE_TIME = 0.5f;
 }
 
 // Nodes for bezier transitions
