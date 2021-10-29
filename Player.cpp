@@ -110,16 +110,32 @@ void Player::update(InputHandler& input_handler, AudioHandler& audio_handler, Le
 		}
 	}
 
-	// todo: get buttons currently pressed, compare it to after player.updates. If different (OR if buttons have been pressed???) play sfx
+	// Get buttons currently pressed, check if it's different after updating the buttons.
+	// Note: player.update(...) doesn't handle releasing of buttons, so no sfx will be played when buttons unpress themselves.
+	uint16_t a = 0; // Bad things happen if more than 16 buttons!
+	uint8_t i = 0;
+	for (Button& button : level_handler.get_buttons()) {
+		a += button.get_pressed() ? std::pow(2, i) : 0;
+		i++;
+	}
 
 	bool should_die = false;
 
 	should_die |= blue.update(tiles, level_handler.get_springs(), level_handler.get_buttons(), level_handler.get_doors(), dt);
 	should_die |= pink.update(tiles, level_handler.get_springs(), level_handler.get_buttons(), level_handler.get_doors(), dt);
 
+	uint16_t b = 0;
+	i = 0;
+	for (Button& button : level_handler.get_buttons()) {
+		b += button.get_pressed() ? std::pow(2, i) : 0;
+		i++;
+	}
+
 	// Play button click sfx
-	// if (false)
-	//audio_handler.play_sound(audio_handler.sound_samples.at(AUDIO::SFX::BUTTON));
+	// rather hacky using a and b vars
+	if (a != b) {
+		audio_handler.play_sound(audio_handler.sound_samples.at(AUDIO::SFX::BUTTON));
+	}
 
 	// Update player position to allow walking over finish
 	if (is_colliding(level_handler.level_finish_blue_x + GAME::FINISH::BORDER, level_handler.level_finish_blue_y + SPRITES::SIZE - GAME::FINISH::HEIGHT,

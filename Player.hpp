@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 #include "Constants.hpp"
 
 #include "Square.hpp"
