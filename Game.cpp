@@ -398,14 +398,22 @@ void Game::update_menu_intro(float dt) {
 		timer_handler.get_timer(TIMER_ID::INTRO_LENGTH) >= DELAY::MENU_INTRO_LENGTH &&
 		!audio_handler.is_music_playing()) {
 
-		// Start fade
-		timer_handler.reset_timer(TIMER_ID::INTRO_LENGTH);
-		timer_handler.set_timer_state(TIMER_ID::INTRO_LENGTH, TimerState::PAUSED);
+		if (intro_music_started) {
+			// Start fade
+			timer_handler.reset_timer(TIMER_ID::INTRO_LENGTH);
+			timer_handler.set_timer_state(TIMER_ID::INTRO_LENGTH, TimerState::PAUSED);
 
-		timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
-		timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::RUNNING);
+			timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
+			timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::RUNNING);
 
-		fade_state = FadeState::FADE;
+			fade_state = FadeState::FADE;
+		}
+		else {
+			// Play intro music
+			audio_handler.play_music(audio_handler.music_samples.at(0), 0);
+
+			intro_music_started = true;
+		}
 	}
 }
 
@@ -1119,8 +1127,6 @@ void Game::setup_menu_intro() {
 
 	timer_handler.reset_timer(TIMER_ID::MENU_TRANSITION_FADE);
 	timer_handler.set_timer_state(TIMER_ID::MENU_TRANSITION_FADE, TimerState::PAUSED);
-
-	audio_handler.play_music(audio_handler.music_samples.at(0), 0);
 }
 
 void Game::setup_menu_title() {

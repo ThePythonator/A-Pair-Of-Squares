@@ -179,6 +179,8 @@ private:
 
 	bool paused = false;
 
+	bool intro_music_started = false;
+
 	uint8_t option_selected = 0;
 	bool option_confirmed = false;
 

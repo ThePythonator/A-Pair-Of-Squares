@@ -353,7 +353,7 @@ namespace FILES {
 	// const std::string FONT_SHEET = "font.png";
 
 	namespace AUDIO {
-		const std::string INTRO = "music_intro.mp3";
+		const std::string INTRO = "Intro.mp3";
 
 		const std::vector<std::string> GAME_TRACKS = { "Solitude.mp3", "Lost-In-The-Void.mp3" };
 
