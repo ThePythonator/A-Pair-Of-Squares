@@ -231,13 +231,13 @@ void LevelHandler::update(AudioHandler audio_handler, float dt) { //Player& play
 				door.open();
 
 				// Play door sfx
-				//audio_handler.play_sound(audio_handler.sound_samples.at(AUDIO::SFX::DOOR));
+				audio_handler.play_sound(audio_handler.sound_samples.at(AUDIO::SFX::DOOR));
 			}
 		}
 		else {
 			if (door.is_open()) {
 				// Play door sfx
-				//audio_handler.play_sound(audio_handler.sound_samples.at(AUDIO::SFX::DOOR));
+				audio_handler.play_sound(audio_handler.sound_samples.at(AUDIO::SFX::DOOR));
 			}
 
 			door.close();

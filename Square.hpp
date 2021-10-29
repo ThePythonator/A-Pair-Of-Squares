@@ -35,6 +35,7 @@ public:
 
 
 	void set_dead();
+	bool get_dead();
 	void reset_dead_fade();
 
 	bool get_fade_finished();

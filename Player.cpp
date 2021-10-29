@@ -222,14 +222,17 @@ void Player::update(InputHandler& input_handler, AudioHandler& audio_handler, Le
 	}
 
 	// Handle spike collisions
-	if (level_handler.handle_spike_collisions(blue.get_x(), blue.get_y() + SPRITES::SIZE - GAME::SQUARE::HEIGHT) ||
+	if ((level_handler.handle_spike_collisions(blue.get_x(), blue.get_y() + SPRITES::SIZE - GAME::SQUARE::HEIGHT) ||
 		level_handler.handle_spike_collisions(pink.get_x(), pink.get_y() + SPRITES::SIZE - GAME::SQUARE::HEIGHT) ||
-		should_die) {
+		should_die) && !(blue.get_dead() || blue.get_dead())) {
 		// Blue or pink hit spikes
 
 		// Start square death animation
 		blue.set_dead();
 		pink.set_dead();
+
+		// Play death sfx
+		audio_handler.play_sound(audio_handler.sound_samples.at(AUDIO::SFX::DEATH));
 	}
 
 	// Check if square death animations have completed

@@ -364,7 +364,7 @@ namespace FILES {
 namespace DELAY {
 	const float TRANSITION_FADE_LENGTH = 0.6f;
 
-	const float MENU_INTRO_LENGTH = 2.0f;
+	const float MENU_INTRO_LENGTH = 1.5f;
 	const float MENU_INTRO_FADE_LENGTH = 1.0f;
 
 	const float MENU_BEZIER_LENGTH = 1.0f;

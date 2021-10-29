@@ -330,6 +330,10 @@ void Square::set_dead() {
 	dead = true;
 }
 
+bool Square::get_dead() {
+	return dead;
+}
+
 void Square::reset_dead_fade() {
 	dead = false;
 	fade_age = 0.0f;
