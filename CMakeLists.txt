@@ -91,7 +91,7 @@ if (NOT EMSCRIPTEN)
     endif()
 
     if(TARGET SDL2_mixer)
-        list(APPEND DEP_SEARCH_DIRS $<TARGET_FILE_DIR:SDL2_mixer>)
+        list(APPEND DEP_SEARCH_DIRS $<TARGET_FILE_DIR:SDL2_mixer>) # missing ogg and mp3 support
     endif()
 
     set(EXE_SUFFIX)

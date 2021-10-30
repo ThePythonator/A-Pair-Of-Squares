@@ -11,12 +11,13 @@ bool AudioHandler::init(uint8_t channels, int frequency, int chunksize, uint16_t
 	}
 
 	// We want mp3 and ogg files:
-	int flags = MIX_INIT_OGG | MIX_INIT_MP3;
-	if (Mix_Init(flags) & flags != flags) {
+	// For some reason, works for me without this. Breaks with it.
+	//int flags = MIX_INIT_OGG | MIX_INIT_MP3;
+	/*if (Mix_Init(flags) & flags != flags) {
 		printf("Mix_Init: Failed to init required .ogg and .mp3 support!\n");
 		printf("Mix_Init: %s\n", Mix_GetError());
 		return false;
-	}
+	}*/
 
 	// Initialize SDL_mixer
 	if (Mix_OpenAudio(frequency, format, channels, chunksize) < 0) {
