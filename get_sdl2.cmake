@@ -77,6 +77,6 @@ if(NOT TARGET SDL2::mixer)
         GIT_REPOSITORY https://github.com/Daft-Freak/SDL_mixer
         GIT_TAG        patch-1
     )
-    add_definitions(-DMUSIC_MP3 -DMUSIC_OGG) # VS compile errors if no music formats //-DMUSIC_WAV
+    #add_definitions(-DMUSIC_MP3 -DMUSIC_OGG) # VS compile errors if no music formats?? //-DMUSIC_WAV
     add_subdirectory(${sdl2_mixer_SOURCE_DIR} SDL2_mixer EXCLUDE_FROM_ALL)
 endif()
