@@ -71,7 +71,8 @@ endif()
 if(NOT TARGET SDL2::mixer)
     # Not sure what I'm doing here
     set(SUPPORT_MP3_MPG123 ON)
-    set(SUPPORT_OGG ON)
+    #set(SUPPORT_OGG ON)
+    set(SUPPORT_OGG ON CACHE BOOL "")
 
     FetchContent_Populate(SDL2_mixer
         GIT_REPOSITORY https://github.com/Daft-Freak/SDL_mixer
