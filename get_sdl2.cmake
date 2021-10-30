@@ -80,4 +80,5 @@ if(NOT TARGET SDL2::mixer)
     )
     #add_definitions(-DMUSIC_MP3 -DMUSIC_OGG) # VS compile errors if no music formats?? //-DMUSIC_WAV
     add_subdirectory(${sdl2_mixer_SOURCE_DIR} SDL2_mixer EXCLUDE_FROM_ALL)
+    set_property(TARGET vorbisidec PROPERTY POSITION_INDEPENDENT_CODE ON) # build fix
 endif()
