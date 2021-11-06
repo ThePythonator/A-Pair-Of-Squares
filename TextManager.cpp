@@ -93,7 +93,7 @@ FontHandler::Font::Font(SDL_Renderer* renderer, SDL_Surface* font_sheet_surface,
 
 				if (a) {
 					// Pixel isn't transparent!
-					set_pixel(font_sheet_surface, x, y, replace_colour.r, replace_colour.g, replace_colour.b, replace_colour.a);
+					set_pixel(font_sheet_surface, x, y, replace_colour.r, replace_colour.g, replace_colour.b, a); //replace_colour.a
 				}
 			}
 		}

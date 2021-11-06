@@ -309,6 +309,8 @@ namespace STRINGS {
 			extern const std::string HEADING;
 
 			extern const std::string OPTION_BACK;
+
+			extern const std::string LEVEL_LOCKED;
 		}
 
 		namespace LEVEL_PAUSED {

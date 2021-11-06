@@ -323,6 +323,8 @@ namespace STRINGS {
 			const std::string HEADING = "LEVEL SELECT";
 
 			const std::string OPTION_BACK = "Back";
+
+			const std::string LEVEL_LOCKED = "Locked!";
 		}
 
 		namespace LEVEL_PAUSED {

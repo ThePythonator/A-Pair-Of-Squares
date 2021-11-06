@@ -133,8 +133,10 @@ void Game::load_data() {
 	SDL_Surface* title_font_pink_sheet_surface = load_surface(assets_path + FILES::TITLE_PINK_FONT_SHEET);
 
 	//font_black = FontHandler::Font(renderer, font_sheet_texture, font_sheet_surface, SPRITES::SIZE, SPRITE_SCALE, COLOURS::BLACK);
-	font_white = FontHandler::Font(renderer, font_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::WHITE);
-	font_selected = FontHandler::Font(renderer, font_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::SELECTED);
+
+	font_white = FontHandler::Font(renderer, font_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::WHITE, COLOURS::TRUE_WHITE);
+	//font_white = FontHandler::Font(renderer, font_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::WHITE);
+	font_selected = FontHandler::Font(renderer, font_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::SELECTED, COLOURS::TRUE_WHITE);
 
 	font_title_blue = FontHandler::Font(renderer, title_font_blue_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::TRUE_WHITE);
 	font_title_pink = FontHandler::Font(renderer, title_font_pink_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::TRUE_WHITE);
@@ -636,6 +638,8 @@ void Game::update_menu_level_select(float dt) {
 
 		// Check if up/down has been pressed, and naviagate the menu as necessary
 		if (KeyHandler::just_down(input_handler.get_key_union().keys.UP)) {
+			show_level_locked_message = false;
+
 			/*if (option_selected == (uint8_t)MENU::LEVEL_SELECT::BACK) {
 				option_selected--;
 			}
@@ -645,6 +649,8 @@ void Game::update_menu_level_select(float dt) {
 			}
 		}
 		if (KeyHandler::just_down(input_handler.get_key_union().keys.DOWN)) {
+			show_level_locked_message = false;
+
 			if (option_selected < (uint8_t)MENU::LEVEL_SELECT::OPTION_COUNT - 5) {
 				option_selected += 4;
 				// Should we play select sfx?
@@ -655,12 +661,16 @@ void Game::update_menu_level_select(float dt) {
 			}
 		}
 		if (KeyHandler::just_down(input_handler.get_key_union().keys.LEFT)) {
+			show_level_locked_message = false;
+
 			if (option_selected % 4 > 0) {
 				option_selected--;
 				// Should we play select sfx?
 			}
 		}
 		if (KeyHandler::just_down(input_handler.get_key_union().keys.RIGHT)) {
+			show_level_locked_message = false;
+
 			if (option_selected % 4 < 3 && option_selected != (uint8_t)MENU::LEVEL_SELECT::OPTION_COUNT - 1) {
 				option_selected++;
 				// Should we play select sfx?
@@ -670,6 +680,8 @@ void Game::update_menu_level_select(float dt) {
 		// Check if user has just selected an option
 		if (KeyHandler::just_down(input_handler.get_key_union().keys.SPACE)) {
 			if (option_selected == (uint8_t)MENU::LEVEL_SELECT::BACK || option_selected <= data.level_reached) {
+				show_level_locked_message = false;
+
 				// Reset timer and set it to running
 				timer_handler.set_timer_state(TIMER_ID::MENU_BEZIER_TEXT, TimerState::RUNNING);
 				timer_handler.reset_timer(TIMER_ID::MENU_BEZIER_TEXT);
@@ -678,6 +690,10 @@ void Game::update_menu_level_select(float dt) {
 
 				// Play 'select' sfx
 				audio_handler.play_sound(audio_handler.sound_samples.at(AUDIO::SFX::SELECT));
+			}
+			else {
+				// Level locked!
+				show_level_locked_message = true;
 			}
 		}
 	}
@@ -742,8 +758,20 @@ void Game::render_menu_level_select() {
 			(option_selected == i ? font_selected : font_white).set_alpha(old_alpha);
 		}
 	}
-	
-	TextHandler::render_text(option_selected == (uint8_t)MENU::LEVEL_SELECT::BACK ? font_selected : font_white, STRINGS::MENU::LEVEL_SELECT::OPTION_BACK, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE * 3, SPRITES::SPACE_WIDTH);
+
+	if (show_level_locked_message) {
+		uint8_t old_alpha = font_white.get_alpha();
+
+		font_white.set_alpha(SPRITES::TEXT_LOCKED_ALPHA);
+
+		//TextHandler::render_text(font_white, STRINGS::MENU::LEVEL_SELECT::LEVEL_LOCKED, WINDOW::TEXT_SCALED_WIDTH_HALF, SPRITES::SIZE, SPRITES::SPACE_WIDTH);
+		TextHandler::render_text(font_white, STRINGS::MENU::LEVEL_SELECT::LEVEL_LOCKED, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE * 3, SPRITES::SPACE_WIDTH);
+
+		font_white.set_alpha(old_alpha);
+	}
+	else {
+		TextHandler::render_text(option_selected == (uint8_t)MENU::LEVEL_SELECT::BACK ? font_selected : font_white, STRINGS::MENU::LEVEL_SELECT::OPTION_BACK, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE * 3, SPRITES::SPACE_WIDTH);
+	}
 
 	// Display fade-out black rect
 	if (fade_state == FadeState::FADE) {

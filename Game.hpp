@@ -184,6 +184,8 @@ private:
 
 	bool intro_music_started = false;
 
+	bool show_level_locked_message = false;
+
 	uint8_t option_selected = 0;
 	bool option_confirmed = false;
 
