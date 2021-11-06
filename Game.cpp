@@ -567,14 +567,14 @@ void Game::update_menu_settings(float dt) {
 			switch ((MENU::SETTINGS)option_selected)
 			{
 			case MENU::SETTINGS::MUSIC:
-				settings.audio_music = !settings.audio_music;
+				data.audio_music = !data.audio_music;
 				break;
 
 			case MENU::SETTINGS::SFX:
-				settings.audio_sfx = !settings.audio_sfx;
+				data.audio_sfx = !data.audio_sfx;
 
 				// Turn sfx volume on/off
-				audio_handler.set_sound_volume(settings.audio_sfx ? AUDIO::SOUND_VOLUME : 0.0f);
+				audio_handler.set_sound_volume(data.audio_sfx ? AUDIO::SOUND_VOLUME : 0.0f);
 				break;
 
 			case MENU::SETTINGS::BACK:
@@ -614,8 +614,8 @@ void Game::render_menu_settings() {
 	float right_x = positions.second;
 
 
-	TextHandler::render_text(option_selected == 0 ? font_selected : font_white, STRINGS::MENU::SETTINGS::OPTION_MUSIC + STRINGS::COLON_SPACE + (settings.audio_music ? STRINGS::ON : STRINGS::OFF), left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE * 2, SPRITES::SPACE_WIDTH);
-	TextHandler::render_text(option_selected == 1 ? font_selected : font_white, STRINGS::MENU::SETTINGS::OPTION_SFX + STRINGS::COLON_SPACE + (settings.audio_sfx ? STRINGS::ON : STRINGS::OFF), right_x, WINDOW::TEXT_SCALED_HEIGHT_HALF, SPRITES::SPACE_WIDTH);
+	TextHandler::render_text(option_selected == 0 ? font_selected : font_white, STRINGS::MENU::SETTINGS::OPTION_MUSIC + STRINGS::COLON_SPACE + (data.audio_music ? STRINGS::ON : STRINGS::OFF), left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE * 2, SPRITES::SPACE_WIDTH);
+	TextHandler::render_text(option_selected == 1 ? font_selected : font_white, STRINGS::MENU::SETTINGS::OPTION_SFX + STRINGS::COLON_SPACE + (data.audio_sfx ? STRINGS::ON : STRINGS::OFF), right_x, WINDOW::TEXT_SCALED_HEIGHT_HALF, SPRITES::SPACE_WIDTH);
 	TextHandler::render_text(option_selected == 2 ? font_selected : font_white, STRINGS::MENU::SETTINGS::OPTION_BACK, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE * 2, SPRITES::SPACE_WIDTH);
 }
 
@@ -669,14 +669,16 @@ void Game::update_menu_level_select(float dt) {
 
 		// Check if user has just selected an option
 		if (KeyHandler::just_down(input_handler.get_key_union().keys.SPACE)) {
-			// Reset timer and set it to running
-			timer_handler.set_timer_state(TIMER_ID::MENU_BEZIER_TEXT, TimerState::RUNNING);
-			timer_handler.reset_timer(TIMER_ID::MENU_BEZIER_TEXT);
+			if (option_selected == (uint8_t)MENU::LEVEL_SELECT::BACK || option_selected <= data.level_reached) {
+				// Reset timer and set it to running
+				timer_handler.set_timer_state(TIMER_ID::MENU_BEZIER_TEXT, TimerState::RUNNING);
+				timer_handler.reset_timer(TIMER_ID::MENU_BEZIER_TEXT);
 
-			option_confirmed = true;
+				option_confirmed = true;
 
-			// Play 'select' sfx
-			audio_handler.play_sound(audio_handler.sound_samples.at(AUDIO::SFX::SELECT));
+				// Play 'select' sfx
+				audio_handler.play_sound(audio_handler.sound_samples.at(AUDIO::SFX::SELECT));
+			}
 		}
 	}
 	else if (timer_handler.get_timer_state(TIMER_ID::MENU_TRANSITION_FADE) == TimerState::PAUSED) {
@@ -727,7 +729,18 @@ void Game::render_menu_level_select() {
 
 		x += (i / 4) % 2 ? left_x : right_x;
 
+
+		// Modify alpha if locked
+		uint8_t old_alpha = (option_selected == i ? font_selected : font_white).get_alpha();
+		if (i > data.level_reached) {
+			(option_selected == i ? font_selected : font_white).set_alpha(SPRITES::TEXT_LOCKED_ALPHA);
+		}
+
 		TextHandler::render_text(option_selected == i ? font_selected : font_white, std::to_string(i + 1), x, y, SPRITES::SPACE_WIDTH);
+
+		if (i > data.level_reached) {
+			(option_selected == i ? font_selected : font_white).set_alpha(old_alpha);
+		}
 	}
 	
 	TextHandler::render_text(option_selected == (uint8_t)MENU::LEVEL_SELECT::BACK ? font_selected : font_white, STRINGS::MENU::LEVEL_SELECT::OPTION_BACK, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE * 3, SPRITES::SPACE_WIDTH);
@@ -771,6 +784,11 @@ void Game::update_game_running(float dt) {
 	}
 	else if (level_is_completed()) {
 		// Level has ended
+
+		// Update max level number
+		if (current_level == data.level_reached && data.level_reached < GAME::LEVEL_COUNT) {
+			data.level_reached++;
+		}
 
 		if (timer_handler.get_timer_state(TIMER_ID::MENU_TRANSITION_FADE) == TimerState::PAUSED) {
 			if (timer_handler.get_timer_state(TIMER_ID::GAME_DURATION) == TimerState::PAUSED) {
@@ -1438,7 +1456,7 @@ void Game::handle_music() {
 	// TODO: possibly change settings stuff to fade out/in
 	// TODO:	...OR... change settings stuff to set volume, so it still plays in background (also, fade in/out if possible)
 
-	if (settings.audio_music) {
+	if (data.audio_music) {
 		// NOTE: toggling settings often gets weird cutin/outs at start
 		if (!audio_handler.is_music_playing()) {
 			// Assumes at least 2 pieces of music in music_samples

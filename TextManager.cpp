@@ -132,6 +132,14 @@ SDL_Rect FontHandler::Font::get_character_rect(uint8_t c) {
 	}
 }
 
+void FontHandler::Font::set_alpha(uint8_t alpha) {
+	font_sheet.set_alpha(alpha);
+}
+
+uint8_t FontHandler::Font::get_alpha() {
+	return font_sheet.get_alpha();
+}
+
 
 
 void TextHandler::render_text(FontHandler::Font& font, std::string text, float x, float y, int8_t space_width, AnchorPosition anchor) {

@@ -191,10 +191,12 @@ private:
 
 	uint8_t menu_shape_particle_count = 0;
 
+	// Todo: load/save from file
 	struct {
 		bool audio_music = true;
 		bool audio_sfx = true;
-	} settings;
+		uint8_t level_reached = 0;
+	} data;
 };
 
 // Transition functions

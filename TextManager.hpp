@@ -18,6 +18,10 @@ namespace FontHandler {
 		void render_char(uint8_t c, float x, float y);
 		SDL_Rect get_character_rect(uint8_t c);
 
+		void set_alpha(uint8_t alpha);
+		uint8_t get_alpha();
+
+
 	private:
 		Spritesheet font_sheet;
 

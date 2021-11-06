@@ -13,6 +13,8 @@ namespace SPRITES {
 	const uint8_t SPACE_WIDTH = 1;
 
 	const uint8_t TEXT_OFFSET_X = SIZE * 4;// 5 or 6 work too, but text looks too wide when beziering
+
+	const uint8_t TEXT_LOCKED_ALPHA = 96;
 }
 
 namespace TILE_ID {
