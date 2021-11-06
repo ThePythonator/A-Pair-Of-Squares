@@ -350,12 +350,15 @@ namespace FILES {
 	const std::string TITLE_BLUE_FONT_SHEET = "title_blue.png";
 	const std::string TITLE_PINK_FONT_SHEET = "title_pink.png";
 
+	const std::string WINDOW_ICON = "icon.png";
+
 	// const std::string FONT_SHEET = "font.png";
 
 	namespace AUDIO {
-		const std::string INTRO = "Intro.mp3";
+		// Used to use .mp3, but couldn't distribute necessary dlls for that.
+		const std::string INTRO = "Intro.ogg";
 
-		const std::vector<std::string> GAME_TRACKS = { "Solitude.mp3", "Lost-In-The-Void.mp3" };
+		const std::vector<std::string> GAME_TRACKS = { "Solitude.ogg", "Lost-In-The-Void.ogg" };
 
 		const std::vector<std::string> SFX_SAMPLES = { "Jump.ogg", "Boing.ogg", "Pickup.ogg", "Death.ogg", "Select.ogg", "Steam.ogg", "Click.ogg"};
 	}
@@ -396,7 +399,7 @@ namespace AUDIO {
 	const int DEFAULT_CHUNKSIZE = 2048;
 
 	const float SOUND_VOLUME = 0.4f;
-	const float MUSIC_VOLUME = 0.9f;
+	const float MUSIC_VOLUME = 0.8f;
 
 	const float MUSIC_FADE_TIME = 0.5f;
 }

@@ -336,6 +336,8 @@ namespace FILES {
 	extern const std::string TITLE_BLUE_FONT_SHEET;
 	extern const std::string TITLE_PINK_FONT_SHEET;
 
+	extern const std::string WINDOW_ICON;
+
 	// extern const std::string FONT_SHEET = "font.png";
 
 	namespace AUDIO {

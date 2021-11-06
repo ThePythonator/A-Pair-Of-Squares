@@ -6,5 +6,8 @@ out/
 SDL/
 SDL2/
 
-# Don't upload .wav files (only .mp3)
+# Don't upload .wav files (only .ogg)
 *.wav
+# Don't upload .mp3 files - can't build necessary dlls easily
+# Use .ogg instead for music
+*.mp3

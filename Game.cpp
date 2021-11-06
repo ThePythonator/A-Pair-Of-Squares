@@ -180,10 +180,17 @@ void Game::load_data() {
 
 	// Load level handler
 	level_handler = LevelHandler(SPRITES::SIZE);
+
+
+	// Set Window icon
+	window_icon_surface = load_surface(assets_path + FILES::WINDOW_ICON);
+	SDL_SetWindowIcon(window, window_icon_surface);
 }
 
 void Game::clear_data() {
 	// Free loaded data such as images
+	SDL_FreeSurface(window_icon_surface);
+
 	SDL_DestroyTexture(spritesheet_texture);
 	spritesheet_texture = NULL;
 

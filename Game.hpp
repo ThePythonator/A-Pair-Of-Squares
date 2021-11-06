@@ -142,6 +142,9 @@ private:
 	SDL_Texture* spritesheet_texture = NULL;
 	Spritesheet spritesheet;
 
+	// Icon
+	SDL_Surface* window_icon_surface = NULL;
+
 	// Fonts
 	SDL_Texture* font_sheet_texture = NULL;
 	FontHandler::Font font_white, font_selected, font_title_blue, font_title_pink;
