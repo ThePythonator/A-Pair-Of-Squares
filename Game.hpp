@@ -197,7 +197,7 @@ private:
 	struct {
 		bool audio_music = true;
 		bool audio_sfx = true;
-		uint8_t level_reached = 0;
+		uint8_t level_reached = 10;//0;
 	} data;
 };
 

@@ -20,7 +20,7 @@ set(PROJECT_NAME APairOfSquares)
 project(${PROJECT_NAME})
 
 # Add your sources here (adding headers is optional, but helps some CMake generators)
-set(PROJECT_SOURCES "APairOfSquares.cpp" "Square.cpp" "Entity.cpp" "Spritesheet.cpp" "InputManager.cpp" "Assets.cpp" "LevelManager.cpp" "Player.cpp" "ParticleManager.cpp" "TimerManager.cpp" "Bezier.cpp" "TextManager.cpp" "Game.cpp" "Utilities.cpp" "AudioManager.cpp" "Orb.cpp" "Spike.cpp" "Colour.cpp" "Constants.cpp" "Spring.cpp" "TransitionManager.cpp" "Button.cpp" "Door.cpp")
+set(PROJECT_SOURCES "APairOfSquares.cpp" "Square.cpp" "Entity.cpp" "Spritesheet.cpp" "InputManager.cpp" "Assets.cpp" "LevelManager.cpp" "Player.cpp" "ParticleManager.cpp" "TimerManager.cpp" "Bezier.cpp" "TextManager.cpp" "Game.cpp" "Utilities.cpp" "AudioManager.cpp" "Orb.cpp" "Spike.cpp" "Colour.cpp" "Constants.cpp" "Spring.cpp" "TransitionManager.cpp" "Button.cpp" "Door.cpp" "JSONManager.cpp")
 
 # Or let GLOB find all the .cpp files in the current directory... (CMake won't detect when files are added)
 #file(GLOB PROJECT_SOURCES RELATIVE ${CMAKE_SOURCE_DIR} "*.cpp")
@@ -56,11 +56,12 @@ add_custom_command(
 )
 
 include(get_sdl2.cmake)
+include(get_json.cmake)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
 # Link
-target_link_libraries(${PROJECT_NAME} SDL2::SDL2main SDL2::SDL2 SDL2::image SDL2::mixer)
+target_link_libraries(${PROJECT_NAME} SDL2::SDL2main SDL2::SDL2 SDL2::image SDL2::mixer nlohmann_json::nlohmann_json)
 
 
 # Setup release packages
