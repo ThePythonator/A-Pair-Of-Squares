@@ -49,7 +49,7 @@ jobs:
           - os: windows-latest
             name: Visual Studio
             release-suffix: WIN64
-            cmake-args: _DNO_CONSOLE=TRUE#-DSDL2_DIR=$GITHUB_WORKSPACE/main/SDL2 -DSDL2_image_DIR=$GITHUB_WORKSPACE/main/SDL2
+            cmake-args: _DNO_CONSOLE=TRUE #-DSDL2_DIR=$GITHUB_WORKSPACE/main/SDL2 -DSDL2_image_DIR=$GITHUB_WORKSPACE/main/SDL2
             can-fail: true
 
 
