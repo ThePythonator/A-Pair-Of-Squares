@@ -7,7 +7,8 @@
 
 namespace JSONHandler {
 	using namespace nlohmann;
+	using namespace nlohmann::detail;
 
-	json read(std::string path, std::string filename);
-	void write(std::string path, std::string filename, json data);
+	json read(std::string filepath);
+	void write(std::string filepath, json data);
 }

@@ -22,6 +22,8 @@
 #include "TransitionManager.hpp"
 #include "AudioManager.hpp"
 
+#include "JSONManager.hpp"
+
 #include "Assets.hpp"
 
 
@@ -99,6 +101,9 @@ private:
 	bool level_is_completed();
 
 	void handle_music();
+
+	void load_save_data(std::string assets_path);
+	void write_save_data(std::string assets_path);
 
 
 
@@ -197,8 +202,10 @@ private:
 	struct {
 		bool audio_music = true;
 		bool audio_sfx = true;
-		uint8_t level_reached = 10;//0;
+		uint8_t level_reached = 0;
 	} data;
+
+	std::string assets_path;
 };
 
 // Transition functions

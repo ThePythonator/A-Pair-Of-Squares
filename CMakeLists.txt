@@ -13,7 +13,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # set(CMAKE_FIND_DEBUG_MODE TRUE)
 
 # Comment out if you want the console window (on Windows)
-set(NO_CONSOLE TRUE)
+#set(NO_CONSOLE TRUE)
 
 set(PROJECT_NAME APairOfSquares)
 

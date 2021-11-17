@@ -356,6 +356,8 @@ namespace FILES {
 
 	const std::string WINDOW_ICON = "icon.png";
 
+	const std::string SAVE_DATA = "save_data.json";
+
 	// const std::string FONT_SHEET = "font.png";
 
 	namespace AUDIO {

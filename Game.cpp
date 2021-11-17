@@ -99,6 +99,9 @@ bool Game::init() {
 }
 
 void Game::quit() {
+	// Save game
+	write_save_data(assets_path);
+
 	// Destroy assets
 	clear_data();
 
@@ -120,7 +123,7 @@ void Game::quit() {
 
 void Game::load_data() {
 	// Uses spritesheet_texture as a test to check whether we can find the assets folder.
-	std::string assets_path = find_assets_path(FILES::SPRITESHEET);
+	assets_path = find_assets_path(FILES::SPRITESHEET);
 
 	// Load data such as images
 	spritesheet_texture = load_texture(assets_path + FILES::SPRITESHEET);
@@ -187,6 +190,10 @@ void Game::load_data() {
 	// Set Window icon
 	window_icon_surface = load_surface(assets_path + FILES::WINDOW_ICON);
 	SDL_SetWindowIcon(window, window_icon_surface);
+
+	// Load save data
+	load_save_data(assets_path);
+	
 }
 
 void Game::clear_data() {
@@ -1496,6 +1503,27 @@ void Game::handle_music() {
 		audio_handler.fade_music_out(AUDIO::MUSIC_FADE_TIME);
 	}
 }
+
+
+
+void Game::load_save_data(std::string assets_path) {
+	JSONHandler::json json_data = JSONHandler::read(assets_path + FILES::SAVE_DATA);
+	try {
+		data.level_reached = json_data.at("level_reached").get<uint8_t>();
+	}
+	catch (const JSONHandler::type_error& error) {
+		printf("Invalid data, using defaults...\n");
+		data.level_reached = 0;
+	}
+}
+
+void Game::write_save_data(std::string assets_path) {
+	JSONHandler::json json_data;
+	json_data["level_reached"] = data.level_reached;
+	JSONHandler::write(assets_path + FILES::SAVE_DATA, json_data);
+}
+
+
 
 
 SDL_Texture* Game::load_texture(std::string path, bool display_errors) {

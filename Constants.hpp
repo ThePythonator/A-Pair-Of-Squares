@@ -342,6 +342,8 @@ namespace FILES {
 
 	extern const std::string WINDOW_ICON;
 
+	extern const std::string SAVE_DATA;
+
 	// extern const std::string FONT_SHEET = "font.png";
 
 	namespace AUDIO {
