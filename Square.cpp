@@ -243,28 +243,30 @@ void Square::render(Spritesheet& spritesheet) {
 		}
 	}
 
-	if (dead && fade_age < GAME::SQUARE::FADE::MAX_AGE) {
-		// Calculate age ratio
-		float age_ratio = (fade_age / GAME::SQUARE::FADE::MAX_AGE);
+	if (dead) {
+		if (fade_age < GAME::SQUARE::FADE::MAX_AGE) {
+			// Calculate age ratio
+			float age_ratio = (fade_age / GAME::SQUARE::FADE::MAX_AGE);
 
-		// Get alpha from age
-		uint8_t alpha = (1.0f - age_ratio) * 0xFF;
+			// Get alpha from age
+			uint8_t alpha = (1.0f - age_ratio) * 0xFF;
 
-		// Get scale from age
-		float scale = age_ratio * GAME::SQUARE::FADE::MAX_SCALE_BOOST + spritesheet.get_scale();
+			// Get scale from age
+			float scale = age_ratio * GAME::SQUARE::FADE::MAX_SCALE_BOOST + spritesheet.get_scale();
 
-		// Calculate scale ratio
-		float scale_ratio = spritesheet.get_scale() / scale;
+			// Calculate scale ratio
+			float scale_ratio = spritesheet.get_scale() / scale;
 
-		// Get offset to keep sprites centered
-		float offset = SPRITES::SIZE * (scale - spritesheet.get_scale()) / 4.0f;
-		//float offset = spritesheet.get_sprite_size() * (scale - spritesheet.get_scale()) / 4.0f;
-		//float offset = (spritesheet.get_sprite_size() / 2.0f) * (scale - spritesheet.get_scale()) / 2.0f; // Same as line above but less optimized.
+			// Get offset to keep sprites centered
+			float offset = SPRITES::SIZE * (scale - spritesheet.get_scale()) / 4.0f;
+			//float offset = spritesheet.get_sprite_size() * (scale - spritesheet.get_scale()) / 4.0f;
+			//float offset = (spritesheet.get_sprite_size() / 2.0f) * (scale - spritesheet.get_scale()) / 2.0f; // Same as line above but less optimized.
 
-		uint8_t old_alpha = spritesheet.get_alpha();
-		spritesheet.set_alpha(alpha);
-		spritesheet.sprite(sprite_index, (x - offset) * scale_ratio, (y - offset) * scale_ratio, scale, 0.0f, NULL, x_vel < 0 ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
-		spritesheet.set_alpha(old_alpha);
+			uint8_t old_alpha = spritesheet.get_alpha();
+			spritesheet.set_alpha(alpha);
+			spritesheet.sprite(sprite_index, (x - offset) * scale_ratio, (y - offset) * scale_ratio, scale, 0.0f, NULL, x_vel < 0 ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);
+			spritesheet.set_alpha(old_alpha);
+		}
 	}
 	else {
 		spritesheet.sprite_scaled(index_base, x, y, 0.0, NULL, x_vel < 0 ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL);

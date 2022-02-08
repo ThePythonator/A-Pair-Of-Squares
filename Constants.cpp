@@ -383,6 +383,9 @@ namespace DELAY {
 	const float GAME_FINISH_PARTICLE_GENERATION = 0.9f;
 
 	const float PAUSE_FADE_LENGTH = 0.5f;
+
+	const float RESETTING_FADE_OUT_LENGTH = 0.5f;
+	const float RESETTING_FADE_IN_LENGTH = 0.4f;
 }
 
 // Timer IDs (are set later in program)

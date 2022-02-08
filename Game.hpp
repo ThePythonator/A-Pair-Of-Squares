@@ -166,7 +166,7 @@ private:
 	TimerHandler timer_handler;
 
 	// Transition handlers
-	TransitionHandler pause_transition;//menu_transition, 
+	TransitionHandler pause_transition, resetting_transition;//menu_transition, 
 
 	// Player
 	Player player;
@@ -187,6 +187,8 @@ private:
 
 	bool paused = false;
 
+	bool resetting = false;
+
 	bool intro_music_started = false;
 
 	bool show_level_locked_message = false;
@@ -203,6 +205,11 @@ private:
 		bool audio_music = true;
 		bool audio_sfx = true;
 		uint8_t level_reached = 0;
+		
+		/*float highscore_times[GAME::LEVEL_COUNT];
+		uint8_t highscore_orbs[GAME::LEVEL_COUNT];*/
+		std::vector<float> highscore_times;
+		std::vector<uint8_t> highscore_orbs;
 	} data;
 
 	std::string assets_path;
@@ -212,3 +219,6 @@ private:
 // Not sure why can't be inside Game scope
 void pause_transition_update(TransitionState* transition_state, float* timer, float dt);
 void pause_transition_render(TransitionState* transition_state, float* timer, SDL_Renderer* renderer, Spritesheet& spritesheet);
+
+void resetting_transition_update(TransitionState* transition_state, float* timer, float dt);
+void resetting_transition_render(TransitionState* transition_state, float* timer, SDL_Renderer* renderer, Spritesheet& spritesheet);

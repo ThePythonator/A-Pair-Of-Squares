@@ -107,8 +107,8 @@ FontHandler::Font::Font(SDL_Renderer* renderer, SDL_Surface* font_sheet_surface,
 }
 
 void FontHandler::Font::render_char(uint8_t c, float x, float y) {
-	// Check character is one we have an image/rect for (don't include c == 32, since that's a space)
-	if (c >= 33 && c <= 255) {
+	// Check character is one we have an image/rect for (don't include c == 32 or 127, since that's a space and delete respectively)
+	if (c >= 33 && c <= 126) {
 		// Set colour (need to do this every frame since other fonts may also be using the same texture)
 		if (colour.a) {
 			// Colour isn't transparent

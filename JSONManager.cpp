@@ -19,6 +19,7 @@ namespace JSONHandler {
 	void write(std::string filepath, json data) {
 		// Write to the file
 		std::ofstream file(filepath);
-		file << std::setw(4) << data << std::endl;
+		file << data << std::endl;
+		//file << std::setw(4) << data << std::endl;
 	}
 }

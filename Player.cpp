@@ -12,7 +12,9 @@ Player::Player(uint16_t blue_x, uint16_t blue_y, uint16_t pink_x, uint16_t pink_
 	pink = Square(4, pink_x, pink_y);
 }
 
-void Player::update(InputHandler& input_handler, AudioHandler& audio_handler, LevelHandler& level_handler, float dt) {
+bool Player::update(InputHandler& input_handler, AudioHandler& audio_handler, LevelHandler& level_handler, float dt) {
+	bool reset = false;
+
 	std::vector<Tile> tiles = level_handler.get_tiles();
 
 	// Handle inputs
@@ -238,11 +240,16 @@ void Player::update(InputHandler& input_handler, AudioHandler& audio_handler, Le
 	// Check if square death animations have completed
 	if (blue.get_fade_finished() && pink.get_fade_finished()) {
 		// Reset position
-		reset_players(level_handler);
+		//reset_players(level_handler);
+		
+		// Reset all!
+		reset = true;
 
 		// Add to death count
 		death_count++;
 	}
+
+	return reset;
 }
 
 void Player::render(Spritesheet& spritesheet) {
@@ -255,8 +262,8 @@ void Player::render(Spritesheet& spritesheet) {
 //	pink = Square(4, pink_x, pink_y);
 //}
 
-void Player::reset_stats() {
-	death_count = 0;
+void Player::reset_orb_count() {
+	//death_count = 0;
 	orb_count = 0;
 }
 

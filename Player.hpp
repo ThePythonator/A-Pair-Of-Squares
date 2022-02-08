@@ -15,11 +15,11 @@ public:
 	Player();
 	Player(uint16_t blue_x, uint16_t blue_y, uint16_t pink_x, uint16_t pink_y);
 
-	void update(InputHandler& input_handler, AudioHandler& audio_handler, LevelHandler& level_handler, float dt);
+	bool update(InputHandler& input_handler, AudioHandler& audio_handler, LevelHandler& level_handler, float dt);
 
 	void render(Spritesheet& spritesheet);
 
-	void reset_stats();
+	void reset_orb_count();
 
 	void reset_players(LevelHandler& level_handler);
 

@@ -178,10 +178,12 @@ void Game::load_data() {
 	// Load transitions
 	//menu_transition = TransitionHandler(renderer);
 	pause_transition = TransitionHandler(renderer);
+	resetting_transition = TransitionHandler(renderer);
 
 	// Setup transitions
 	//menu_transition.set_transition();
 	pause_transition.set_transition(pause_transition_update, pause_transition_render);
+	resetting_transition.set_transition(resetting_transition_update, resetting_transition_render);
 
 	// Load level handler
 	level_handler = LevelHandler(SPRITES::SIZE);
@@ -358,6 +360,7 @@ void Game::update(float dt) {
 	}
 
 	pause_transition.update(dt);
+	resetting_transition.update(dt);
 }
 
 void Game::render() {
@@ -394,6 +397,7 @@ void Game::render() {
 	particle_handlers.front.render(spritesheet);
 
 	pause_transition.render(spritesheet);
+	resetting_transition.render(spritesheet);
 }
 
 // Update and render functions for each state
@@ -787,6 +791,10 @@ void Game::render_menu_level_select() {
 }
 
 void Game::update_game_running(float dt) {
+	if (resetting && resetting_transition.is_open()) {
+		resetting = false;
+	}
+
 	// Update music (auto-play random piece)
 	handle_music();
 
@@ -804,10 +812,14 @@ void Game::update_game_running(float dt) {
 	particle_handlers.spare.remove_if([](ImageParticle& particle) { return particle.get_alpha() == 0.0f; });
 
 	// Only move the player and entities when there aren't transitions in the way
-	if (!paused && fade_state == FadeState::NONE) {
-		player.update(input_handler, audio_handler, level_handler, dt);
+	if (!paused && !resetting && resetting_transition.is_open() && fade_state == FadeState::NONE) {
+		resetting = player.update(input_handler, audio_handler, level_handler, dt);
 
 		level_handler.update(audio_handler, dt);
+
+		if (resetting) {
+			resetting_transition.close();
+		}
 	}
 
 	if (timer_handler.get_timer(TIMER_ID::GAME_DURATION) == 0.0f && timer_handler.get_timer_state(TIMER_ID::GAME_DURATION) == TimerState::PAUSED) {
@@ -862,8 +874,12 @@ void Game::update_game_running(float dt) {
 		}
 	}
 
-	if (pause_transition.is_closed() && paused) {
+	if (paused && pause_transition.is_closed()) {
 		setup_game_paused();
+	}
+	else if (resetting && resetting_transition.is_closed()) {
+		restart_game();
+		resetting_transition.open();
 	}
 	else if (fade_state == FadeState::NONE && !paused) {
 		// Unpause game timer
@@ -1143,6 +1159,8 @@ void Game::render_game_end() {
 	float right_x = positions.second;
 
 
+	// TODO: No longer use death count in score. Possible remove score altogether and just display time, orbs, and highscores for those.
+
 	// Calculate score (has to be signed so that it can be stopped from going below 0)
 	int16_t score = GAME::SCORE::INITIAL;
 	score += GAME::SCORE::ORB * player.get_orb_count();
@@ -1270,6 +1288,14 @@ void Game::setup_game_paused() {
 }
 
 void Game::setup_game_end() {
+	// Update highscores!
+	if (data.highscore_times.at(current_level) < timer_handler.get_timer(TIMER_ID::GAME_DURATION)) {
+		data.highscore_times.at(current_level) = timer_handler.get_timer(TIMER_ID::GAME_DURATION);
+	}
+	if (data.highscore_orbs.at(current_level) > player.get_orb_count()) {
+		data.highscore_orbs.at(current_level) = player.get_orb_count();
+	}
+
 	game_state = GameState::GAME_END;
 
 	option_selected = 0;
@@ -1307,7 +1333,9 @@ void Game::resume_game_running() {
 void Game::restart_game() {
 	level_handler.load_level(asset_levels[current_level]);
 
-	player = Player(level_handler.level_spawn_blue_x, level_handler.level_spawn_blue_y, level_handler.level_spawn_pink_x, level_handler.level_spawn_pink_y);
+	player.reset_players(level_handler);
+	player.reset_orb_count();
+	//player = Player(level_handler.level_spawn_blue_x, level_handler.level_spawn_blue_y, level_handler.level_spawn_pink_x, level_handler.level_spawn_pink_y);
 
 	timer_handler.set_timer_state(TIMER_ID::GAME_DURATION, TimerState::PAUSED);
 	timer_handler.reset_timer(TIMER_ID::GAME_DURATION);
@@ -1510,16 +1538,27 @@ void Game::load_save_data(std::string assets_path) {
 	JSONHandler::json json_data = JSONHandler::read(assets_path + FILES::SAVE_DATA);
 	try {
 		data.level_reached = json_data.at("level_reached").get<uint8_t>();
+		data.highscore_times = json_data.at("highscore_times").get<std::vector<float>>();
+		data.highscore_orbs = json_data.at("highscore_orbs").get<std::vector<uint8_t>>();
 	}
-	catch (const JSONHandler::type_error& error) {
+	//catch (const JSONHandler::type_error& error) {
+	catch (const std::exception& e) {
+		printf("Error: %s\n", e.what());
 		printf("Invalid data, using defaults...\n");
+
 		data.level_reached = 0;
+
+		// Not sure if this is necessary
+		data.highscore_times.assign(GAME::LEVEL_COUNT, 0.0f);
+		data.highscore_orbs.assign(GAME::LEVEL_COUNT, 0);
 	}
 }
 
 void Game::write_save_data(std::string assets_path) {
 	JSONHandler::json json_data;
 	json_data["level_reached"] = data.level_reached;
+	json_data["highscore_times"] = data.highscore_times;
+	json_data["highscore_orbs"] = data.highscore_orbs;
 	JSONHandler::write(assets_path + FILES::SAVE_DATA, json_data);
 }
 
@@ -1605,5 +1644,48 @@ void pause_transition_render(TransitionState* transition_state, float* timer, SD
 
 		/*SDL_SetRenderDrawColor(renderer, Colour(COLOURS::BLACK, 0xFF));
 		SDL_RenderFillRect(renderer, &screen_rect);*/
+	}
+}
+
+
+void resetting_transition_update(TransitionState* transition_state, float* timer, float dt) {
+	*timer += dt;
+
+	if (*transition_state == TransitionState::OPENING) {
+		if (*timer > DELAY::RESETTING_FADE_IN_LENGTH) {
+			*transition_state = TransitionState::OPEN;
+		}
+	}
+	else if (*transition_state == TransitionState::CLOSING) {
+		if (*timer > DELAY::RESETTING_FADE_OUT_LENGTH) {
+			*transition_state = TransitionState::CLOSED;
+		}
+	}
+}
+
+void resetting_transition_render(TransitionState* transition_state, float* timer, SDL_Renderer* renderer, Spritesheet& spritesheet) {
+	SDL_Rect screen_rect{ 0, 0, WINDOW::WIDTH, WINDOW::HEIGHT };
+
+	if (*transition_state == TransitionState::OPENING) {
+		// Calculate alpha
+		uint8_t alpha = 0xFF * (1.0f - *timer / DELAY::RESETTING_FADE_IN_LENGTH);
+
+		// Fill with semi-transparent black
+		SDL_SetRenderDrawColor(renderer, Colour(COLOURS::BLACK, alpha));
+		SDL_RenderFillRect(renderer, &screen_rect);
+	}
+	else if (*transition_state == TransitionState::CLOSING) {
+		// Calculate alpha
+		uint8_t alpha = 0xFF * (*timer / DELAY::RESETTING_FADE_OUT_LENGTH);
+
+		// Fill with semi-transparent black
+		SDL_SetRenderDrawColor(renderer, Colour(COLOURS::BLACK, alpha));
+		SDL_RenderFillRect(renderer, &screen_rect);
+	}
+	else if (*transition_state == TransitionState::CLOSED) {
+		// Ffill with black when closed
+
+		SDL_SetRenderDrawColor(renderer, Colour(COLOURS::BLACK, 0xFF));
+		SDL_RenderFillRect(renderer, &screen_rect);
 	}
 }
