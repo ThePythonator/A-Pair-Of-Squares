@@ -246,8 +246,7 @@ std::string Game::find_assets_path(std::string test_file, uint8_t depth) {
 	return base_path + "assets/";
 }
 
-void Game::run()
-{
+void Game::run() {
 	// Initialise SDL and globals - if it fails, don't run program
 	running = init();
 
@@ -1289,10 +1288,10 @@ void Game::setup_game_paused() {
 
 void Game::setup_game_end() {
 	// Update highscores!
-	if (data.highscore_times.at(current_level) < timer_handler.get_timer(TIMER_ID::GAME_DURATION)) {
+	if (data.highscore_times.at(current_level) > timer_handler.get_timer(TIMER_ID::GAME_DURATION)) {
 		data.highscore_times.at(current_level) = timer_handler.get_timer(TIMER_ID::GAME_DURATION);
 	}
-	if (data.highscore_orbs.at(current_level) > player.get_orb_count()) {
+	if (data.highscore_orbs.at(current_level) < player.get_orb_count()) {
 		data.highscore_orbs.at(current_level) = player.get_orb_count();
 	}
 
@@ -1540,6 +1539,9 @@ void Game::load_save_data(std::string assets_path) {
 		data.level_reached = json_data.at("level_reached").get<uint8_t>();
 		data.highscore_times = json_data.at("highscore_times").get<std::vector<float>>();
 		data.highscore_orbs = json_data.at("highscore_orbs").get<std::vector<uint8_t>>();
+
+		for (float t : data.highscore_times) printf("t: %f\n", t);
+		for (uint8_t s : data.highscore_orbs) printf("s: %u\n", s);
 	}
 	//catch (const JSONHandler::type_error& error) {
 	catch (const std::exception& e) {

@@ -11,3 +11,7 @@ SDL2/
 # Don't upload .mp3 files - can't build necessary dlls easily
 # Use .ogg instead for music
 *.mp3
+
+# Ignore save data, cmake settings and other stuff
+*.json
+todo.txt

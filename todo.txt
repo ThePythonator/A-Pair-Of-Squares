@@ -1,9 +1,0 @@
-"i thought i must collect all dots to pass the level"
-
-Reset everything when player dies.
-Add highscores
-Add saving of levels.
-
-"figured out space was enter so think i'm all good"
-Need tutorial in level/ help page
-Update readme too

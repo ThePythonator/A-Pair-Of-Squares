@@ -6,8 +6,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Uncomment these to put the dlls in the same directory as the executable (useful if you don't have SDL2 installed and you're building from source)
-# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 # Uncomment if you need to do some debugging :)
 # set(CMAKE_FIND_DEBUG_MODE TRUE)
@@ -101,7 +101,7 @@ if (NOT EMSCRIPTEN)
     endif()
 
     if(TARGET SDL2_mixer)
-        list(APPEND DEP_SEARCH_DIRS $<TARGET_FILE_DIR:SDL2_mixer>) # missing ogg and mp3 support
+        list(APPEND DEP_SEARCH_DIRS $<TARGET_FILE_DIR:SDL2_mixer>) # missing ogg and mp3 support?
     endif()
 
     set(EXE_SUFFIX)
