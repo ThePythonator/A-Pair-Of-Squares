@@ -203,7 +203,7 @@ namespace GAME {
 		const uint8_t BORDER = 1;
 		const uint8_t WIDTH = SPRITES::SIZE - BORDER * 2;
 
-		const float RELEASE_DELAY = 0.4f;
+		const float RELEASE_DELAY = 0.45f;
 	}
 
 	namespace SQUARE {
@@ -384,7 +384,7 @@ namespace DELAY {
 
 	const float PAUSE_FADE_LENGTH = 0.5f;
 
-	const float RESETTING_FADE_OUT_LENGTH = 0.5f;
+	const float RESETTING_FADE_OUT_LENGTH = 0.4f;
 	const float RESETTING_FADE_IN_LENGTH = 0.4f;
 }
 
