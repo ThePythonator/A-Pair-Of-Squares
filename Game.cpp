@@ -1539,9 +1539,6 @@ void Game::load_save_data(std::string assets_path) {
 		data.level_reached = json_data.at("level_reached").get<uint8_t>();
 		data.highscore_times = json_data.at("highscore_times").get<std::vector<float>>();
 		data.highscore_orbs = json_data.at("highscore_orbs").get<std::vector<uint8_t>>();
-
-		for (float t : data.highscore_times) printf("t: %f\n", t);
-		for (uint8_t s : data.highscore_orbs) printf("s: %u\n", s);
 	}
 	//catch (const JSONHandler::type_error& error) {
 	catch (const std::exception& e) {
