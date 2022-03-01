@@ -154,7 +154,7 @@ private:
 
 	// Fonts
 	SDL_Texture* font_sheet_texture = NULL;
-	FontHandler::Font font_white, font_selected, font_highlighted, font_hint, font_title_blue, font_title_pink;
+	FontHandler::Font font_white, font_selected, font_highlighted, font_hint;// , font_title_blue, font_title_pink;
 
 	// Input handler
 	InputHandler input_handler;

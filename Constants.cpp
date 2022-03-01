@@ -12,11 +12,13 @@ namespace SPRITES {
 	const uint8_t SIZE_HALF = SIZE / 2;
 
 	const uint8_t SPACE_WIDTH = 1;
+	const uint8_t TITLE_SPACE_WIDTH = 2;
 
 	const uint8_t TEXT_OFFSET_X = SIZE * 4;// 5 or 6 work too, but text looks too wide when beziering
 
 	const uint8_t TEXT_LOCKED_ALPHA = 96;
 	const uint8_t TEXT_HINT_ALPHA = 128;
+	const uint8_t TEXT_TITLE_ALPHA = 128;
 }
 
 namespace TILE_ID {
@@ -317,6 +319,8 @@ namespace STRINGS {
 			const std::string HEADING_BLUE = "A PAIR OF";
 			const std::string HEADING_PINK = "SQUARES";
 
+			const std::string HEADING = "A PAIR OF SQUARES"; // "A Pair Of Squares";
+
 			const std::string OPTION_PLAY = "Play";
 			const std::string OPTION_SETTINGS = "Settings";
 			const std::string OPTION_QUIT = "Quit";
@@ -362,8 +366,8 @@ namespace FILES {
 	const std::string SPRITESHEET = "spritesheet.png";
 
 	const std::string FONT_SHEET = "font.png";//"another-font.png"//"another-another-font.png";
-	const std::string TITLE_BLUE_FONT_SHEET = "title_blue.png";
-	const std::string TITLE_PINK_FONT_SHEET = "title_pink.png";
+	//const std::string TITLE_BLUE_FONT_SHEET = "title.png";// "title_blue.png";
+	//const std::string TITLE_PINK_FONT_SHEET = "title_pink.png";
 
 	const std::string WINDOW_ICON = "icon.png";
 

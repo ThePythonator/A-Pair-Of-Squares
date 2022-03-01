@@ -20,11 +20,13 @@ namespace SPRITES {
 	extern const uint8_t SIZE_HALF;
 
 	extern const uint8_t SPACE_WIDTH;
+	extern const uint8_t TITLE_SPACE_WIDTH;
 
 	extern const uint8_t TEXT_OFFSET_X;// 5 or 6 work too, but text looks too wide when beziering
 
 	extern const uint8_t TEXT_LOCKED_ALPHA;
 	extern const uint8_t TEXT_HINT_ALPHA;
+	extern const uint8_t TEXT_TITLE_ALPHA;
 }
 
 namespace TILE_ID {
@@ -298,6 +300,8 @@ namespace STRINGS {
 			extern const std::string HEADING_BLUE;
 			extern const std::string HEADING_PINK;
 
+			extern const std::string HEADING;
+
 			extern const std::string OPTION_PLAY;
 			extern const std::string OPTION_SETTINGS;
 			extern const std::string OPTION_QUIT;
@@ -343,8 +347,8 @@ namespace FILES {
 	extern const std::string SPRITESHEET;
 
 	extern const std::string FONT_SHEET;
-	extern const std::string TITLE_BLUE_FONT_SHEET;
-	extern const std::string TITLE_PINK_FONT_SHEET;
+	//extern const std::string TITLE_BLUE_FONT_SHEET;
+	//extern const std::string TITLE_PINK_FONT_SHEET;
 
 	extern const std::string WINDOW_ICON;
 

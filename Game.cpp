@@ -136,8 +136,8 @@ void Game::load_data() {
 	spritesheet = Spritesheet(renderer, spritesheet_texture, SPRITES::SIZE, SPRITES::SCALE);
 
 	SDL_Surface* font_sheet_surface = load_surface(assets_path + FILES::FONT_SHEET);
-	SDL_Surface * title_font_blue_sheet_surface = load_surface(assets_path + FILES::TITLE_BLUE_FONT_SHEET);
-	SDL_Surface* title_font_pink_sheet_surface = load_surface(assets_path + FILES::TITLE_PINK_FONT_SHEET);
+	//SDL_Surface * title_font_blue_sheet_surface = load_surface(assets_path + FILES::TITLE_BLUE_FONT_SHEET);
+	//SDL_Surface* title_font_pink_sheet_surface = load_surface(assets_path + FILES::TITLE_PINK_FONT_SHEET);
 
 	//font_black = FontHandler::Font(renderer, font_sheet_texture, font_sheet_surface, SPRITES::SIZE, SPRITE_SCALE, COLOURS::BLACK);
 
@@ -148,12 +148,12 @@ void Game::load_data() {
 	font_hint = FontHandler::Font(renderer, font_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_HINT_SCALE, COLOURS::WHITE, COLOURS::TRUE_WHITE);
 	font_hint.set_alpha(SPRITES::TEXT_HINT_ALPHA);
 
-	font_title_blue = FontHandler::Font(renderer, title_font_blue_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::TRUE_WHITE);
-	font_title_pink = FontHandler::Font(renderer, title_font_pink_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::TRUE_WHITE);
+	//font_title_blue = FontHandler::Font(renderer, title_font_blue_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::TRUE_WHITE);
+	//font_title_pink = FontHandler::Font(renderer, title_font_pink_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::TRUE_WHITE);
 
 	SDL_FreeSurface(font_sheet_surface);
-	SDL_FreeSurface(title_font_blue_sheet_surface);
-	SDL_FreeSurface(title_font_pink_sheet_surface);
+	//SDL_FreeSurface(title_font_blue_sheet_surface);
+	//SDL_FreeSurface(title_font_pink_sheet_surface);
 
 	// Load audio:
 	// Music
@@ -537,6 +537,11 @@ void Game::render_menu_title() {
 
 	//TextHandler::render_text(font_title_blue, STRINGS::MENU::TITLE::HEADING_BLUE, right_x, SPRITES::SIZE, SPRITES::SPACE_WIDTH, TextHandler::CENTER_RIGHT);
 	//TextHandler::render_text(font_title_pink, STRINGS::MENU::TITLE::HEADING_PINK, right_x + SPRITES::SIZE_HALF, SPRITES::SIZE, SPRITES::SPACE_WIDTH, TextHandler::CENTER_LEFT);
+
+	uint8_t old_alpha = font_white.get_alpha();
+	font_white.set_alpha(SPRITES::TEXT_TITLE_ALPHA);
+	TextHandler::render_text(font_white, STRINGS::MENU::TITLE::HEADING, right_x, SPRITES::SIZE, SPRITES::TITLE_SPACE_WIDTH);
+	font_white.set_alpha(old_alpha);
 	
 	TextHandler::render_text(option_selected == 0 ? font_selected : font_white, STRINGS::MENU::TITLE::OPTION_PLAY, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE * 2, SPRITES::SPACE_WIDTH);
 	TextHandler::render_text(option_selected == 1 ? font_selected : font_white, STRINGS::MENU::TITLE::OPTION_SETTINGS, right_x, WINDOW::TEXT_SCALED_HEIGHT_HALF, SPRITES::SPACE_WIDTH);
