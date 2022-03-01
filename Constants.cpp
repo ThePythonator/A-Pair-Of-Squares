@@ -291,6 +291,8 @@ namespace COLOURS {
 	const Colour TRUE_WHITE = Colour(0xFF, 0xFF, 0xFF);
 
 	const Colour SELECTED = Colour(0x1C, 0x92, 0xA7);
+
+	const Colour HIGHLIGHTED = Colour(0xFF, 0xEB, 0x8C);
 }
 
 namespace STRINGS {
@@ -341,7 +343,7 @@ namespace STRINGS {
 			const std::string TEXT_TIME_TAKEN = "Time taken";
 			const std::string TEXT_ORBS_COLLECTED = "Orbs collected";
 			const std::string TEXT_NUMBER_OF_DEATHS = "Number of deaths";
-			const std::string TEXT_SCORE = "Score";
+			const std::string TEXT_HIGHSCORE = "Highscore";
 			const std::string OPTION_CONTINUE = "Continue";
 		}
 	}

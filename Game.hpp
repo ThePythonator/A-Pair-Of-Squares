@@ -152,7 +152,7 @@ private:
 
 	// Fonts
 	SDL_Texture* font_sheet_texture = NULL;
-	FontHandler::Font font_white, font_selected, font_title_blue, font_title_pink;
+	FontHandler::Font font_white, font_selected, font_highlighted, font_title_blue, font_title_pink;
 
 	// Input handler
 	InputHandler input_handler;
@@ -206,11 +206,14 @@ private:
 		bool audio_sfx = true;
 		uint8_t level_reached = 0;
 		
-		/*float highscore_times[GAME::LEVEL_COUNT];
-		uint8_t highscore_orbs[GAME::LEVEL_COUNT];*/
 		std::vector<float> highscore_times;
 		std::vector<uint8_t> highscore_orbs;
 	} data;
+
+	struct {
+		bool time = false;
+		bool orbs = false;
+	} new_highscore;
 
 	std::string assets_path;
 };

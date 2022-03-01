@@ -277,6 +277,8 @@ namespace COLOURS {
 	extern const Colour TRUE_WHITE;
 
 	extern const Colour SELECTED;
+
+	extern const Colour HIGHLIGHTED;
 }
 
 namespace STRINGS {
@@ -327,7 +329,7 @@ namespace STRINGS {
 			extern const std::string TEXT_TIME_TAKEN;
 			extern const std::string TEXT_ORBS_COLLECTED;
 			extern const std::string TEXT_NUMBER_OF_DEATHS;
-			extern const std::string TEXT_SCORE;
+			extern const std::string TEXT_HIGHSCORE;
 			extern const std::string OPTION_CONTINUE;
 		}
 	}

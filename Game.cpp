@@ -9,7 +9,11 @@ const uint8_t* asset_levels[] = {
 	asset_level_4,
 	asset_level_5,
 	asset_level_6,
-	asset_level_7
+	asset_level_7,
+	asset_level_8,
+	asset_level_9,
+	asset_level_10,
+	asset_level_11
 };
 
 namespace GAME {
@@ -140,6 +144,7 @@ void Game::load_data() {
 	font_white = FontHandler::Font(renderer, font_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::WHITE, COLOURS::TRUE_WHITE);
 	//font_white = FontHandler::Font(renderer, font_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::WHITE);
 	font_selected = FontHandler::Font(renderer, font_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::SELECTED, COLOURS::TRUE_WHITE);
+	font_highlighted = FontHandler::Font(renderer, font_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::HIGHLIGHTED, COLOURS::TRUE_WHITE);
 
 	font_title_blue = FontHandler::Font(renderer, title_font_blue_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::TRUE_WHITE);
 	font_title_pink = FontHandler::Font(renderer, title_font_pink_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::TRUE_WHITE);
@@ -1160,34 +1165,46 @@ void Game::render_game_end() {
 
 	// TODO: No longer use death count in score. Possible remove score altogether and just display time, orbs, and highscores for those.
 
+	// TODO: JUST DISPLAY TIME, ORBS, and HIGHSCORES FOR EACH. (and deaths)
+
 	// Calculate score (has to be signed so that it can be stopped from going below 0)
-	int16_t score = GAME::SCORE::INITIAL;
+	/*int16_t score = GAME::SCORE::INITIAL;
 	score += GAME::SCORE::ORB * player.get_orb_count();
 	score -= GAME::SCORE::TIME * (uint16_t)timer_handler.get_timer(TIMER_ID::GAME_DURATION);
 	score -= GAME::SCORE::DEATH * player.get_death_count();
 
 	if (score < 0) {
 		score = 0;
-	}
+	}*/
 
 	// Convert to strings
 	std::string time_string = trim_precision(std::to_string(timer_handler.get_timer(TIMER_ID::GAME_DURATION)), MENU::FLOAT_TEXT_PRECISION);
+	std::string time_high_string = trim_precision(std::to_string(data.highscore_times[current_level]), MENU::FLOAT_TEXT_PRECISION);
+
 	std::string orbs_string = std::to_string(player.get_orb_count());
+	std::string orbs_high_string = std::to_string(data.highscore_orbs[current_level]);
+
 	std::string death_count_string = std::to_string(player.get_death_count());
-	std::string score_string = std::to_string(score);
 
 	// Display stats
 	TextHandler::render_text(font_white, STRINGS::MENU::LEVEL_COMPLETED::TEXT_TIME_TAKEN + STRINGS::COLON_SPACE, left_x - SPRITES::TEXT_OFFSET_X, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 7, SPRITES::SPACE_WIDTH, TextHandler::CENTER_LEFT);
-	TextHandler::render_text(font_white, STRINGS::MENU::LEVEL_COMPLETED::TEXT_ORBS_COLLECTED + STRINGS::COLON_SPACE, right_x - SPRITES::TEXT_OFFSET_X, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 4, SPRITES::SPACE_WIDTH, TextHandler::CENTER_LEFT);
-	TextHandler::render_text(font_white, STRINGS::MENU::LEVEL_COMPLETED::TEXT_NUMBER_OF_DEATHS + STRINGS::COLON_SPACE, left_x - SPRITES::TEXT_OFFSET_X, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 1, SPRITES::SPACE_WIDTH, TextHandler::CENTER_LEFT);
-	TextHandler::render_text(font_white, STRINGS::MENU::LEVEL_COMPLETED::TEXT_SCORE + STRINGS::COLON_SPACE, right_x - SPRITES::TEXT_OFFSET_X, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE_HALF * 2, SPRITES::SPACE_WIDTH, TextHandler::CENTER_LEFT);
+	TextHandler::render_text(new_highscore.time ? font_highlighted : font_white, STRINGS::MENU::LEVEL_COMPLETED::TEXT_HIGHSCORE + STRINGS::COLON_SPACE, right_x - SPRITES::TEXT_OFFSET_X + SPRITES::SIZE, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 5, SPRITES::SPACE_WIDTH, TextHandler::CENTER_LEFT);
+	
+	TextHandler::render_text(font_white, STRINGS::MENU::LEVEL_COMPLETED::TEXT_ORBS_COLLECTED + STRINGS::COLON_SPACE, left_x - SPRITES::TEXT_OFFSET_X, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 2, SPRITES::SPACE_WIDTH, TextHandler::CENTER_LEFT);
+	TextHandler::render_text(new_highscore.orbs ? font_highlighted : font_white, STRINGS::MENU::LEVEL_COMPLETED::TEXT_HIGHSCORE + STRINGS::COLON_SPACE, right_x - SPRITES::TEXT_OFFSET_X + SPRITES::SIZE, WINDOW::TEXT_SCALED_HEIGHT_HALF, SPRITES::SPACE_WIDTH, TextHandler::CENTER_LEFT);
+	
+	TextHandler::render_text(font_white, STRINGS::MENU::LEVEL_COMPLETED::TEXT_NUMBER_OF_DEATHS + STRINGS::COLON_SPACE, left_x - SPRITES::TEXT_OFFSET_X, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE_HALF * 3, SPRITES::SPACE_WIDTH, TextHandler::CENTER_LEFT);
 
 	TextHandler::render_text(font_white, time_string, left_x + SPRITES::TEXT_OFFSET_X, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 7, SPRITES::SPACE_WIDTH, TextHandler::CENTER_RIGHT);
-	TextHandler::render_text(font_white, orbs_string, right_x + SPRITES::TEXT_OFFSET_X, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 4, SPRITES::SPACE_WIDTH, TextHandler::CENTER_RIGHT);
-	TextHandler::render_text(font_white, death_count_string, left_x + SPRITES::TEXT_OFFSET_X, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 1, SPRITES::SPACE_WIDTH, TextHandler::CENTER_RIGHT);
-	TextHandler::render_text(font_white, score_string, right_x + SPRITES::TEXT_OFFSET_X, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE_HALF * 2, SPRITES::SPACE_WIDTH, TextHandler::CENTER_RIGHT);
+	TextHandler::render_text(new_highscore.time ? font_highlighted : font_white, time_high_string, right_x + SPRITES::TEXT_OFFSET_X, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 5, SPRITES::SPACE_WIDTH, TextHandler::CENTER_RIGHT);
 	
-	TextHandler::render_text(font_selected, STRINGS::MENU::LEVEL_COMPLETED::OPTION_CONTINUE, left_x, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE_HALF * 7, SPRITES::SPACE_WIDTH);
+	TextHandler::render_text(font_white, orbs_string, left_x + SPRITES::TEXT_OFFSET_X, WINDOW::TEXT_SCALED_HEIGHT_HALF - SPRITES::SIZE_HALF * 2, SPRITES::SPACE_WIDTH, TextHandler::CENTER_RIGHT);
+	TextHandler::render_text(new_highscore.orbs ? font_highlighted : font_white, orbs_high_string, right_x + SPRITES::TEXT_OFFSET_X, WINDOW::TEXT_SCALED_HEIGHT_HALF, SPRITES::SPACE_WIDTH, TextHandler::CENTER_RIGHT);
+
+	TextHandler::render_text(font_white, death_count_string, left_x + SPRITES::TEXT_OFFSET_X, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE_HALF * 3, SPRITES::SPACE_WIDTH, TextHandler::CENTER_RIGHT);
+	
+	// Continue button
+	TextHandler::render_text(font_selected, STRINGS::MENU::LEVEL_COMPLETED::OPTION_CONTINUE, right_x, WINDOW::TEXT_SCALED_HEIGHT_HALF + SPRITES::SIZE_HALF * 7, SPRITES::SPACE_WIDTH);
 
 
 	// Display fade-in black rect
@@ -1288,10 +1305,16 @@ void Game::setup_game_paused() {
 
 void Game::setup_game_end() {
 	// Update highscores!
-	if (data.highscore_times.at(current_level) > timer_handler.get_timer(TIMER_ID::GAME_DURATION)) {
+	new_highscore.orbs = false;
+	new_highscore.time = false;
+
+	// If time <= 0.0f, can't be valid, so set it to current time
+	if (data.highscore_times.at(current_level) > timer_handler.get_timer(TIMER_ID::GAME_DURATION) || data.highscore_times.at(current_level) <= 0.0f) {
+		new_highscore.time = true;
 		data.highscore_times.at(current_level) = timer_handler.get_timer(TIMER_ID::GAME_DURATION);
 	}
 	if (data.highscore_orbs.at(current_level) < player.get_orb_count()) {
+		new_highscore.orbs = true;
 		data.highscore_orbs.at(current_level) = player.get_orb_count();
 	}
 
