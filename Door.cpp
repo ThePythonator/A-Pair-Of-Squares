@@ -40,8 +40,9 @@ void Door::render(Spritesheet& spritesheet) {
 	/*if (height < SPRITES::SIZE) {
 		spritesheet.sprite_scaled(type == 0 ? TILE_ID::DOOR::VERTICAL::BLUE_MIDDLE : TILE_ID::DOOR::VERTICAL::PINK_MIDDLE, x, y - height + GAME::DOOR::CLOSE_SIZE);
 	}*/
+	float clamped = std::max(y - height + GAME::DOOR::CLOSE_SIZE, y - SPRITES::SIZE);
 
-	spritesheet.sprite_scaled(type == 0 ? TILE_ID::DOOR::VERTICAL::BLUE_MIDDLE : TILE_ID::DOOR::VERTICAL::PINK_MIDDLE, x, y - height + GAME::DOOR::CLOSE_SIZE);
+	spritesheet.sprite_scaled(type == 0 ? TILE_ID::DOOR::VERTICAL::BLUE_MIDDLE : TILE_ID::DOOR::VERTICAL::PINK_MIDDLE, x, clamped);
 	spritesheet.sprite_scaled(type == 0 ? TILE_ID::DOOR::VERTICAL::BLUE_BOTTOM : TILE_ID::DOOR::VERTICAL::PINK_BOTTOM, x, y - height + GAME::DOOR::CLOSE_SIZE + SPRITES::SIZE);
 }
 

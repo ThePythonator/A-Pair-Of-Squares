@@ -145,6 +145,8 @@ void Game::load_data() {
 	//font_white = FontHandler::Font(renderer, font_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::WHITE);
 	font_selected = FontHandler::Font(renderer, font_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::SELECTED, COLOURS::TRUE_WHITE);
 	font_highlighted = FontHandler::Font(renderer, font_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::HIGHLIGHTED, COLOURS::TRUE_WHITE);
+	font_hint = FontHandler::Font(renderer, font_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_HINT_SCALE, COLOURS::WHITE, COLOURS::TRUE_WHITE);
+	font_hint.set_alpha(SPRITES::TEXT_HINT_ALPHA);
 
 	font_title_blue = FontHandler::Font(renderer, title_font_blue_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::TRUE_WHITE);
 	font_title_pink = FontHandler::Font(renderer, title_font_pink_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::TRUE_WHITE);
@@ -897,6 +899,8 @@ void Game::render_game_running() {
 
 	level_handler.render(spritesheet);
 
+	render_hint();
+
 	player.render(spritesheet);
 
 	// Display fade-in black rect
@@ -1085,6 +1089,8 @@ void Game::render_game_paused() {
 
 	level_handler.render(spritesheet);
 
+	render_hint();
+
 	player.render(spritesheet);
 	
 	// Cause game scene to be partially faded out
@@ -1161,7 +1167,6 @@ void Game::render_game_end() {
 
 	float left_x = positions.first;
 	float right_x = positions.second;
-
 
 	// TODO: No longer use death count in score. Possible remove score altogether and just display time, orbs, and highscores for those.
 
@@ -1489,6 +1494,13 @@ ImageParticle Game::create_game_finish_particle(float x, float y, uint8_t colour
 	float fade = -40.0f;
 
 	return ImageParticle(TILE_ID::PARTICLE::FINISH_BLUE + colour, new_x * position_scale, y * position_scale, x_speed * position_scale, y_speed * position_scale, 0.0f, 0.0f, 0.0f, rand() % 90 - 45, scale, 255, fade);
+}
+
+void Game::render_hint() {
+	// Render help text
+	if (current_level < STRINGS::HINTS.size()) {
+		TextHandler::render_text(font_hint, STRINGS::HINTS[current_level], WINDOW::WIDTH / (2 * SPRITES::TEXT_HINT_SCALE), SPRITES::SIZE * 4, SPRITES::SPACE_WIDTH);
+	}
 }
 
 void Game::fill_menu_shape_particle(uint8_t count) {

@@ -14,6 +14,7 @@ namespace SPRITES {
 	extern const uint8_t SCALE;
 
 	extern const uint8_t TEXT_SCALE;
+	extern const uint8_t TEXT_HINT_SCALE;
 
 	extern const uint8_t SIZE;
 	extern const uint8_t SIZE_HALF;
@@ -23,6 +24,7 @@ namespace SPRITES {
 	extern const uint8_t TEXT_OFFSET_X;// 5 or 6 work too, but text looks too wide when beziering
 
 	extern const uint8_t TEXT_LOCKED_ALPHA;
+	extern const uint8_t TEXT_HINT_ALPHA;
 }
 
 namespace TILE_ID {
@@ -288,6 +290,8 @@ namespace STRINGS {
 	extern const std::string OFF;
 
 	extern const std::string COLON_SPACE;
+
+	extern const std::vector<std::string> HINTS;
 
 	namespace MENU {
 		namespace TITLE {

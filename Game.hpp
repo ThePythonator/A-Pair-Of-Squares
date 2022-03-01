@@ -95,6 +95,8 @@ private:
 
 	ImageParticle create_game_finish_particle(float x, float y, uint8_t id);
 
+	void render_hint();
+
 	void fill_menu_shape_particle(uint8_t count);
 	void setup_menu_shape_particles();
 
@@ -152,7 +154,7 @@ private:
 
 	// Fonts
 	SDL_Texture* font_sheet_texture = NULL;
-	FontHandler::Font font_white, font_selected, font_highlighted, font_title_blue, font_title_pink;
+	FontHandler::Font font_white, font_selected, font_highlighted, font_hint, font_title_blue, font_title_pink;
 
 	// Input handler
 	InputHandler input_handler;
@@ -204,6 +206,8 @@ private:
 	struct {
 		bool audio_music = true;
 		bool audio_sfx = true;
+		//bool show_hints = true;
+
 		uint8_t level_reached = 0;
 		
 		std::vector<float> highscore_times;

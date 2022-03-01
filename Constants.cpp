@@ -6,6 +6,7 @@ namespace SPRITES {
 	const uint8_t SCALE = 2;
 
 	const uint8_t TEXT_SCALE = 4;
+	const uint8_t TEXT_HINT_SCALE = 2;
 
 	const uint8_t SIZE = 16;
 	const uint8_t SIZE_HALF = SIZE / 2;
@@ -15,6 +16,7 @@ namespace SPRITES {
 	const uint8_t TEXT_OFFSET_X = SIZE * 4;// 5 or 6 work too, but text looks too wide when beziering
 
 	const uint8_t TEXT_LOCKED_ALPHA = 96;
+	const uint8_t TEXT_HINT_ALPHA = 128;
 }
 
 namespace TILE_ID {
@@ -302,6 +304,13 @@ namespace STRINGS {
 	const std::string OFF = "Off";
 
 	const std::string COLON_SPACE = ": ";
+
+	extern const std::vector<std::string> HINTS {
+		"Blue and Pink move in opposite directions",
+		"If you want a challenge, try collecting the orbs",
+		"Springs can be used to reach other areas",
+		"Buttons open all doors of the same colour"
+	};
 
 	namespace MENU {
 		namespace TITLE {
