@@ -151,6 +151,9 @@ void Game::load_data() {
 	//font_title_blue = FontHandler::Font(renderer, title_font_blue_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::TRUE_WHITE);
 	//font_title_pink = FontHandler::Font(renderer, title_font_pink_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, COLOURS::TRUE_WHITE);
 
+	font_blue = FontHandler::Font(renderer, font_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, Colour(0x1C, 0x92, 0xA7), COLOURS::TRUE_WHITE);
+	font_pink = FontHandler::Font(renderer, font_sheet_surface, SPRITES::SIZE, SPRITES::TEXT_SCALE, Colour(0xC0, 0x3B, 0x94), COLOURS::TRUE_WHITE);
+
 	SDL_FreeSurface(font_sheet_surface);
 	//SDL_FreeSurface(title_font_blue_sheet_surface);
 	//SDL_FreeSurface(title_font_pink_sheet_surface);
@@ -905,6 +908,13 @@ void Game::render_game_running() {
 	level_handler.render(spritesheet);
 
 	render_hint();
+
+	//TextHandler::render_text(font_white, STRINGS::MENU::TITLE::HEADING, WINDOW::TEXT_SCALED_WIDTH_HALF, SPRITES::SIZE, SPRITES::TITLE_SPACE_WIDTH);
+
+	/*TextHandler::render_text(font_blue, "A", 72.5, SPRITES::SIZE * 4, SPRITES::TITLE_SPACE_WIDTH);
+	TextHandler::render_text(font_pink, "PAIR", 93, SPRITES::SIZE * 4, SPRITES::TITLE_SPACE_WIDTH);
+	TextHandler::render_text(font_blue, "OF", 116.5, SPRITES::SIZE * 4, SPRITES::TITLE_SPACE_WIDTH);
+	TextHandler::render_text(font_pink, "SQUARES", 149.5, SPRITES::SIZE * 4, SPRITES::TITLE_SPACE_WIDTH);*/
 
 	player.render(spritesheet);
 

@@ -45,7 +45,7 @@ if(NOT TARGET SDL2::image)
     # Get SDL2_image (no released version has CMake support)
     FetchContent_Populate(SDL2_image
         GIT_REPOSITORY https://github.com/libsdl-org/SDL_image
-        GIT_TAG        main
+        GIT_TAG        main #3c8c09d3ecd924e4b65a23bb209ba2160ba89c70
     )
     add_subdirectory(${sdl2_image_SOURCE_DIR} SDL2_image EXCLUDE_FROM_ALL)
     #set_property(TARGET jpeg PROPERTY POSITION_INDEPENDENT_CODE ON) # build fix

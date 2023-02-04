@@ -97,7 +97,7 @@ if (NOT EMSCRIPTEN)
     endif()
 
     if(TARGET SDL2_image)
-        list(APPEND DEP_SEARCH_DIRS $<TARGET_FILE_DIR:SDL2_image> $<TARGET_FILE_DIR:png> $<TARGET_FILE_DIR:zlib>)
+        list(APPEND DEP_SEARCH_DIRS $<TARGET_FILE_DIR:SDL2_image>) #$<TARGET_FILE_DIR:png> $<TARGET_FILE_DIR:zlib>
     endif()
 
     if(TARGET SDL2_mixer)
